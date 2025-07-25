@@ -1,0 +1,36 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Base application theme. -->
+    <style name="Base.Theme.ArFitness" parent="Theme.Material3.DayNight.NoActionBar">
+        <!-- Customize your light theme here. -->
+        <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+    </style>
+
+    <style name="Theme.ArFitness" parent="Base.Theme.ArFitness" />
+
+    <!-- Splash Theme -->
+    <style name="SplashTheme" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="android:windowBackground">@color/primary_dark</item>
+        <item name="android:statusBarColor">@color/primary_dark</item>
+        <item name="android:windowLightStatusBar">false</item>
+        <item name="android:navigationBarColor">@color/primary_dark</item>
+        <item name="android:windowLightNavigationBar">false</item>
+    </style>
+    <!-- Ay ve Yıl Başlığı İçin Stil (örn: "Haziran 2025") -->
+    <style name="CalendarHeader" parent="TextAppearance.AppCompat.Medium">
+        <item name="android:textColor">@color/text_main</item> <!-- Ana metin renginiz -->
+        <item name="android:textStyle">bold</item>
+        <item name="android:textSize">18sp</item>
+    </style>
+
+    <!-- Hafta Günleri İçin Stil (Pzt, Sal, Çar...) -->
+    <style name="CalendarWeekDay" parent="TextAppearance.AppCompat.Caption">
+        <item name="android:textColor">@color/text_secondary</item> <!-- İkincil metin renginiz -->
+        <item name="android:textSize">14sp</item>
+    </style>
+
+    <!-- Tarih Sayıları İçin Stil (1, 2, 3...) -->
+    <style name="CalendarDate" parent="TextAppearance.AppCompat.Body1">
+        <item name="android:textColor">@color/text_main</item> <!-- Ana metin renginiz -->
+    </style>
+
+</resources>

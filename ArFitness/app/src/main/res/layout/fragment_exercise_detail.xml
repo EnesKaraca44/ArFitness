@@ -1,0 +1,262 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/primary_dark"
+    tools:context=".fragment.ExerciseDetailFragment">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="24dp">
+
+            <!-- Header with back button and title -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginBottom="24dp">
+
+                <ImageView
+                    android:id="@+id/btnBack"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:background="@drawable/circle_background"
+                    android:padding="8dp"
+                    android:src="@drawable/ic_launcher_foreground"
+                    app:tint="@color/primary"
+                    android:rotation="180" />
+
+                <TextView
+                    android:id="@+id/tvExerciseTitle"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="16dp"
+                    android:text="Egzersiz Adı"
+                    android:textSize="24sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/text_main"
+                    android:gravity="center" />
+
+                <View
+                    android:layout_width="40dp"
+                    android:layout_height="40dp" />
+
+            </LinearLayout>
+
+            <!-- Exercise Animation/Image -->
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="250dp"
+                android:layout_marginBottom="24dp"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="8dp">
+
+                <ImageView
+                    android:id="@+id/ivExerciseAnimation"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:scaleType="centerCrop"
+                    android:background="@color/primary"
+                    android:src="@drawable/ic_fitness" />
+
+            </androidx.cardview.widget.CardView>
+
+            <!-- Target Muscles Section -->
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="4dp"
+                app:cardBackgroundColor="@color/primary">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="🎯 Hedef Kaslar"
+                        android:textSize="18sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/text_main"
+                        android:layout_marginBottom="8dp" />
+
+                    <TextView
+                        android:id="@+id/tvTargetMuscles"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:lineSpacingExtra="4dp"
+                        android:text="Bu egzersiz ile çalışan kas grupları"
+                        android:textColor="@color/black"
+                        android:textSize="16sp" />
+
+                </LinearLayout>
+
+            </androidx.cardview.widget.CardView>
+
+            <!-- Instructions Section -->
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="24dp"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="4dp"
+                app:cardBackgroundColor="@color/primary">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="⚠️ Dikkat Edilmesi Gerekenler"
+                        android:textSize="18sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/text_main"
+                        android:layout_marginBottom="8dp" />
+
+                    <TextView
+                        android:id="@+id/tvInstructions"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:lineSpacingExtra="4dp"
+                        android:text="• Egzersizi yaparken dikkat edilmesi gereken önemli noktalar\n• Yaralanma riskini azaltmak için gerekli önlemler\n• Doğru form ve teknik ipuçları"
+                        android:textColor="@color/black"
+                        android:textSize="16sp" />
+
+                </LinearLayout>
+
+            </androidx.cardview.widget.CardView>
+
+            <!-- Exercise Stats -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="32dp">
+
+                <androidx.cardview.widget.CardView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginEnd="8dp"
+                    app:cardCornerRadius="12dp"
+                    app:cardElevation="4dp"
+                    app:cardBackgroundColor="@color/primary">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="16dp"
+                        android:gravity="center">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="⏱️"
+                            android:textSize="24sp"
+                            android:layout_marginBottom="4dp" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Süre"
+                            android:textSize="14sp"
+                            android:textColor="@color/text_secondary" />
+
+                        <TextView
+                            android:id="@+id/tvDuration"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="5-10 dk"
+                            android:textSize="16sp"
+                            android:textStyle="bold"
+                            android:textColor="@color/text_main" />
+
+                    </LinearLayout>
+
+                </androidx.cardview.widget.CardView>
+
+                <androidx.cardview.widget.CardView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="8dp"
+                    app:cardCornerRadius="12dp"
+                    app:cardElevation="4dp"
+                    app:cardBackgroundColor="@color/primary">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="16dp"
+                        android:gravity="center">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="🔥"
+                            android:textSize="24sp"
+                            android:layout_marginBottom="4dp" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Zorluk"
+                            android:textSize="14sp"
+                            android:textColor="@color/text_secondary" />
+
+                        <TextView
+                            android:id="@+id/tvDifficulty"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Orta"
+                            android:textSize="16sp"
+                            android:textStyle="bold"
+                            android:textColor="@color/text_main" />
+
+                    </LinearLayout>
+
+                </androidx.cardview.widget.CardView>
+
+            </LinearLayout>
+
+            <!-- Start Workout Button -->
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/btnStartWorkout"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:text="🚀 Antrenmanı Başlat"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:textColor="@color/text_main"
+                android:background="@drawable/circle_background"
+                android:backgroundTint="@color/primary"
+                android:elevation="4dp"
+                android:layout_marginBottom="16dp" />
+
+        </LinearLayout>
+
+    </ScrollView>
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout> 

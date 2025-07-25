@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_host"
+    app:startDestination="@id/anasayfaFragment">
+
+    <fragment
+        android:id="@+id/anasayfaFragment"
+        android:name="com.example.arfitness.fragment.AnasayfaFragment"
+        android:label="fragment_anasayfa"
+        tools:layout="@layout/fragment_anasayfa" >
+        <action
+            android:id="@+id/anadanhistorıye"
+            app:destination="@id/historyFragment" />
+        <action
+            android:id="@+id/anadanexercise"
+            app:destination="@id/exerciseFragment" />
+        <action
+            android:id="@+id/anadandetaya"
+            app:destination="@id/exerciseDetailFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/exerciseFragment"
+        android:name="com.example.arfitness.fragment.ExerciseFragment"
+        android:label="fragment_exercise"
+        tools:layout="@layout/fragment_exercise" >
+        <argument
+            android:name="exerciseName"
+            app:argType="string" />
+        <action
+            android:id="@+id/exercisidenresulta"
+            app:destination="@id/resultFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/historyFragment"
+        android:name="com.example.arfitness.fragment.HistoryFragment"
+        android:label="fragment_history"
+        tools:layout="@layout/fragment_history" />
+    <fragment
+        android:id="@+id/resultFragment"
+        android:name="com.example.arfitness.fragment.ResultFragment"
+        android:label="fragment_result"
+        tools:layout="@layout/fragment_result" >
+        <action
+            android:id="@+id/resulttananaya"
+            app:destination="@id/anasayfaFragment" />
+        <argument
+            android:name="workoutResult"
+            app:argType="com.example.arfitness.entitiy.WorkoutResult" />
+    </fragment>
+    <fragment
+        android:id="@+id/exerciseDetailFragment"
+        android:name="com.example.arfitness.fragment.ExerciseDetailFragment"
+        android:label="fragment_exercise_detail"
+        tools:layout="@layout/fragment_exercise_detail" >
+        <action
+            android:id="@+id/exercisdendetaya"
+            app:destination="@id/exerciseFragment" />
+        <argument
+            android:name="egzersizDetay"
+            app:argType="com.example.arfitness.entitiy.EgzersizDetay" />
+    </fragment>
+</navigation>

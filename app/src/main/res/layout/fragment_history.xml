@@ -1,0 +1,336 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/primary_dark"
+    tools:context=".fragment.HistoryFragment">
+
+    <!-- 1. SABİT BAŞLIK VE İSTATİSTİKLER -->
+    <LinearLayout
+        android:id="@+id/layout_top_section"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="20dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <!-- Header Section -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="24dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/history"
+                    android:textColor="@color/text_main"
+                    android:textSize="28sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/tvTotalWorkouts"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:text="@string/workouts_completed"
+                    android:textColor="@color/text_secondary"
+                    android:textSize="14sp" />
+            </LinearLayout>
+
+            <ImageView
+                android:id="@+id/ivFilter"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:background="@drawable/circle_background"
+                android:padding="10dp"
+                android:src="@drawable/ic_history"
+                app:tint="@color/primary" />
+        </LinearLayout>
+
+
+    </LinearLayout>
+
+    <!-- 2. YENİ TAKVİM GÖRÜNÜMÜ -->
+    <com.prolificinteractive.materialcalendarview.MaterialCalendarView
+        android:id="@+id/calendarView"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="12dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        android:paddingBottom="0dp"
+        app:layout_constraintTop_toBottomOf="@id/layout_top_section"
+
+        app:mcv_selectionColor="@color/primary"
+         />
+
+    <!-- 3. FİLTRE ÇİPLERİ (Yatayda kaydırılabilir) -->
+    <HorizontalScrollView
+        android:id="@+id/scroll_chips"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="-25dp"
+        android:paddingTop="0dp"
+        android:scrollbars="none"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/calendarView">
+
+        <com.google.android.material.chip.ChipGroup
+            android:id="@+id/chipGroupFilter"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingHorizontal="20dp"
+            app:selectionRequired="false"
+            app:singleSelection="true">
+            <!-- TÜM CHIP'LERİN BURADA -->
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chipAll"
+                style="@style/Widget.MaterialComponents.Chip.Filter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/all"
+                android:checked="true"/>
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chipSquat"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Squat"
+                android:checkable="true"
+                app:chipBackgroundColor="@color/card_bg"
+                app:chipStrokeColor="@color/primary"
+                app:chipStrokeWidth="1dp"
+                android:textColor="@color/text_main" />
+
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chipPushup"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Push-up"
+                android:checkable="true"
+                app:chipBackgroundColor="@color/card_bg"
+                app:chipStrokeColor="@color/primary"
+                app:chipStrokeWidth="1dp"
+                android:textColor="@color/text_main" />
+
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chipBiceps"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Biceps"
+                android:checkable="true"
+                app:chipBackgroundColor="@color/card_bg"
+                app:chipStrokeColor="@color/primary"
+                app:chipStrokeWidth="1dp"
+                android:textColor="@color/text_main" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chipshulderpress"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Shoulder press"
+                android:checkable="true"
+                app:chipBackgroundColor="@color/card_bg"
+                app:chipStrokeColor="@color/primary"
+                app:chipStrokeWidth="1dp"
+                android:textColor="@color/text_main" />
+
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chipLunge"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Lunge"
+                android:checkable="true"
+                app:chipBackgroundColor="@color/card_bg"
+                app:chipStrokeColor="@color/primary"
+                app:chipStrokeWidth="1dp"
+                android:textColor="@color/text_main" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chipdumbelfly"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Dumbell fly"
+                android:checkable="true"
+                app:chipBackgroundColor="@color/card_bg"
+                app:chipStrokeColor="@color/primary"
+                app:chipStrokeWidth="1dp"
+                android:textColor="@color/text_main" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chipBenchPress"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/bench_press"
+                android:checkable="true"
+                app:chipBackgroundColor="@color/card_bg"
+                app:chipStrokeColor="@color/primary"
+                app:chipStrokeWidth="1dp"
+                android:textColor="@color/text_main" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chipPlank"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/plank"
+                android:checkable="true"
+                app:chipBackgroundColor="@color/card_bg"
+                app:chipStrokeColor="@color/primary"
+                app:chipStrokeWidth="1dp"
+                android:textColor="@color/text_main" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chipPullUp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/pull_up"
+                android:checkable="true"
+                app:chipBackgroundColor="@color/card_bg"
+                app:chipStrokeColor="@color/primary"
+                app:chipStrokeWidth="1dp"
+                android:textColor="@color/text_main" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chipLatPulldown"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/lat_pulldown"
+                android:checkable="true"
+                app:chipBackgroundColor="@color/card_bg"
+                app:chipStrokeColor="@color/primary"
+                app:chipStrokeWidth="1dp"
+                android:textColor="@color/text_main" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chipHammerCurl"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/hammer_curl"
+                android:checkable="true"
+                app:chipBackgroundColor="@color/card_bg"
+                app:chipStrokeColor="@color/primary"
+                app:chipStrokeWidth="1dp"
+                android:textColor="@color/text_main" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chipCablePushdown"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/cable_pushdown"
+                android:checkable="true"
+                app:chipBackgroundColor="@color/card_bg"
+                app:chipStrokeColor="@color/primary"
+                app:chipStrokeWidth="1dp"
+                android:textColor="@color/text_main" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chipLateralRaise"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/lateral_raise"
+                android:checkable="true"
+                app:chipBackgroundColor="@color/card_bg"
+                app:chipStrokeColor="@color/primary"
+                app:chipStrokeWidth="1dp"
+                android:textColor="@color/text_main" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chipFrontRaise"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/front_raise"
+                android:checkable="true"
+                app:chipBackgroundColor="@color/card_bg"
+                app:chipStrokeColor="@color/primary"
+                app:chipStrokeWidth="1dp"
+                android:textColor="@color/text_main" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chipDeadlift"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/deadlift"
+                android:checkable="true"
+                app:chipBackgroundColor="@color/card_bg"
+                app:chipStrokeColor="@color/primary"
+                app:chipStrokeWidth="1dp"
+                android:textColor="@color/text_main" />
+
+        </com.google.android.material.chip.ChipGroup>
+        </HorizontalScrollView>
+
+    <!-- 4. ANTRENMAN LİSTESİ (Kendi içinde kaydırılabilir) -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvWorkoutHistory"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="8dp"
+        android:paddingHorizontal="16dp"
+        android:clipToPadding="false"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/scroll_chips"
+        tools:listitem="@layout/item_workout_history" />
+
+    <!-- 5. BOŞ DURUM GÖRÜNÜMÜ (Liste boşken gösterilir) -->
+    <LinearLayout
+        android:id="@+id/layoutEmptyState"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/scroll_chips"
+        app:layout_constraintVertical_bias="0.0"
+        tools:visibility="visible">
+
+        <ImageView
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:alpha="0.5"
+            android:src="@drawable/ic_history"
+            app:tint="@color/text_secondary" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="@string/no_workout_history"
+            android:textColor="@color/text_secondary"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:gravity="center"
+            android:text="@string/start_first_workout"
+            android:textColor="@color/text_secondary"
+            android:textSize="14sp" />
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

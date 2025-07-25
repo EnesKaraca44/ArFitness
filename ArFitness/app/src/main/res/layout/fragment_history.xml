@@ -1,0 +1,295 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true"
+    android:background="@color/primary_dark"
+    tools:context=".fragment.HistoryFragment">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="20dp">
+
+        <!-- Header Section -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="24dp">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Geçmiş"
+                    android:textColor="@color/text_main"
+                    android:textSize="28sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/tvTotalWorkouts"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="12 antrenman tamamlandı"
+                    android:textColor="@color/text_secondary"
+                    android:textSize="14sp"
+                    android:layout_marginTop="4dp" />
+
+            </LinearLayout>
+
+            <ImageView
+                android:id="@+id/ivFilter"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:background="@drawable/circle_background"
+                android:padding="10dp"
+                android:src="@drawable/ic_history"
+                app:tint="@color/primary" />
+
+        </LinearLayout>
+
+        <!-- Stats Cards Section -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="24dp">
+
+            <!-- Total Time Card -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="0dp"
+                android:layout_height="80dp"
+                android:layout_weight="1"
+                android:layout_marginEnd="8dp"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="0dp"
+                app:strokeColor="@color/card_bg"
+                app:strokeWidth="1dp"
+                android:backgroundTint="@color/card_bg">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:padding="12dp">
+
+                    <TextView
+                        android:id="@+id/tvTotalTime"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="4h 32m"
+                        android:textColor="@color/primary"
+                        android:textSize="18sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Toplam Süre"
+                        android:textColor="@color/text_secondary"
+                        android:textSize="12sp" />
+
+                </LinearLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Best Score Card -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="0dp"
+                android:layout_height="80dp"
+                android:layout_weight="1"
+                android:layout_marginStart="8dp"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="0dp"
+                app:strokeColor="@color/card_bg"
+                app:strokeWidth="1dp"
+                android:backgroundTint="@color/card_bg">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:padding="12dp">
+
+                    <TextView
+                        android:id="@+id/tvBestScore"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="95%"
+                        android:textColor="@color/primary"
+                        android:textSize="18sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="En İyi Skor"
+                        android:textColor="@color/text_secondary"
+                        android:textSize="12sp" />
+
+                </LinearLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+
+        </LinearLayout>
+
+        <HorizontalScrollView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="20dp"
+            android:scrollbars="none">
+
+        <!-- Filter Chips -->
+        <com.google.android.material.chip.ChipGroup
+            android:id="@+id/chipGroupFilter"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="20dp"
+            app:singleSelection="true"
+            app:selectionRequired="false">
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chipAll"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Tümü"
+                android:checkable="true"
+                android:checked="true"
+                app:chipBackgroundColor="@color/card_bg"
+                app:chipStrokeColor="@color/primary"
+                app:chipStrokeWidth="1dp"
+                android:textColor="@color/text_main" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chipSquat"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Squat"
+                android:checkable="true"
+                app:chipBackgroundColor="@color/card_bg"
+                app:chipStrokeColor="@color/primary"
+                app:chipStrokeWidth="1dp"
+                android:textColor="@color/text_main" />
+
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chipPushup"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Push-up"
+                android:checkable="true"
+                app:chipBackgroundColor="@color/card_bg"
+                app:chipStrokeColor="@color/primary"
+                app:chipStrokeWidth="1dp"
+                android:textColor="@color/text_main" />
+
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chipBiceps"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Biceps"
+                android:checkable="true"
+                app:chipBackgroundColor="@color/card_bg"
+                app:chipStrokeColor="@color/primary"
+                app:chipStrokeWidth="1dp"
+                android:textColor="@color/text_main" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chipshulderpress"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Shoulder press"
+                android:checkable="true"
+                app:chipBackgroundColor="@color/card_bg"
+                app:chipStrokeColor="@color/primary"
+                app:chipStrokeWidth="1dp"
+                android:textColor="@color/text_main" />
+
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chipLunge"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Lunge"
+                android:checkable="true"
+                app:chipBackgroundColor="@color/card_bg"
+                app:chipStrokeColor="@color/primary"
+                app:chipStrokeWidth="1dp"
+                android:textColor="@color/text_main" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chipdumbelfly"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Dumbell flys"
+                android:checkable="true"
+                app:chipBackgroundColor="@color/card_bg"
+                app:chipStrokeColor="@color/primary"
+                app:chipStrokeWidth="1dp"
+                android:textColor="@color/text_main" />
+
+
+        </com.google.android.material.chip.ChipGroup>
+        </HorizontalScrollView>
+
+        <!-- Empty State View -->
+        <LinearLayout
+            android:id="@+id/layoutEmptyState"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:padding="40dp"
+            android:visibility="gone">
+
+            <ImageView
+                android:layout_width="80dp"
+                android:layout_height="80dp"
+                android:src="@drawable/ic_history"
+                app:tint="@color/text_secondary"
+                android:alpha="0.5" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Henüz Antrenman Geçmişi Yok"
+                android:textColor="@color/text_secondary"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:layout_marginTop="16dp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="İlk antrenmanınızı başlatarak geçmişinizi oluşturmaya başlayın"
+                android:textColor="@color/text_secondary"
+                android:textSize="14sp"
+                android:gravity="center"
+                android:layout_marginTop="8dp" />
+
+        </LinearLayout>
+
+        <!-- Workout History List -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rvWorkoutHistory"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:nestedScrollingEnabled="false"
+            tools:listitem="@layout/item_workout_history" />
+
+    </LinearLayout>
+
+</ScrollView>

@@ -1,0 +1,185 @@
+<resources>
+    <string name="app_name">ArFitness</string>
+    
+    <!-- Welcome and Main Screen -->
+    <string name="welcome_message">Hoş Geldin</string>
+    <string name="ready_for_workouts">Hazırsan Başarılar Dolu Antrenmanlar!</string>
+    
+    <!-- Exercise Screen -->
+    <string name="repetitions">Tekrar</string>
+    <string name="duration">Süre</string>
+    <string name="time">Süre</string>
+    <string name="live">LIVE</string>
+    <string name="perfect_feedback">Mükemmel! Sırtını dik tut ve temponu koru.</string>
+    <string name="finish_workout">Antrenmanı Bitir</string>
+    <string name="start">Başla</string>
+    <string name="get_ready">Harekete Başla!</string>
+    <string name="start_exercise">Egzersize Başla!</string>
+    <string name="time_up">Süre Doldu! Harika İş!</string>
+    
+    <!-- History Screen -->
+    <string name="history">Geçmiş</string>
+    <string name="workouts_completed">%d antrenman tamamlandı</string>
+    <string name="total_time">Toplam Süre</string>
+    <string name="best_score">En İyi Skor</string>
+    <string name="all">Tümü</string>
+    <string name="form_score">Form Skoru</string>
+    <string name="calories">Kalori</string>
+    <string name="form_analysis">Form Analizi</string>
+    <string name="good_form">İyi Form</string>
+    <string name="perfect_form">Mükemmel Form</string>
+    <string name="improvable">Geliştirilebilir</string>
+    <string name="detail">Detay</string>
+    <string name="repeat">Tekrarla</string>
+    
+    <!-- Empty State -->
+    <string name="no_workout_history">Henüz Antrenman Geçmişi Yok</string>
+    <string name="start_first_workout">İlk antrenmanınızı başlatarak geçmişinizi oluşturmaya başlayın</string>
+    
+    <!-- Result Screen -->
+    <string name="congratulations">Tebrikler! Antrenman Tamamlandı!</string>
+    <string name="exercise_label">Egzersiz: %s</string>
+
+    <string name="duration_label">Süre: %s</string>
+    <string name="go_home">Ana Sayfaya Dön</string>
+    
+    <!-- Exercise Detail Screen -->
+    <string name="exercise_name">Egzersiz Adı</string>
+    <string name="target_muscles">🎯 Hedef Kaslar</string>
+    <string name="target_muscles_description">Bu egzersiz ile çalışan kas grupları</string>
+    <string name="important_points">⚠️ Dikkat Edilmesi Gerekenler</string>
+    <string name="instructions_template">• Egzersizi yaparken dikkat edilmesi gereken önemli noktalar\n• Yaralanma riskini azaltmak için gerekli önlemler\n• Doğru form ve teknik ipuçları</string>
+    <string name="difficulty">Zorluk</string>
+    <string name="start_workout_emoji">🚀 Antrenmanı Başlat</string>
+    
+    <!-- Exercise Names -->
+    <string name="squat">Squat</string>
+    <string name="push_up">Push-Up</string>
+    <string name="bicep_curl">Bicep Curl</string>
+    <string name="shoulder_press">Shoulder Press</string>
+    <string name="lunge">Lunge</string>
+    <string name="dumbbell_fly">Dumbbell Fly</string>
+    <string name="bench_press">Bench Press</string>
+    <string name="plank">Plank</string>
+    <string name="pull_up">Pull-up</string>
+    <string name="lat_pulldown">Lat Pulldown</string>
+    <string name="hammer_curl">Hammer Curl</string>
+    <string name="cable_pushdown">Cable Pushdown</string>
+    <string name="lateral_raise">Lateral Raise</string>
+    <string name="front_raise">Front Raise</string>
+    <string name="deadlift">Deadlift</string>
+    
+    <!-- Exercise Descriptions -->
+    <string name="squat_description">Bacak kaslarını çalıştırır</string>
+    <string name="leg_muscles">Kalça, Ön Bacak, Arka Bacak</string>
+    <string name="chest_shoulder_tricep">Göğüs, Omuz, Arka Kol</string>
+    <string name="biceps">Pazu (Biceps)</string>
+    <string name="shoulders">Omuz (Deltoid)</string>
+    <string name="leg_complex">Bacak (Quadriceps, Hamstring, Gluteus)</string>
+    <string name="chest">Göğüs (Pectoralis Major)</string>
+    <string name="core_abs">Karın, Core Bölgesi</string>
+    <string name="lats_biceps_upper_back">Sırt (Latissimus Dorsi), Pazu</string>
+    <string name="forearms_brachialis">Pazu (Brachialis), Ön Kol</string>
+    <string name="triceps">Arka Kol (Triceps)</string>
+    <string name="side_deltoids">Omuz (Yan Deltoid)</string>
+    <string name="front_deltoids">Omuz (Ön Deltoid)</string>
+    <string name="full_body">Tüm Vücut (Sırt, Kalça, Bacak)</string>
+    
+    <!-- Exercise Instructions -->
+    <string name="squat_instructions">• Sırtınızı dik tutun.\n• Dizlerinizin parmak uçlarınızı geçmemesine özen gösterin.</string>
+    <string name="pushup_instructions">• Vücudunuzu baştan topuklara kadar düz bir çizgi halinde tutun.</string>
+    <string name="bicep_instructions">• Dirseklerinizi vücudunuza sabit tutarak dumbbell\'ları omuzlarınıza doğru kaldırın.</string>
+    <string name="shoulder_press_instructions">• Dumbbell\'ları omuz hizasında avuç içleriniz ileri bakacak şekilde tutun.\n• Kollarınızı tamamen yukarı kaldırana kadar dumbbell\'ları başınızın üzerine doğru itin.\n• Kontrollü bir şekilde başlangıç pozisyonuna geri dönün.</string>
+    <string name="lunge_instructions">• Bir ayağınızla öne doğru büyük bir adım atın.\n• Her iki dizinizi de yaklaşık 90 derece bükerek arka diziniz yere yaklaşana kadar vücudunuzu indirin.\n• Ön dizinizin ayak bileğinizin üzerinde olduğundan emin olun.\n• Başlangıç pozisyonuna geri dönmek için ön ayağınızla itin ve diğer bacağınızla tekrarlayın.</string>
+    <string name="dumbbell_fly_instructions">• Sırt üstü bir bench\'e uzanın, her elinizde birer dumbbell tutun.\n• Kollarınızı hafifçe bükerek dumbbell\'ları göğsünüzün üzerinde birleştirin, avuç içleriniz birbirine baksın.\n• Kontrollü bir şekilde kollarınızı yana doğru açarak dumbbell\'ları omuz hizasına indirin, göğsünüzde bir gerilme hissedin.\n• Göğüs kaslarınızı sıkarak dumbbell\'ları tekrar yukarı kaldırın.</string>
+    <string name="bench_press_instructions">• Sırt üstü uzanın. Barı veya dumbbell\'ları göğüs hizanıza indirip, kollarınızı tamamen kilitleyene kadar yukarı itin.</string>
+    <string name="plank_instructions">• Dirsekler üzerinde, vücut baştan topuklara kadar düz bir çizgide sabit durun.</string>
+    <string name="pull_up_instructions">• Geniş tutuşla barı kavrayın. Kendinizi, çeneniz barı geçene kadar yukarı çekin ve yavaşça başlangıç pozisyonuna inin.</string>
+    <string name="lat_pulldown_instructions">• Geniş tutuşla barı kavrayın. Sırtınızı hafifçe geriye yaslayarak barı göğsünüzün üstüne doğru çekin ve yavaşça yukarı salın.</string>
+    <string name="hammer_curl_instructions">• Avuç içleri birbirine bakacak şekilde dumbbell\'ları kavrayın. Dirseklerinizi vücudunuza sabit tutarak dumbbell\'ları omuzlarınıza doğru kaldırın.</string>
+    <string name="cable_pushdown_instructions">• Makarayı en üst seviyeye ayarlayın. Dirseklerinizi vücudunuza yakın tutarak barı aşağıya doğru, kollarınız düzelene kadar itin.</string>
+    <string name="lateral_raise_instructions">• Dirseklerinizi hafifçe kırık tutarak, dumbbell\'ları omuz hizasına gelene kadar yanlara doğru kaldırın. Hile yapmaktan kaçının.</string>
+    <string name="front_raise_instructions">• Dumbbell\'ları vücudunuzun önünde tutun. Kollarınızı, omuz hizasına gelene kadar dümdüz öne doğru kaldırın.</string>
+    <string name="deadlift_instructions">• Sırtınızı kesinlikle düz tutarak, kalçanızı geriye itin ve barı/dumbbell\'ları yerden kaldırın. Hareketi kalça ve bacak gücüyle yapın.</string>
+    
+    <!-- Difficulty Levels -->
+    <string name="beginner">Başlangıç</string>
+    <string name="intermediate">Orta</string>
+    <string name="hard">Zor</string>
+    <string name="advanced">İleri Seviye</string>
+    
+    <!-- Duration -->
+    <string name="duration_1_3_min">1-3 dk</string>
+    <string name="duration_2_4_min">2-4 dk</string>
+    <string name="duration_3_5_min">3-5 dk</string>
+    <string name="duration_3_6_min">3-6 dk</string>
+    <string name="duration_4_6_min">4-6 dk</string>
+    <string name="duration_4_7_min">4-7 dk</string>
+    <string name="duration_5_8_min">5-8 dk</string>
+    <string name="duration_7_12_min">7-12 dk</string>
+    
+    <!-- Exercise Feedback Messages -->
+    <string name="body_not_fully_visible">Vücut tam olarak görünmüyor.</string>
+    <string name="shoulder_level_start">Omuz hizasında başla!</string>
+    <string name="lock_arms_overhead">Kollarını tepede tam kilitle!</string>
+    <string name="controlled_slow">Kontrollü ve yavaş ol!</string>
+    <string name="great_rep_counted">Harika! %d. tekrar!</string>
+    <string name="arms_not_visible">Kolların tam olarak görünmüyor.</string>
+    <string name="get_position">Pozisyon al!</string>
+    <string name="dont_lower_hips">Kalçanı düşürme, vücudunu düz tut!</string>
+    <string name="form_perfect">Formun harika!</string>
+    <string name="thats_it_rep">İşte bu! %d. tekrar</string>
+    <string name="body_not_visible">Vücudun tam görünmüyor.</string>
+    <string name="wider_step">Adımını daha geniş at!</string>
+    <string name="going_great">Harika gidiyorsun!</string>
+    <string name="rep_completed">%d. tekrar tamamlandı!</string>
+    <string name="upper_body_not_visible">Vücudunun üst kısmı tam görünmüyor.</string>
+    <string name="lying_position_start">Yatar pozisyonda başla!</string>
+    <string name="dont_bend_elbows">Dirseklerini çok kırma, kollarını daha düz tut!</string>
+    <string name="squeeze_chest">Göğsünü sıkarak kapat!</string>
+    <string name="rep_great">%d. tekrar harika!</string>
+    <string name="keep_elbow_stable">Dirseğini sabit tut, omuzdan güç alma!</string>
+    <string name="great_form">Harika form!</string>
+    <string name="arm_not_visible">Kolun tam olarak görünmüyor.</string>
+    
+    <!-- Permissions -->
+    <string name="camera_permission_required">Uygulamanın çalışması için kamera izni gereklidir.</string>
+    
+    <!-- Template strings for dynamic content -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    
+    <!-- Splash Screen -->
+    <string name="splash_text">Kameranı Aç,Hareketi Yap,\nAI Sana Koçluk yapsın</string>
+    
+    <!-- User Profile Screen -->
+    <string name="profile">Profil</string>
+    <string name="settings">Ayarlar</string>
+    <string name="user_name">Kullanıcı Adı</string>
+    <string name="user_email">user@email.com</string>
+    <string name="edit_profile">Profili Düzenle</string>
+    <string name="profile_picture">Profil Fotoğrafı</string>
+    <string name="total_workouts">Toplam Antrenman</string>
+    <string name="total_reps">Toplam Tekrar</string>
+    <string name="personal_information">Kişisel Bilgiler</string>
+    <string name="preferences">Tercihler</string>
+    <string name="about">Hakkında</string>
+    <string name="logout">Çıkış Yap</string>
+    
+    <!-- Onboarding Screen -->
+    <string name="welcome_to_arfitness">ArFitness\'e Hoş Geldin!</string>
+    <string name="onboarding_description">AI destekli antrenman koçu ile formunu geliştir ve hedeflerine ulaş</string>
+    <string name="lets_get_started">Hadi Başlayalım!</string>
+    <string name="your_name">İsmin</string>
+    <string name="enter_your_name">İsmini gir</string>
+    <string name="your_email">E-posta</string>
+    <string name="enter_your_email">E-posta adresini gir</string>
+    <string name="your_goal">Hedefin</string>
+    <string name="select_your_goal">Hedefini seç</string>
+    <string name="weight_loss">Kilo Verme</string>
+    <string name="muscle_gain">Kas Kazanma</string>
+    <string name="general_fitness">Genel Fitness</string>
+    <string name="strength_training">Güç Antrenmanı</string>
+    <string name="start_journey">Yolculuğunu Başlat</string>
+    <string name="please_fill_all_fields">Lütfen tüm alanları doldurun</string>
+    
+</resources>

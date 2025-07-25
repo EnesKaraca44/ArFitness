@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/primary_dark"
+    tools:context=".fragment.AnasayfaFragment">
+
+    <!-- Ana layout olarak LinearLayout kullanıyoruz, bu yapıyı koruyoruz -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <!-- 1. ÜST BAŞLIK BÖLÜMÜ (Senin tasarımınla aynı) -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingHorizontal="24dp"
+            android:paddingTop="24dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/tvWelcome"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/welcome_message"
+                    android:textColor="@color/text_main"
+                    android:textSize="28sp"
+                    android:textStyle="bold" />
+
+                <ImageView
+                    android:id="@+id/btnHistory"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:background="@drawable/circle_background"
+                    android:padding="8dp"
+                    android:src="@drawable/ic_history"
+                    app:tint="@color/primary" />
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="16dp"
+                android:text="@string/ready_for_workouts"
+                android:textColor="@color/text_secondary"
+                android:textSize="15sp" />
+        </LinearLayout>
+
+        <!-- 2. YATAY KATEGORİ LİSTESİ (Yeni eklenen kısım) -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rvCategories"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            android:clipToPadding="false"
+            android:paddingHorizontal="20dp"
+            tools:listitem="@layout/item_category" />
+        <!-- item_category.xml adında bir layout oluşturman gerekecek -->
+
+        <!-- 3. DİKEY EGZERSİZ LİSTESİ (Senin tasarımınla aynı, sadece layout_weight kaldırıldı) -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rvExercises"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="16dp"
+            android:paddingHorizontal="16dp"
+            android:clipToPadding="false"
+            android:paddingBottom="16dp"
+            android:scrollbars="vertical"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            tools:listitem="@layout/item_exercise"/>
+
+    </LinearLayout>
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

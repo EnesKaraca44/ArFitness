@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/primary_dark"
+    tools:context=".fragment.AnasayfaFragment">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:padding="24dp"
+        android:background="@color/primary_dark">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="24dp">
+
+            <TextView
+                android:id="@+id/tvWelcome"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Hoş Geldin"
+                android:textSize="28sp"
+                android:textStyle="bold"
+                android:textColor="@color/text_main" />
+
+            <ImageView
+                android:id="@+id/btnHistory"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:background="@drawable/circle_background"
+                android:padding="8dp"
+                android:src="@drawable/ic_history"
+                app:tint="@color/primary" />
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Hazırsan Başarılar Dolu Antrenmanlar!"
+            android:textSize="15sp"
+            android:textColor="@color/text_secondary"
+            android:layout_marginBottom="24dp" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rvExercises"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:clipToPadding="false"
+            android:paddingBottom="16dp"
+            android:scrollbars="vertical" />
+
+    </LinearLayout>
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

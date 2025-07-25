@@ -1,0 +1,182 @@
+<resources>
+    <string name="app_name">ArFitness</string>
+    
+    <!-- Welcome and Main Screen -->
+    <string name="welcome_message">Welcome</string>
+    <string name="ready_for_workouts">Ready for Successful Workouts!</string>
+    
+    <!-- Exercise Screen -->
+    <string name="repetitions">Reps</string>
+    <string name="duration">Duration</string>
+    <string name="time">Time</string>
+    <string name="live">LIVE</string>
+    <string name="perfect_feedback">Perfect! Keep your back straight and maintain your pace.</string>
+    <string name="finish_workout">Finish Workout</string>
+    <string name="start">Start</string>
+    <string name="get_ready">Get Ready to Move!</string>
+    <string name="start_exercise">Start Exercise!</string>
+    <string name="time_up">Time\'s Up! Great Job!</string>
+    
+    <!-- History Screen -->
+    <string name="history">History</string>
+    <string name="workouts_completed">%d workouts completed</string>
+    <string name="total_time">Total Time</string>
+    <string name="best_score">Best Score</string>
+    <string name="all">All</string>
+    <string name="form_score">Form Score</string>
+    <string name="calories">Calories</string>
+    <string name="form_analysis">Form Analysis</string>
+    <string name="good_form">Good Form</string>
+    <string name="perfect_form">Perfect Form</string>
+    <string name="improvable">Needs Improvement</string>
+    <string name="detail">Details</string>
+    <string name="repeat">Repeat</string>
+    
+    <!-- Empty State -->
+    <string name="no_workout_history">No Workout History Yet</string>
+    <string name="start_first_workout">Start your first workout to begin building your history</string>
+    
+    <!-- Result Screen -->
+    <string name="congratulations">Congratulations! Workout Completed!</string>
+    <string name="exercise_label">Exercise: %s</string>
+
+    <string name="duration_label">Duration: %s</string>
+    <string name="go_home">Go to Home</string>
+    
+    <!-- Exercise Detail Screen -->
+    <string name="exercise_name">Exercise Name</string>
+    <string name="target_muscles">🎯 Target Muscles</string>
+    <string name="target_muscles_description">Muscle groups worked by this exercise</string>
+    <string name="important_points">⚠️ Important Points to Consider</string>
+    <string name="instructions_template">• Important points to consider while doing the exercise\n• Necessary precautions to reduce injury risk\n• Correct form and technique tips</string>
+    <string name="difficulty">Difficulty</string>
+    <string name="start_workout_emoji">🚀 Start Workout</string>
+    
+    <!-- Exercise Names -->
+    <string name="squat">Squat</string>
+    <string name="push_up">Push-Up</string>
+    <string name="bicep_curl">Bicep Curl</string>
+    <string name="shoulder_press">Shoulder Press</string>
+    <string name="lunge">Lunge</string>
+    <string name="dumbbell_fly">Dumbbell Fly</string>
+    <string name="bench_press">Bench Press</string>
+    <string name="plank">Plank</string>
+    <string name="pull_up">Pull-up</string>
+    <string name="lat_pulldown">Lat Pulldown</string>
+    <string name="hammer_curl">Hammer Curl</string>
+    <string name="cable_pushdown">Cable Pushdown</string>
+    <string name="lateral_raise">Lateral Raise</string>
+    <string name="front_raise">Front Raise</string>
+    <string name="deadlift">Deadlift</string>
+    
+    <!-- Exercise Descriptions -->
+    <string name="squat_description">Works leg muscles</string>
+    <string name="leg_muscles">Glutes, Quadriceps, Hamstrings</string>
+    <string name="chest_shoulder_tricep">Chest, Shoulders, Triceps</string>
+    <string name="biceps">Biceps</string>
+    <string name="shoulders">Shoulders (Deltoids)</string>
+    <string name="leg_complex">Legs (Quadriceps, Hamstrings, Glutes)</string>
+    <string name="chest">Chest (Pectoralis Major)</string>
+    <string name="core_abs">Core, Abdominals</string>
+    <string name="lats_biceps_upper_back">Lats (Latissimus Dorsi), Biceps</string>
+    <string name="forearms_brachialis">Brachialis, Forearms</string>
+    <string name="triceps">Triceps</string>
+    <string name="side_deltoids">Shoulders (Side Deltoids)</string>
+    <string name="front_deltoids">Shoulders (Front Deltoids)</string>
+    <string name="full_body">Full Body (Back, Glutes, Legs)</string>
+    
+    <!-- Exercise Instructions -->
+    <string name="squat_instructions">• Keep your back straight.\n• Make sure your knees don\'t extend past your toes.</string>
+    <string name="pushup_instructions">• Keep your body in a straight line from head to heels.</string>
+    <string name="bicep_instructions">• Keep your elbows fixed to your body while lifting dumbbells towards your shoulders.</string>
+    <string name="shoulder_press_instructions">• Hold dumbbells at shoulder level with palms facing forward.\n• Push dumbbells overhead until arms are fully extended.\n• Return to starting position in a controlled manner.</string>
+    <string name="lunge_instructions">• Take a large step forward with one foot.\n• Bend both knees to about 90 degrees, lowering your body until back knee nearly touches the ground.\n• Make sure your front knee is over your ankle.\n• Push with your front foot to return to starting position and repeat with other leg.</string>
+    <string name="dumbbell_fly_instructions">• Lie on a bench with a dumbbell in each hand.\n• Bring dumbbells together above your chest with arms slightly bent, palms facing each other.\n• Lower dumbbells to shoulder level in a controlled arc, feeling a stretch in your chest.\n• Squeeze chest muscles to bring dumbbells back up.</string>
+    <string name="bench_press_instructions">• Lie on a bench. Lower the bar or dumbbells to chest level, then push up until arms are fully locked.</string>
+    <string name="plank_instructions">• Hold position on your elbows, keep your body in a straight line from head to heels.</string>
+    <string name="pull_up_instructions">• Grip the bar with a wide grip. Pull yourself up until your chin clears the bar, then lower slowly to starting position.</string>
+    <string name="lat_pulldown_instructions">• Grip the bar with a wide grip. Lean slightly back and pull the bar down to your upper chest, then slowly release.</string>
+    <string name="hammer_curl_instructions">• Hold dumbbells with palms facing each other. Keep elbows fixed to your body while lifting dumbbells towards your shoulders.</string>
+    <string name="cable_pushdown_instructions">• Set the pulley to the highest level. Keep elbows close to your body and push the bar down until your arms are straight.</string>
+    <string name="lateral_raise_instructions">• Keep elbows slightly bent, lift dumbbells to the side until they reach shoulder level. Avoid using momentum.</string>
+    <string name="front_raise_instructions">• Hold dumbbells in front of your body. Lift your arms straight forward until they reach shoulder level.</string>
+    <string name="deadlift_instructions">• Keep your back absolutely straight, push your hips back and lift the bar/dumbbells from the ground. Use hip and leg power for the movement.</string>
+    
+    <!-- Difficulty Levels -->
+    <string name="beginner">Beginner</string>
+    <string name="intermediate">Intermediate</string>
+    <string name="hard">Hard</string>
+    <string name="advanced">Advanced</string>
+    
+    <!-- Duration -->
+    <string name="duration_1_3_min">1-3 min</string>
+    <string name="duration_2_4_min">2-4 min</string>
+    <string name="duration_3_5_min">3-5 min</string>
+    <string name="duration_3_6_min">3-6 min</string>
+    <string name="duration_4_6_min">4-6 min</string>
+    <string name="duration_4_7_min">4-7 min</string>
+    <string name="duration_5_8_min">5-8 min</string>
+    <string name="duration_7_12_min">7-12 min</string>
+    
+    <!-- Exercise Feedback Messages -->
+    <string name="body_not_fully_visible">Body not fully visible.</string>
+    <string name="shoulder_level_start">Start at shoulder level!</string>
+    <string name="lock_arms_overhead">Lock your arms overhead!</string>
+    <string name="controlled_slow">Be controlled and slow!</string>
+    <string name="great_rep_counted">Great! Rep %d!</string>
+    <string name="arms_not_visible">Arms not fully visible.</string>
+    <string name="get_position">Get in position!</string>
+    <string name="dont_lower_hips">Don\'t lower your hips, keep your body straight!</string>
+    <string name="form_perfect">Your form is perfect!</string>
+    <string name="thats_it_rep">That\'s it! Rep %d</string>
+    <string name="body_not_visible">Body not fully visible.</string>
+    <string name="wider_step">Take a wider step!</string>
+    <string name="going_great">You\'re doing great!</string>
+    <string name="rep_completed">Rep %d completed!</string>
+    <string name="upper_body_not_visible">Upper body not fully visible.</string>
+    <string name="lying_position_start">Start in lying position!</string>
+    <string name="dont_bend_elbows">Don\'t bend your elbows too much, keep arms straighter!</string>
+    <string name="squeeze_chest">Squeeze and close your chest!</string>
+    <string name="rep_great">Rep %d great!</string>
+    <string name="keep_elbow_stable">Keep your elbow stable, don\'t use shoulder power!</string>
+    <string name="great_form">Great form!</string>
+    <string name="arm_not_visible">Arm not fully visible.</string>
+    
+    <!-- Permissions -->
+    <string name="camera_permission_required">Camera permission is required for the app to work.</string>
+    
+    <!-- Template strings for dynamic content -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    
+    <!-- User Profile Screen -->
+    <string name="profile">Profile</string>
+    <string name="settings">Settings</string>
+    <string name="user_name">User Name</string>
+    <string name="user_email">user@email.com</string>
+    <string name="edit_profile">Edit Profile</string>
+    <string name="profile_picture">Profile Picture</string>
+    <string name="total_workouts">Total Workouts</string>
+    <string name="total_reps">Total Reps</string>
+    <string name="personal_information">Personal Information</string>
+    <string name="preferences">Preferences</string>
+    <string name="about">About</string>
+    <string name="logout">Logout</string>
+    
+    <!-- Onboarding Screen -->
+    <string name="welcome_to_arfitness">Welcome to ArFitness!</string>
+    <string name="onboarding_description">Improve your form and reach your goals with AI-powered workout coach</string>
+    <string name="lets_get_started">Let\'s Get Started!</string>
+    <string name="your_name">Your Name</string>
+    <string name="enter_your_name">Enter your name</string>
+    <string name="your_email">Email</string>
+    <string name="enter_your_email">Enter your email address</string>
+    <string name="your_goal">Your Goal</string>
+    <string name="select_your_goal">Select your goal</string>
+    <string name="weight_loss">Weight Loss</string>
+    <string name="muscle_gain">Muscle Gain</string>
+    <string name="general_fitness">General Fitness</string>
+    <string name="strength_training">Strength Training</string>
+    <string name="start_journey">Start Your Journey</string>
+    <string name="please_fill_all_fields">Please fill all fields</string>
+    
+</resources> 
