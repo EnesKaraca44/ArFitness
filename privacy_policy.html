@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gizlilik Politikası - ArFitness</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            padding: 40px;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding-bottom: 20px;
+            border-bottom: 3px solid #667eea;
+        }
+        
+        h1 {
+            color: #667eea;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        
+        .app-name {
+            font-size: 1.2em;
+            color: #764ba2;
+            font-weight: 600;
+        }
+        
+        .last-updated {
+            color: #666;
+            font-size: 0.9em;
+            margin-top: 10px;
+        }
+        
+        h2 {
+            color: #667eea;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            font-size: 1.8em;
+            border-left: 4px solid #667eea;
+            padding-left: 15px;
+        }
+        
+        h3 {
+            color: #764ba2;
+            margin-top: 20px;
+            margin-bottom: 10px;
+            font-size: 1.3em;
+        }
+        
+        p, li {
+            margin-bottom: 10px;
+            color: #555;
+        }
+        
+        ul {
+            margin-left: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .info-box {
+            background: #f8f9fa;
+            border-left: 4px solid #667eea;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+        
+        .highlight {
+            background: #e8f5e9;
+            border-left: 4px solid #4caf50;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 4px;
+        }
+        
+        .highlight strong {
+            color: #2e7d32;
+        }
+        
+        .warning {
+            background: #fff3e0;
+            border-left: 4px solid #ff9800;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 4px;
+        }
+        
+        .contact-info {
+            background: #e3f2fd;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 30px;
+        }
+        
+        .contact-info strong {
+            color: #1976d2;
+        }
+        
+        a {
+            color: #667eea;
+            text-decoration: none;
+        }
+        
+        a:hover {
+            text-decoration: underline;
+        }
+        
+        .lang-switch {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        .lang-btn {
+            display: inline-block;
+            padding: 10px 20px;
+            margin: 0 5px;
+            background: #667eea;
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        
+        .lang-btn:hover {
+            background: #764ba2;
+        }
+        
+        .section {
+            display: none;
+        }
+        
+        .section.active {
+            display: block;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+            
+            h1 {
+                font-size: 2em;
+            }
+            
+            h2 {
+                font-size: 1.5em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏋️ ArFitness</h1>
+            <div class="app-name">AI Kişisel Antrenör</div>
+        </div>
+
+        <div class="lang-switch">
+            <span class="lang-btn" onclick="showLanguage('tr')">🇹🇷 Türkçe</span>
+            <span class="lang-btn" onclick="showLanguage('en')">🇬🇧 English</span>
+        </div>
+
+        <!-- TÜRKÇE SECTION -->
+        <div id="tr-section" class="section active">
+            <h1>Gizlilik Politikası</h1>
+            <p class="last-updated"><strong>Son Güncelleme:</strong> 2 Şubat 2026</p>
+
+            <h2>📋 Genel Bakış</h2>
+            <p>ArFitness uygulaması, kullanıcıların gizliliğini önemser. Bu gizlilik politikası, uygulamanın hangi verileri topladığını, nasıl kullandığını ve koruduğunu açıklar.</p>
+
+            <h2>📊 Toplanan Veriler</h2>
+
+            <h3>1. 📷 Kamera Görüntüleri</h3>
+            <div class="info-box">
+                <strong>Ne Toplanır:</strong> Egzersiz sırasında kamera görüntüleri<br>
+                <strong>Nasıl Kullanılır:</strong> Sadece cihazınızda gerçek zamanlı işlenir (Google ML Kit Pose Detection)<br>
+                <strong>Saklanır mı:</strong> <span style="color: #d32f2f;">HAYIR</span> - Hiçbir kamera görüntüsü kaydedilmez veya sunucuya gönderilmez<br>
+                <strong>Üçüncü Taraflarla Paylaşılır mı:</strong> <span style="color: #d32f2f;">HAYIR</span>
+            </div>
+
+            <h3>2. 💪 Egzersiz Verileri</h3>
+            <div class="info-box">
+                <strong>Ne Toplanır:</strong>
+                <ul>
+                    <li>Egzersiz adı</li>
+                    <li>Tekrar sayısı</li>
+                    <li>Süre</li>
+                    <li>Tarih/saat</li>
+                    <li>Hesaplanan kalori ve form skoru</li>
+                </ul>
+                <strong>Nasıl Kullanılır:</strong> İlerlemenizi takip etmek için<br>
+                <strong>Saklanır mı:</strong> <span style="color: #388e3c;">EVET</span> - Sadece cihazınızda (yerel veritabanı)<br>
+                <strong>Üçüncü Taraflarla Paylaşılır mı:</strong> <span style="color: #d32f2f;">HAYIR</span>
+            </div>
+
+            <h3>3. 👤 Kullanıcı Profili</h3>
+            <div class="info-box">
+                <strong>Ne Toplanır:</strong> Ad, fotoğraf (opsiyonel)<br>
+                <strong>Nasıl Kullanılır:</strong> Kişiselleştirilmiş deneyim için<br>
+                <strong>Saklanır mı:</strong> <span style="color: #388e3c;">EVET</span> - Sadece cihazınızda<br>
+                <strong>Üçüncü Taraflarla Paylaşılır mı:</strong> <span style="color: #d32f2f;">HAYIR</span>
+            </div>
+
+            <h2>🔧 Üçüncü Taraf Servisler</h2>
+
+            <h3>Google ML Kit Pose Detection</h3>
+            <div class="highlight">
+                <strong>Amaç:</strong> Vücut pozisyonu tespiti için yapay zeka modeli<br>
+                <strong>Veri Paylaşımı:</strong> Kamera görüntüleri sadece cihazınızda işlenir<br>
+                <strong>Gizlilik:</strong> Google, bu verileri toplamaz veya sunucularına göndermez<br>
+                <strong>Daha Fazla Bilgi:</strong> <a href="https://developers.google.com/ml-kit/terms" target="_blank">Google ML Kit Gizlilik Politikası</a>
+            </div>
+
+            <h2>🛡️ Veri Güvenliği</h2>
+            <div class="highlight">
+                <ul>
+                    <li>✅ Tüm verileriniz cihazınızda saklanır</li>
+                    <li>✅ Hiçbir veri sunucuya gönderilmez</li>
+                    <li>✅ Internet bağlantısı gerektirmez</li>
+                    <li>✅ Kamera görüntüleri kaydedilmez</li>
+                    <li>✅ Verileriniz üçüncü taraflarla paylaşılmaz</li>
+                </ul>
+            </div>
+
+            <h2>👶 Çocukların Gizliliği</h2>
+            <p>ArFitness, 13 yaşın altındaki çocuklardan bilerek veri toplamaz. Ebeveynler, çocuklarının uygulamayı kullanması durumunda denetim sağlamalıdır.</p>
+
+            <h2>🔐 İzinler</h2>
+
+            <h3>Kamera İzni</h3>
+            <div class="info-box">
+                <strong>Neden Gerekli:</strong> Egzersiz formunuzu analiz etmek için<br>
+                <strong>Ne Zaman Kullanılır:</strong> Sadece egzersiz ekranındayken<br>
+                <strong>Kaydedilir mi:</strong> <span style="color: #d32f2f;">HAYIR</span> - Gerçek zamanlı işlenir ve silinir
+            </div>
+
+            <h2>🗑️ Verilerinizi Kontrol Edin</h2>
+
+            <h3>Veri Silme</h3>
+            <p>Uygulama ayarlarından "Geçmişi Temizle" butonuyla tüm egzersiz geçmişinizi silebilirsiniz. Uygulamayı kaldırdığınızda tüm veriler otomatik olarak silinir.</p>
+
+            <h2>📧 İletişim</h2>
+            <div class="contact-info">
+                <p><strong>E-posta:</strong> eneskaraca44@gmail.com</p>
+                <p><strong>Geliştirici:</strong> Enes Karaca</p>
+                <p><strong>Uygulama:</strong> ArFitness - AI Personal Trainer</p>
+            </div>
+        </div>
+
+        <!-- ENGLISH SECTION -->
+        <div id="en-section" class="section">
+            <h1>Privacy Policy</h1>
+            <p class="last-updated"><strong>Last Updated:</strong> February 2, 2026</p>
+
+            <h2>📋 Overview</h2>
+            <p>ArFitness application respects user privacy. This privacy policy explains what data the app collects, how it uses it, and how it protects it.</p>
+
+            <h2>📊 Collected Data</h2>
+
+            <h3>1. 📷 Camera Images</h3>
+            <div class="info-box">
+                <strong>What is collected:</strong> Camera feed during exercise<br>
+                <strong>How it's used:</strong> Processed in real-time on your device only (Google ML Kit Pose Detection)<br>
+                <strong>Is it stored:</strong> <span style="color: #d32f2f;">NO</span> - No camera images are saved or sent to servers<br>
+                <strong>Shared with third parties:</strong> <span style="color: #d32f2f;">NO</span>
+            </div>
+
+            <h3>2. 💪 Workout Data</h3>
+            <div class="info-box">
+                <strong>What is collected:</strong>
+                <ul>
+                    <li>Exercise name</li>
+                    <li>Repetition count</li>
+                    <li>Duration</li>
+                    <li>Date/time</li>
+                    <li>Calculated calories and form score</li>
+                </ul>
+                <strong>How it's used:</strong> To track your progress<br>
+                <strong>Is it stored:</strong> <span style="color: #388e3c;">YES</span> - Only on your device (local database)<br>
+                <strong>Shared with third parties:</strong> <span style="color: #d32f2f;">NO</span>
+            </div>
+
+            <h3>3. 👤 User Profile</h3>
+            <div class="info-box">
+                <strong>What is collected:</strong> Name, photo (optional)<br>
+                <strong>How it's used:</strong> For personalized experience<br>
+                <strong>Is it stored:</strong> <span style="color: #388e3c;">YES</span> - Only on your device<br>
+                <strong>Shared with third parties:</strong> <span style="color: #d32f2f;">NO</span>
+            </div>
+
+            <h2>🔧 Third-Party Services</h2>
+
+            <h3>Google ML Kit Pose Detection</h3>
+            <div class="highlight">
+                <strong>Purpose:</strong> AI model for body position detection<br>
+                <strong>Data Sharing:</strong> Camera images processed only on your device<br>
+                <strong>Privacy:</strong> Google does not collect or send this data to servers<br>
+                <strong>More Info:</strong> <a href="https://developers.google.com/ml-kit/terms" target="_blank">Google ML Kit Privacy Policy</a>
+            </div>
+
+            <h2>🛡️ Data Security</h2>
+            <div class="highlight">
+                <ul>
+                    <li>✅ All your data is stored on your device</li>
+                    <li>✅ No data is sent to servers</li>
+                    <li>✅ No internet connection required</li>
+                    <li>✅ Camera images are not recorded</li>
+                    <li>✅ Your data is not shared with third parties</li>
+                </ul>
+            </div>
+
+            <h2>👶 Children's Privacy</h2>
+            <p>ArFitness does not knowingly collect data from children under 13. Parents should supervise their children's use of the app.</p>
+
+            <h2>🔐 Permissions</h2>
+
+            <h3>Camera Permission</h3>
+            <div class="info-box">
+                <strong>Why needed:</strong> To analyze your exercise form<br>
+                <strong>When used:</strong> Only on exercise screen<br>
+                <strong>Recorded:</strong> <span style="color: #d32f2f;">NO</span> - Processed in real-time and discarded
+            </div>
+
+            <h2>🗑️ Control Your Data</h2>
+
+            <h3>Data Deletion</h3>
+            <p>You can delete all your workout history from app settings using the "Clear History" button. All data is automatically deleted when you uninstall the app.</p>
+
+            <h2>📧 Contact</h2>
+            <div class="contact-info">
+                <p><strong>Email:</strong> eneskaraca44@gmail.com</p>
+                <p><strong>Developer:</strong> Enes Karaca</p>
+                <p><strong>App:</strong> ArFitness - AI Personal Trainer</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function showLanguage(lang) {
+            document.getElementById('tr-section').classList.remove('active');
+            document.getElementById('en-section').classList.remove('active');
+            document.getElementById(lang + '-section').classList.add('active');
+        }
+    </script>
+</body>
+</html>
