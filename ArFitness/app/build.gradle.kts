@@ -16,7 +16,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.example.arfitness"
+        applicationId = "com.eneskaraca.arfitness"
         minSdk = 24
         targetSdk = 34
         versionCode = 1
@@ -24,10 +24,20 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
+    signingConfigs {
+        create("release") {
+            storeFile = file("arfitness-release-key.jks")
+            storePassword = "REMOVED"
+            keyAlias = "arfitness"
+            keyPassword = "REMOVED"
+        }
+    }
+
     buildTypes {
         release {
             isMinifyEnabled = false
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+            signingConfig = signingConfigs.getByName("release")
         }
     }
 

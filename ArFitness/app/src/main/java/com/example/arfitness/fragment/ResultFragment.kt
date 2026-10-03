@@ -1,11 +1,11 @@
 package com.example.arfitness.fragment
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.navigation.Navigator
+import androidx.fragment.app.Fragment
+import androidx.navigation.NavOptions
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.example.arfitness.R
@@ -14,7 +14,7 @@ import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class ResultFragment : Fragment() {
-    private  var _binding: FragmentResultBinding?=null
+    private var _binding: FragmentResultBinding? = null
     private val binding get() = _binding!!
 
     private val args: ResultFragmentArgs by navArgs()
@@ -22,8 +22,8 @@ class ResultFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        _binding= FragmentResultBinding.inflate(inflater, container, false)
+    ): View {
+        _binding = FragmentResultBinding.inflate(inflater, container, false)
         return binding.root
     }
 
@@ -32,19 +32,18 @@ class ResultFragment : Fragment() {
 
         val result = args.workoutResult
 
-
-        binding.tvExerciseName.text = "Egzersiz: ${result.exerciseName}"
-        binding.tvTotalReps.text = "Toplam Tekrar: ${result.totalReps}"
-        binding.tvDuration.text = "Süre: ${formatTime(result.durationInSeconds)}"
-
+        binding.tvExerciseName.text = result.exerciseName
+        binding.tvTotalReps.text = result.totalReps.toString()
+        binding.tvDuration.text = formatTime(result.durationInSeconds)
 
         binding.btnGoHome.setOnClickListener {
-
-            findNavController().navigate(R.id.anasayfaFragment)
+            val navOptions = NavOptions.Builder()
+                .setPopUpTo(R.id.anasayfaFragment, true)
+                .build()
+            findNavController().navigate(R.id.anasayfaFragment, null, navOptions)
         }
     }
 
-    // Yardımcı zaman formatlama fonksiyonu
     private fun formatTime(seconds: Long): String {
         val minutes = seconds / 60
         val remainingSeconds = seconds % 60
@@ -55,5 +54,4 @@ class ResultFragment : Fragment() {
         super.onDestroyView()
         _binding = null
     }
-
 }

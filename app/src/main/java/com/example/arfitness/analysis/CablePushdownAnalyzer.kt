@@ -5,80 +5,69 @@ import com.google.mlkit.vision.pose.PoseLandmark
 import kotlin.math.abs
 import kotlin.math.atan2
 
-class CablePushdownAnalyzer : ExerciseAnalyzer {
+class CablePushdownAnalyzer : ExerciseAnalyzer() {
 
     override val requiredLandmarks = listOf(
-        PoseLandmark.RIGHT_SHOULDER,
-        PoseLandmark.RIGHT_ELBOW,
-        PoseLandmark.RIGHT_WRIST,
-        PoseLandmark.RIGHT_HIP
+        PoseLandmark.RIGHT_SHOULDER, PoseLandmark.LEFT_SHOULDER,
+        PoseLandmark.RIGHT_ELBOW, PoseLandmark.LEFT_ELBOW,
+        PoseLandmark.RIGHT_WRIST, PoseLandmark.LEFT_WRIST
     )
 
-    // Cable Pushdown için durumlar: Kollar bükülü (UP) ve aşağıda kilitli (DOWN)
     private var state: ExerciseState = ExerciseState.UP
     private var repCount = 0
 
-    override fun analyze(pose: Pose): Feedback {
-        // Gerekli eklem noktaları (sağ kolu takip ediyoruz)
-        val shoulder = pose.getPoseLandmark(PoseLandmark.RIGHT_SHOULDER)
-        val elbow = pose.getPoseLandmark(PoseLandmark.RIGHT_ELBOW)
-        val wrist = pose.getPoseLandmark(PoseLandmark.RIGHT_WRIST)
+    // İdeal Cable Pushdown Şablonu (Kollar bükülü yukarıda -> Aşağı itiş -> Yukarı bırakış)
+    private val idealPushdownTemplate = listOf(
+        70.0, 100.0, 140.0, 170.0, 140.0, 100.0, 70.0
+    )
 
-        var feedbackMessage: String? = "Harika Form!"
+    override fun analyze(pose: Pose): Feedback {
+        val leftShoulder = pose.getPoseLandmark(PoseLandmark.LEFT_SHOULDER)
+        val leftElbow = pose.getPoseLandmark(PoseLandmark.LEFT_ELBOW)
+        val leftWrist = pose.getPoseLandmark(PoseLandmark.LEFT_WRIST)
+        val rightShoulder = pose.getPoseLandmark(PoseLandmark.RIGHT_SHOULDER)
+        val rightElbow = pose.getPoseLandmark(PoseLandmark.RIGHT_ELBOW)
+        val rightWrist = pose.getPoseLandmark(PoseLandmark.RIGHT_WRIST)
+
+        val isLeftVisible = isVisible(leftShoulder, leftElbow, leftWrist)
+        val isRightVisible = isVisible(rightShoulder, rightElbow, rightWrist)
+
+        if (!isLeftVisible && !isRightVisible) {
+            return Feedback(state, "Kolun net olarak görünmüyor (Kameraya uzaklaş).", false, pose)
+        }
+
+        // Hangi taraf net görünüyorsa onu kullan
+        val shoulder = if (isLeftVisible) leftShoulder!! else rightShoulder!!
+        val elbow = if (isLeftVisible) leftElbow!! else rightElbow!!
+        val wrist = if (isLeftVisible) leftWrist!! else rightWrist!!
+
+        // 3D Vektör açısı ve Smoothing (EMA)
+        val rawElbowAngle = AnalysisUtils.getAngle(shoulder, elbow, wrist)
+        val elbowAngle = getSmoothedAngle("pushdownElbow", rawElbowAngle)
+
+        var feedbackMessage = "Harika Form!"
         var repCounted = false
 
-        if (shoulder != null && elbow != null && wrist != null) {
+        // --- FORM KONTROLÜ ---
+        // KURAL 1: Dirsek vücuttan çok fazla ayrılıyor mu? (Omuz hizasından sapma)
+        if (abs(elbow.position3D.x - shoulder.position3D.x) > 120) {
+            feedbackMessage = "Dirseğini gövdene sabitle!"
+        }
 
-            // Dirsek açısını hesapla
-            val elbowAngle = getAngle(shoulder, elbow, wrist)
-
-            // --- FORM KONTROLÜ ---
-            // KURAL 1: Dirsek vücuttan çok fazla ayrılıyor mu?
-            // Dirseğin X pozisyonu, omuzun X pozisyonuna çok yakın olmalı.
-            if (abs(elbow.position.x - shoulder.position.x) > 100) { // 100 piksel tolerans
-                feedbackMessage = "Dirseğini vücuduna yakın tut!"
-            }
-            // KURAL 2: Hareketin en alt noktasında kol tam kilitlendi mi?
-            else if (state == ExerciseState.DOWN && elbowAngle < 160) {
-                feedbackMessage = "Aşağıda kolunu tam kilitle!"
-            }
-            // KURAL 3: Hareketin en üst noktasında yeterince yukarı salındı mı?
-            else if (state == ExerciseState.UP && elbowAngle > 90) {
-                feedbackMessage = "Daha yukarı sal, triceps'i hisset!"
-            }
-
-            // --- Tekrar Sayma Mantığı ---
-            // Kollar aşağıda, kilitli (DOWN durumu)
-            if (elbowAngle > 160) { // Kol neredeyse düz
-                if (state == ExerciseState.UP) {
-                    state = ExerciseState.DOWN
-                }
-            }
-            // Kollar yukarıda, bükülü (UP durumu)
-            else if (elbowAngle < 90) { // Dirsek 90 dereceden daha dar
-                if (state == ExerciseState.DOWN) {
-                    state = ExerciseState.UP
-                    repCounted = true
-                    if (feedbackMessage == "Harika Form!") {
-                        repCount++
-                        feedbackMessage = "$repCount. tekrar tamam!"
-                    }
-                }
-            }
+        // Merkezcil DTW Makine Öğrenmesi ile Sayım
+        if (matchPatternDTW("cablepushdown", elbowAngle, idealPushdownTemplate, threshold = 22.0, bufferSize = 20, cooldownMs = 1200)) {
+            repCount++
+            repCounted = true
+            feedbackMessage = "MÜKEMMEL FORM! $repCount. tekrar"
         } else {
-            feedbackMessage = "Kolun tam olarak görünmüyor."
+            // Anlık görsel geri bildirim (Sayımı etkilemez)
+            if (elbowAngle > 160) { 
+                state = ExerciseState.DOWN
+            } else if (elbowAngle < 90) { 
+                state = ExerciseState.UP
+            }
         }
 
         return Feedback(state, feedbackMessage, repCounted, pose)
-    }
-
-    private fun getAngle(first: PoseLandmark, mid: PoseLandmark, last: PoseLandmark): Double {
-        val angleRad = atan2(last.position.y - mid.position.y, last.position.x - mid.position.x) -
-                atan2(first.position.y - mid.position.y, first.position.x - mid.position.x)
-        var angleDeg = Math.toDegrees(abs(angleRad.toDouble()))
-        if (angleDeg > 180) {
-            angleDeg = 360 - angleDeg
-        }
-        return angleDeg
     }
 }

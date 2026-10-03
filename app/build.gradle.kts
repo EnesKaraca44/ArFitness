@@ -9,25 +9,35 @@ plugins {
 
 android {
     namespace = "com.example.arfitness"
-    compileSdk = 34
+    compileSdk = 36
 
     buildFeatures {
         viewBinding = true
     }
 
     defaultConfig {
-        applicationId = "com.example.arfitness"
+        applicationId = "com.enes.arfitness"
         minSdk = 24
-        targetSdk = 34
-        versionCode = 1
-        versionName = "1.0"
+        targetSdk = 36
+        versionCode = 2
+        versionName = "1.0.1"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    signingConfigs {
+        create("release") {
+            storeFile = file("arfitness-release-key.jks")
+            storePassword = "REMOVED"
+            keyAlias = "arfitness"
+            keyPassword = "REMOVED"
+        }
     }
 
     buildTypes {
         release {
             isMinifyEnabled = false
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+            signingConfig = signingConfigs.getByName("release")
         }
     }
 

@@ -4,20 +4,14 @@ import com.google.mlkit.vision.pose.Pose
 import com.google.mlkit.vision.pose.PoseLandmark
 
 /**
- * Squat hareketini analiz etmekten sorumlu uzman sınıf.
- * ExerciseAnalyzer sözleşmesine uyar.
+ * Squat hareketini analiz etmekten sorumlu sınıf.
  */
 class SquatAnalyzer : ExerciseAnalyzer {
 
-    // Kullanıcının o anki durumunu takip etmek için bir değişken.
-    // Başlangıçta 'NEUTRAL' (ayakta) durumunda.
     private var state: ExerciseState = ExerciseState.NEUTRAL
+    private var repCount = 0
 
-    /**
-     * Gelen her bir iskelet karesini analiz eder ve bir Feedback döndürür.
-     */
     override fun analyze(pose: Pose): Feedback {
-        // Gerekli eklem noktalarını alıyoruz. Eğer biri bile bulunamazsa, analiz yapma.
         val leftHip = pose.getPoseLandmark(PoseLandmark.LEFT_HIP)
         val leftKnee = pose.getPoseLandmark(PoseLandmark.LEFT_KNEE)
         val leftAnkle = pose.getPoseLandmark(PoseLandmark.LEFT_ANKLE)
@@ -26,51 +20,49 @@ class SquatAnalyzer : ExerciseAnalyzer {
         val rightKnee = pose.getPoseLandmark(PoseLandmark.RIGHT_KNEE)
         val rightAnkle = pose.getPoseLandmark(PoseLandmark.RIGHT_ANKLE)
 
-        if (leftHip == null || leftKnee == null || leftAnkle == null ||
-            rightHip == null || rightKnee == null || rightAnkle == null) {
-            // Eğer temel noktalar yoksa, bilinmeyen bir durum raporla.
-            return Feedback(ExerciseState.UNKNOWN, "Vücut tam olarak görünmüyor.", pose = pose)
+        val isLeftVisible = leftHip != null && leftKnee != null && leftAnkle != null
+        val isRightVisible = rightHip != null && rightKnee != null && rightAnkle != null
+
+        if (!isLeftVisible && !isRightVisible) {
+            return Feedback(ExerciseState.UNKNOWN, "Bacakların tam olarak görünmüyor.", false, pose)
         }
 
-        // --- Açıları Hesaplama ---
-        // Yardımcı fonksiyonumuzu kullanarak diz açılarını hesaplıyoruz.
-        val leftKneeAngle = AnalysisUtils.getAngle(leftHip, leftKnee, leftAnkle)
-        val rightKneeAngle = AnalysisUtils.getAngle(rightHip, rightKnee, rightAnkle)
+        val leftKneeAngle = if (isLeftVisible) AnalysisUtils.getAngle(leftHip!!, leftKnee!!, leftAnkle!!) else 180.0
+        val rightKneeAngle = if (isRightVisible) AnalysisUtils.getAngle(rightHip!!, rightKnee!!, rightAnkle!!) else 180.0
 
-        // --- Tekrar Sayma Mantığı ---
+        val averageKneeAngle = when {
+            isLeftVisible && isRightVisible -> (leftKneeAngle + rightKneeAngle) / 2.0
+            isLeftVisible -> leftKneeAngle
+            else -> rightKneeAngle
+        }
+
         var repCounted = false
+        var feedbackMessage = "Pozisyonunu koru"
 
-        // Eğer dizler yeterince büküldüyse (örn: 100 dereceden az) kullanıcı 'DOWN' durumundadır.
-        if (leftKneeAngle < 100 && rightKneeAngle < 100) {
-            // Eğer daha önce 'NEUTRAL' veya 'UP' durumundaysa, şimdi 'DOWN' oldu demektir.
-            // Bu, bir tekrarın yarısının tamamlandığı anlamına gelir.
+        if (averageKneeAngle < 105) {
             if (state == ExerciseState.NEUTRAL || state == ExerciseState.UP) {
                 state = ExerciseState.DOWN
             }
-        }
-        // Eğer dizler tekrar düzelmeye başladıysa (örn: 160 dereceden fazla) kullanıcı 'UP' durumundadır.
-        else if (leftKneeAngle > 160 && rightKneeAngle > 160) {
-            // Eğer daha önce 'DOWN' durumundaysa, bu bir tekrarın tamamlandığı andır!
+            feedbackMessage = "Harika derinlik, şimdi yukarı it!"
+        } else if (averageKneeAngle > 155) {
             if (state == ExerciseState.DOWN) {
                 state = ExerciseState.UP
-                repCounted = true // Rapor formuna "bir tekrar saydım" diye işaretliyoruz.
+                repCount++
+                repCounted = true
+                feedbackMessage = "Tebrikler! $repCount. tekrar"
             } else {
-                // Eğer zaten ayaktaysa, durumu NEUTRAL yap.
                 state = ExerciseState.NEUTRAL
+                feedbackMessage = "Squat için çömelmeye başla"
             }
+        } else if (state == ExerciseState.DOWN) {
+            feedbackMessage = "Tam yukarı kalk!"
         }
 
-        // --- Form Kontrolü ---
-
-
-        // --- Raporu Oluşturma ---
-        // Analiz sonucunda standart Feedback formunu doldurup geri gönderiyoruz.
         return Feedback(
             state = state,
+            message = feedbackMessage,
             isRepCounted = repCounted,
             pose = pose
-            // message = ... (form kontrolünden gelen mesaj)
         )
     }
 }
-

@@ -5,7 +5,7 @@ import com.google.mlkit.vision.pose.PoseLandmark
 import kotlin.math.abs
 import kotlin.math.atan2
 
-class LateralRaiseAnalyzer : ExerciseAnalyzer {
+class LateralRaiseAnalyzer : ExerciseAnalyzer() {
 
     override val requiredLandmarks = listOf(
         PoseLandmark.LEFT_SHOULDER, PoseLandmark.RIGHT_SHOULDER,
@@ -77,9 +77,13 @@ class LateralRaiseAnalyzer : ExerciseAnalyzer {
 
 
             // --- SON KARAR VE MESAJ ---
-            if (repCounted && feedbackMessage == "Harika Form!") {
+            if (repCounted) {
                 repCount++
-                feedbackMessage = "$repCount. tekrar tamam!"
+                feedbackMessage = if (feedbackMessage == "Harika Form!") {
+                    "$repCount. tekrar tamam!"
+                } else {
+                    "$repCount. tekrar! ($feedbackMessage)"
+                }
             }
         } else {
             feedbackMessage = "Vücudun tam olarak görünmüyor."

@@ -5,7 +5,7 @@ import com.google.mlkit.vision.pose.PoseLandmark
 import kotlin.math.abs
 import kotlin.math.atan2
 
-class HammerCurlAnalyzer : ExerciseAnalyzer {
+class HammerCurlAnalyzer : ExerciseAnalyzer() {
 
     override val requiredLandmarks = listOf(
         PoseLandmark.RIGHT_SHOULDER, // veya hem sağ hem sol
@@ -65,9 +65,13 @@ class HammerCurlAnalyzer : ExerciseAnalyzer {
             // --- SON KARAR VE MESAJ ---
             // Eğer bu analizde bir tekrar sayıldıysa VE o ana kadar hiçbir form hatası bulunmadıysa,
             // o zaman tekrar sayısını artır ve başarı mesajı göster.
-            if (repCounted && feedbackMessage == "Harika Form!") {
+            if (repCounted) {
                 repCount++
-                feedbackMessage = "$repCount. tekrar tamam!"
+                feedbackMessage = if (feedbackMessage == "Harika Form!") {
+                    "$repCount. tekrar tamam!"
+                } else {
+                    "$repCount. tekrar! ($feedbackMessage)"
+                }
             }
 
         } else {

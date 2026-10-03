@@ -3,10 +3,10 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginBottom="16dp"
-    app:cardCornerRadius="18dp"
+    android:layout_marginBottom="12dp"
+    app:cardCornerRadius="16dp"
     app:cardElevation="0dp"
-    app:strokeColor="@color/card_bg"
+    app:strokeColor="@color/divider"
     app:strokeWidth="1dp"
     android:backgroundTint="@color/card_bg">
 
@@ -31,35 +31,36 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:orientation="vertical"
-            android:layout_marginStart="16dp">
+            android:layout_marginStart="14dp">
+
             <TextView
                 android:id="@+id/tvExerciseName"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Squat"
                 android:textColor="@color/text_main"
-                android:textSize="18sp"
+                android:textSize="17sp"
                 android:textStyle="bold" />
+
             <TextView
                 android:id="@+id/tvExerciseDescription"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text=""
+                android:text="Bacak kaslarını çalıştırır"
                 android:textColor="@color/text_secondary"
-                android:textSize="14sp" />
+                android:textSize="13sp"
+                android:layout_marginTop="3dp" />
         </LinearLayout>
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnStart"
             android:layout_width="wrap_content"
             android:layout_height="40dp"
-            android:text="@string/start"
+            android:text="Başla"
             android:textSize="14sp"
+            android:textColor="@color/white"
             app:cornerRadius="20dp"
             app:backgroundTint="@color/primary"
-            android:textColor="@color/white"
-            android:layout_marginStart="12dp"
-            android:layout_marginEnd="0dp" />
+            android:layout_marginStart="10dp" />
     </LinearLayout>
-
-</com.google.android.material.card.MaterialCardView> 
+</com.google.android.material.card.MaterialCardView>

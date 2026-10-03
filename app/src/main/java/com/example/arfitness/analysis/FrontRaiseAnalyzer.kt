@@ -5,7 +5,7 @@ import com.google.mlkit.vision.pose.PoseLandmark
 import kotlin.math.abs
 import kotlin.math.atan2
 
-class FrontRaiseAnalyzer : ExerciseAnalyzer {
+class FrontRaiseAnalyzer : ExerciseAnalyzer() {
 
     // --- YENİ EKLENEN KISIM ---
     override val requiredLandmarks = listOf(
@@ -75,9 +75,13 @@ class FrontRaiseAnalyzer : ExerciseAnalyzer {
 
 
             // --- SON KARAR VE MESAJ ---
-            if (repCounted && feedbackMessage == "Harika Form!") {
+            if (repCounted) {
                 repCount++
-                feedbackMessage = "$repCount. tekrar tamam!"
+                feedbackMessage = if (feedbackMessage == "Harika Form!") {
+                    "$repCount. tekrar tamam!"
+                } else {
+                    "$repCount. tekrar! ($feedbackMessage)"
+                }
             }
         } else {
             feedbackMessage = "Vücudun tam olarak görünmüyor."

@@ -2,14 +2,32 @@
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
-    <color name="primary">#00E6C3</color>
-    <color name="primary_dark">#181A20</color>
-    <color name="card_bg">#23262F</color>
-    <color name="icon_bg">#22313C</color>
-    <color name="text_main">#FFFFFF</color>
-    <color name="text_secondary">#B0B8C1</color>
-    <color name="divider">#22242C</color>
-    <color name="light_primary">#22313C</color>
-    <color name="light_gray">#23262F</color>
-    <color name="gray">#B0B8C1</color>
+
+    <!-- Ana Palet: Elektrik Mavi + Koyu Gece -->
+    <color name="primary">#4D9FFF</color>
+    <color name="primary_light">#7AB8FF</color>
+    <color name="primary_dark">#0D1117</color>
+    <color name="primary_variant">#1A6FD1</color>
+
+    <!-- Yüzey ve Kart Renkleri -->
+    <color name="surface">#161B22</color>
+    <color name="card_bg">#1C2128</color>
+    <color name="card_bg_elevated">#21262D</color>
+    <color name="icon_bg">#1A2332</color>
+
+    <!-- Metin Renkleri -->
+    <color name="text_main">#F0F6FC</color>
+    <color name="text_secondary">#8B949E</color>
+    <color name="text_tertiary">#6E7681</color>
+
+    <!-- İşlevsel Renkler -->
+    <color name="divider">#30363D</color>
+    <color name="success">#3FB950</color>
+    <color name="warning">#D29922</color>
+    <color name="error">#F85149</color>
+
+    <!-- Eski isimlerin uyumluluğu -->
+    <color name="light_primary">#1A2332</color>
+    <color name="light_gray">#21262D</color>
+    <color name="gray">#8B949E</color>
 </resources>

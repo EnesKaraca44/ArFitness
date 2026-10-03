@@ -28,58 +28,68 @@ class ExerciseViewModel @Inject constructor(private val repository: WorkoutRepos
     val feedbackMessage: LiveData<String> = _feedbackMessage
 
     // --- Zamanlayıcı (LiveData olarak) ---
-    private val _timerValueString = MutableLiveData<String>("00:30") // Başlangıç değeri
+    private val _timerValueString = MutableLiveData<String>("00:00")
     val timerValueString: LiveData<String> = _timerValueString
+
+    // Toplam geçen süre (saniye cinsinden)
+    private var totalDurationSeconds: Long = 60L
+    private var elapsedSeconds: Long = 0L
 
     // Coroutine işini tutacak değişken. Bu, zamanlayıcıyı durdurmamızı sağlar.
     private var timerJob: Job? = null
 
-
     // Bu fonksiyonlar, analizörden gelen sonuçlara göre ViewModel'i güncelleyecek.
     fun onRepCounted() {
-        _tekrarSayisi.value = (_tekrarSayisi.value ?: 0) + 1
+        val current = _tekrarSayisi.value ?: 0
+        _tekrarSayisi.postValue(current + 1)
     }
+
     fun updateFeedback(message: String) {
         // Aynı mesajı tekrar tekrar göstermemek için kontrol
         if (_feedbackMessage.value != message) {
-            _feedbackMessage.value = message
+            _feedbackMessage.postValue(message)
         }
     }
+
+    fun getElapsedSeconds(): Long {
+        return if (elapsedSeconds > 0) elapsedSeconds else 1L
+    }
+
     fun saveWorkout(exerciseName: String, reps: Int, duration: Long) {
-        // viewModelScope, bu işlemin ViewModel'in yaşam döngüsüne bağlı bir
-        // coroutine içinde güvenle yapılmasını sağlar.
         viewModelScope.launch {
-            val calculatedScore = 90 // Şimdilik varsayılan skor
-            val calculatedCalories = (reps * 1.5).toInt() // Her tekrar için 1.5 kalori gibi basit bir formül
+            // Basit form skoru ve kalori hesabı
+            val calculatedScore = if (reps > 0) 85 + (reps.coerceAtMost(15)) else 70
+            val calculatedCalories = (reps * 1.5).toInt()
             val session = WorkoutSession(
                 exerciseName = exerciseName,
                 repCount = reps,
                 durationInSeconds = duration,
-                date = System.currentTimeMillis(), // O anki zamanı milisaniye olarak alıyoruz
-                        formScore = calculatedScore,
+                date = System.currentTimeMillis(),
+                formScore = calculatedScore,
                 caloriesBurned = calculatedCalories
             )
             repository.saveWorkoutSession(session)
-
-
         }
     }
 
     fun reset() {
-        _tekrarSayisi.value = 0
-        _feedbackMessage.value = "Egzersize Başla!"
-        stopTimer() // Çalışan zamanlayıcıyı durdur
-        _timerValueString.value = "00:30"
+        stopTimer()
+        _tekrarSayisi.postValue(0)
+        _feedbackMessage.postValue("Egzersize Başla!")
+        _timerValueString.postValue("00:00")
+        elapsedSeconds = 0L
     }
 
-    fun startTimer(gerisayimsure: Long) {
-        Log.d("TimerDebug", "LiveData ile startTimer çağrıldı! Süre: $gerisayimsure saniye")
+    fun startTimer(totalSeconds: Long = 60L) {
+        totalDurationSeconds = totalSeconds
+        elapsedSeconds = 0L
+        Log.d("TimerDebug", "startTimer çağrıldı! Süre: $totalSeconds saniye")
         timerJob?.cancel()
         timerJob = viewModelScope.launch {
-            for (second in gerisayimsure downTo 0) {
-                // Arka plandan LiveData'yı güvenle güncellemek için .postValue() kullanılır.
+            for (second in totalSeconds downTo 0) {
+                elapsedSeconds = totalSeconds - second
                 _timerValueString.postValue(formatTime(second))
-                Log.d("TimerDebug", "LiveData güncellendi: ${formatTime(second)}")
+                Log.d("TimerDebug", "Kalan süre: ${formatTime(second)}, Geçen: $elapsedSeconds")
                 delay(1000L)
             }
             _feedbackMessage.postValue("Süre Doldu! Harika İş!")
@@ -109,5 +119,4 @@ class ExerciseViewModel @Inject constructor(private val repository: WorkoutRepos
         super.onCleared()
         stopTimer()
     }
-
 }

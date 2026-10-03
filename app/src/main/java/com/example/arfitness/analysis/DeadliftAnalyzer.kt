@@ -5,7 +5,7 @@ import com.google.mlkit.vision.pose.PoseLandmark
 import kotlin.math.abs
 import kotlin.math.atan2
 
-class DeadliftAnalyzer : ExerciseAnalyzer {
+class DeadliftAnalyzer : ExerciseAnalyzer() {
 
 
     override val requiredLandmarks = listOf(
@@ -72,10 +72,11 @@ class DeadliftAnalyzer : ExerciseAnalyzer {
                 if (state == ExerciseState.DOWN) {
                     state = ExerciseState.UP
                     repCounted = true
-                    // Sadece sırt formu doğruysa tekrarı say ve pozitif mesaj ver
-                    if (feedbackMessage == "Sırtını Düz Tut!") {
-                        repCount++
-                        feedbackMessage = "$repCount. tekrar tamam!"
+                    repCount++
+                    feedbackMessage = if (feedbackMessage == "Sırtını Düz Tut!") {
+                        "$repCount. tekrar tamam!"
+                    } else {
+                        "$repCount. tekrar! ($feedbackMessage)"
                     }
                 }
             }

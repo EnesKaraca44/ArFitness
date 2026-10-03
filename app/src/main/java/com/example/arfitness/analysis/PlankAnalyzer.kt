@@ -1,11 +1,12 @@
 package com.example.arfitness.analysis
 
+import android.util.Log
 import com.google.mlkit.vision.pose.Pose
 import com.google.mlkit.vision.pose.PoseLandmark
 import kotlin.math.abs
 import kotlin.math.atan2
 
-class PlankAnalyzer : ExerciseAnalyzer {
+class PlankAnalyzer : ExerciseAnalyzer() {
 
     override val requiredLandmarks = listOf(
         PoseLandmark.LEFT_SHOULDER, PoseLandmark.RIGHT_SHOULDER,
@@ -29,7 +30,12 @@ class PlankAnalyzer : ExerciseAnalyzer {
 
             // Vücut düzlüğünü kontrol etmek için omuz-kalça-ayak bileği açısı
             val bodyAngle = getAngle(leftShoulder, leftHip, leftAnkle)
+            val shoulderElbowDistanceX = abs(leftShoulder.position.x - leftElbow.position.x)
 
+            Log.d(
+                "Plank_Debug",
+                "Vücut Açısı: ${bodyAngle.toInt()}, Omuz-Dirsek Farkı: ${shoulderElbowDistanceX.toInt()}"
+            )
             // --- GELİŞTİRİLMİŞ FORM KONTROLÜ ---
             // KURAL 1: Kalça çok mu YÜKSEKTE? (Açı çok daralır)
             if (bodyAngle < 160) {
@@ -66,3 +72,4 @@ class PlankAnalyzer : ExerciseAnalyzer {
         return angleDeg
     }
 }
+

@@ -4,224 +4,203 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/primary_dark"
+    android:background="@color/black"
+    android:keepScreenOn="true"
     tools:context=".fragment.ExerciseFragment">
 
-    <!-- Header -->
+    <!-- 1. TAM EKRAN KAMERA -->
+    <androidx.camera.view.PreviewView
+        android:id="@+id/previewView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <com.example.arfitness.entitiy.PoseOverlayView
+        android:id="@+id/overlayView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <!-- Sinematik Gölgeler (Sadece yazılar okunsun diye köşelerde çok hafif) -->
     <View
-        android:id="@+id/headerBackground"
-        android:layout_width="0dp"
-        android:layout_height="56dp"
-        android:background="@color/card_bg"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+        android:background="@drawable/shadow_gradient_top"
+        app:layout_constraintTop_toTopOf="parent" />
 
-    <TextView
-        android:id="@+id/exerciseTitle"
-        android:layout_width="wrap_content"
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        android:background="@drawable/shadow_gradient_bottom"
+        app:layout_constraintBottom_toBottomOf="parent" />
+
+    <!-- 2. ÜST BAR (Şeffaf ve Şık) -->
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Push-ups"
-        android:textColor="@color/text_main"
-        android:textSize="20sp"
-        android:textStyle="bold"
-        app:layout_constraintTop_toTopOf="@id/headerBackground"
-        app:layout_constraintBottom_toBottomOf="@id/headerBackground"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"/>
+        android:layout_marginTop="24dp"
+        android:paddingHorizontal="20dp"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        app:layout_constraintTop_toTopOf="parent">
 
-    <!-- Camera Card -->
-    <androidx.cardview.widget.CardView
-        android:id="@+id/cameraCard"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:layout_margin="8dp"
-        app:cardBackgroundColor="@color/card_bg"
-        app:cardCornerRadius="20dp"
-        app:cardElevation="8dp"
-        app:layout_constraintTop_toBottomOf="@id/headerBackground"
-        app:layout_constraintBottom_toTopOf="@id/statsContainer"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
+        <!-- LIVE Indicator -->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/circle_background"
+            android:backgroundTint="#80000000"
+            android:paddingHorizontal="10dp"
+            android:paddingVertical="4dp"
+            android:orientation="horizontal"
+            android:gravity="center">
 
-        <!-- FrameLayout, elemanları üst üste bindirmek için en iyi yoldur -->
-        <FrameLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            <View
+                android:id="@+id/cameraStatusIndicator"
+                android:layout_width="8dp"
+                android:layout_height="8dp"
+                android:layout_marginEnd="6dp"
+                android:background="@drawable/circle_background"
+                android:backgroundTint="#FF3B30" />
 
-            <!-- Camera Preview (En Arkada) -->
-            <androidx.camera.view.PreviewView
-                android:id="@+id/previewView"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                app:scaleType="fillCenter" />
-
-            <!-- Pose Overlay (Kameranın Üzerinde) -->
-            <com.example.arfitness.entitiy.PoseOverlayView
-                android:id="@+id/overlayView"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent" />
-
-            <!-- Status Indicators (En Önde) -->
-            <LinearLayout
+            <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_margin="12dp"
-                android:gravity="center_vertical"
-                android:orientation="horizontal">
-
-                <View
-                    android:id="@+id/cameraStatusIndicator"
-                    android:layout_width="12dp"
-                    android:layout_height="12dp"
-                    android:layout_marginEnd="8dp"
-                    android:background="@drawable/circle_background"
-                    android:backgroundTint="@color/primary"/>
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/live"
-                    android:textColor="@color/text_main"
-                    android:textSize="12sp"
-                    android:textStyle="bold"/>
-            </LinearLayout>
-
-        </FrameLayout>
-
-    </androidx.cardview.widget.CardView>
-
-    <!-- Stats + Feedback -->
-    <LinearLayout
-        android:id="@+id/statsContainer"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginBottom="8dp"
-        android:orientation="vertical"
-        app:layout_constraintBottom_toTopOf="@id/finishButton"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
-
-        <!-- Stats Row -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:orientation="horizontal">
-
-            <androidx.cardview.widget.CardView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="4dp"
-                android:layout_weight="1"
-                app:cardBackgroundColor="@color/card_bg"
-                app:cardCornerRadius="16dp">
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:minHeight="90dp"
-                    android:gravity="center"
-                    android:orientation="vertical">
-                    <TextView
-                        android:id="@+id/repCountText"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="0"
-                        android:textColor="@color/primary"
-                        android:textSize="32sp"
-                        android:textStyle="bold"/>
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/repetitions"
-                        android:textColor="@color/text_secondary"
-                        android:textSize="14sp"/>
-                </LinearLayout>
-            </androidx.cardview.widget.CardView>
-
-            <androidx.cardview.widget.CardView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="4dp"
-                android:layout_weight="1"
-                app:cardBackgroundColor="@color/card_bg"
-                app:cardCornerRadius="16dp">
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:minHeight="90dp"
-                    android:gravity="center"
-                    android:orientation="vertical">
-                    <TextView
-                        android:id="@+id/timerText"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="00:30"
-                        android:textColor="@color/primary"
-                        android:textSize="32sp"
-                        android:textStyle="bold"/>
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/time"
-                        android:textColor="@color/text_secondary"
-                        android:textSize="14sp"/>
-                </LinearLayout>
-            </androidx.cardview.widget.CardView>
+                android:text="LIVE"
+                android:textColor="@color/white"
+                android:textSize="10sp"
+                android:textStyle="bold" />
         </LinearLayout>
 
-        <!-- Feedback Card -->
-        <androidx.cardview.widget.CardView
-            android:id="@+id/feedbackCard"
-            android:layout_width="match_parent"
+        <!-- Egzersiz Adı (Ortada) -->
+        <TextView
+            android:id="@+id/exerciseTitle"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            app:cardBackgroundColor="@color/light_primary"
-            app:cardCornerRadius="16dp">
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:orientation="vertical"
-                android:padding="16dp">
-                <ImageView
-                    android:id="@+id/feedbackIcon"
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:layout_marginBottom="8dp"
-                    android:src="@drawable/ic_fitness"
-                    app:tint="@color/primary"/>
-                <TextView
-                    android:id="@+id/feedbackText"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:gravity="center"
-                    android:text="@string/perfect_feedback"
-                    android:textColor="@color/text_main"
-                    android:textSize="14sp"/>
-            </LinearLayout>
-        </androidx.cardview.widget.CardView>
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="Egzersiz"
+            android:textColor="@color/white"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:shadowColor="#000"
+            android:shadowDx="0"
+            android:shadowDy="2"
+            android:shadowRadius="5" />
 
+        <!-- Kapat (Bitir) Butonu (Sadece küçük bir çarpı veya Stop butonu) -->
+        <ImageView
+            android:id="@+id/finishButton"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:padding="6dp"
+            android:background="@drawable/circle_background"
+            android:backgroundTint="#80000000"
+            android:src="@drawable/ic_launcher_foreground"
+            app:tint="@color/white" />
     </LinearLayout>
 
-    <!-- Finish Button -->
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/finishButton"
-        android:layout_width="0dp"
-        android:layout_height="48dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginEnd="16dp"
+    <!-- 3. SÜRE (Sağ ortada dikey tarzda veya sağ üstte kalabilir) -->
+    <LinearLayout
+        android:id="@+id/timerContainer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="20dp"
+        android:orientation="vertical"
+        android:gravity="end"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/exerciseTitle">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="SÜRE"
+            android:textColor="#E5E5E5"
+            android:textSize="10sp"
+            android:textStyle="bold"
+            android:letterSpacing="0.1"
+            android:shadowColor="#000"
+            android:shadowRadius="4" />
+
+        <TextView
+            android:id="@+id/timerText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="00:00"
+            android:textColor="#0A84FF"
+            android:textSize="22sp"
+            android:textStyle="bold"
+            android:shadowColor="#000"
+            android:shadowRadius="4" />
+    </LinearLayout>
+
+    <!-- 4. DEV TEKRAR SAYISI (Sol Alt) -->
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="24dp"
         android:layout_marginBottom="24dp"
-        android:backgroundTint="@color/primary"
-        android:text="@string/finish_workout"
-        android:textColor="@color/primary_dark"
-        android:textSize="16sp"
-        android:textStyle="bold"
-        app:cornerRadius="24dp"
-        app:elevation="8dp"
+        android:orientation="vertical"
+        android:gravity="start"
+        app:layout_constraintBottom_toTopOf="@+id/feedbackCard"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="TEKRAR"
+            android:textColor="#E5E5E5"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            android:letterSpacing="0.1"
+            android:shadowColor="#000"
+            android:shadowRadius="6" />
+
+        <TextView
+            android:id="@+id/repCountText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="0"
+            android:textColor="@color/white"
+            android:textSize="72sp"
+            android:textStyle="bold"
+            android:includeFontPadding="false"
+            android:shadowColor="#000"
+            android:shadowRadius="8"
+            android:shadowDx="0"
+            android:shadowDy="4" />
+    </LinearLayout>
+
+    <!-- 5. ANLIK GERİ BİLDİRİM (Alt Orta, İnce ve Zarif) -->
+    <androidx.cardview.widget.CardView
+        android:id="@+id/feedbackCard"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="32dp"
+        app:cardBackgroundColor="#CC0A84FF"
+        app:cardCornerRadius="20dp"
+        app:cardElevation="0dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"/>
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <TextView
+            android:id="@+id/feedbackText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingHorizontal="24dp"
+            android:paddingVertical="10dp"
+            android:text="Pozisyon al!"
+            android:textColor="@color/white"
+            android:textSize="14sp"
+            android:textStyle="bold" />
+    </androidx.cardview.widget.CardView>
+
 </androidx.constraintlayout.widget.ConstraintLayout>

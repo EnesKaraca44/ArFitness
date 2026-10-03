@@ -39,8 +39,17 @@ class MainActivity : AppCompatActivity() {
         // 4. BottomNavigationView'ı NavController ile bağla
         binding.bottomNavigationView.setupWithNavController(navController)
 
+        // 5. Antrenman kamerası açıkken alt menüyü (BottomNav) tamamen gizle!
+        navController.addOnDestinationChangedListener { _, destination, _ ->
+            if (destination.id == R.id.exerciseFragment) {
+                binding.bottomNavigationView.visibility = android.view.View.GONE
+            } else {
+                binding.bottomNavigationView.visibility = android.view.View.VISIBLE
+            }
+        }
+
         // --- PADDING (İÇ BOŞLUK) AYARI ---
-        // 5. 'findViewById' yerine binding.root kullanarak en dıştaki layout'a eriş
+        // 6. 'findViewById' yerine binding.root kullanarak en dıştaki layout'a eriş
         ViewCompat.setOnApplyWindowInsetsListener(binding.root) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)

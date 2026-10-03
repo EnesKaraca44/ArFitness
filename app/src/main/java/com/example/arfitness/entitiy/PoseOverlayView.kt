@@ -32,48 +32,67 @@ class PoseOverlayView @JvmOverloads constructor(
     private var imageHeight: Int = 1
     private var scaleX: Float = 1f
     private var scaleY: Float = 1f
+    private var isFrontCamera: Boolean = true
 
-    fun setPose(newPose: Pose, originalImageWidth: Int, originalImageHeight: Int) {
-        pose = newPose
-        imageWidth = originalImageWidth
-        imageHeight = originalImageHeight
+    fun setPose(newPose: Pose, originalImageWidth: Int, originalImageHeight: Int, isFrontCamera: Boolean = true) {
+        this.pose = newPose
+        this.imageWidth = if (originalImageWidth > 0) originalImageWidth else 1
+        this.imageHeight = if (originalImageHeight > 0) originalImageHeight else 1
+        this.isFrontCamera = isFrontCamera
         invalidate()
+    }
+
+    private fun translateX(x: Float): Float {
+        val scaled = x * scaleX
+        return if (isFrontCamera) {
+            width.toFloat() - scaled
+        } else {
+            scaled
+        }
+    }
+
+    private fun translateY(y: Float): Float {
+        return y * scaleY
     }
 
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
+
         val currentPose = pose ?: return
 
-        scaleX = width.toFloat() / imageWidth
-        scaleY = height.toFloat() / imageHeight
+        scaleX = width.toFloat() / imageWidth.toFloat()
+        scaleY = height.toFloat() / imageHeight.toFloat()
 
-        drawLandmarks(canvas, currentPose.allPoseLandmarks)
-        drawConnections(canvas, currentPose.allPoseLandmarks)
-    }
+        val landmarks = currentPose.allPoseLandmarks
 
-    private fun drawLandmarks(canvas: Canvas, landmarks: List<PoseLandmark>) {
+        // Noktaları çiz
         for (landmark in landmarks) {
             val point = landmark.position
-
-            // --- AYNALAMA ---
-            // Orijinal X koordinatını ölçeklendir ve sonra ekranın genişliğinden çıkararak yansıt.
-            val mirroredX = width - (point.x * scaleX)
-            val scaledY = point.y * scaleY
-
-            canvas.drawCircle(mirroredX, scaledY, 8f, pointPaint)
+            val px = translateX(point.x)
+            val py = translateY(point.y)
+            canvas.drawCircle(px, py, 10f, pointPaint)
         }
-    }
 
-    private fun drawConnections(canvas: Canvas, landmarks: List<PoseLandmark>) {
-        drawLine(canvas, landmarks, PoseLandmark.LEFT_SHOULDER, PoseLandmark.RIGHT_SHOULDER)
+        // Çizgileri çiz
+        // Sol kol
+        drawLine(canvas, landmarks, PoseLandmark.LEFT_SHOULDER, PoseLandmark.LEFT_ELBOW)
         drawLine(canvas, landmarks, PoseLandmark.LEFT_ELBOW, PoseLandmark.LEFT_WRIST)
+
+        // Sağ kol
         drawLine(canvas, landmarks, PoseLandmark.RIGHT_SHOULDER, PoseLandmark.RIGHT_ELBOW)
         drawLine(canvas, landmarks, PoseLandmark.RIGHT_ELBOW, PoseLandmark.RIGHT_WRIST)
+
+        // Gövde
+        drawLine(canvas, landmarks, PoseLandmark.LEFT_SHOULDER, PoseLandmark.RIGHT_SHOULDER)
+        drawLine(canvas, landmarks, PoseLandmark.LEFT_HIP, PoseLandmark.RIGHT_HIP)
         drawLine(canvas, landmarks, PoseLandmark.LEFT_SHOULDER, PoseLandmark.LEFT_HIP)
         drawLine(canvas, landmarks, PoseLandmark.RIGHT_SHOULDER, PoseLandmark.RIGHT_HIP)
-        drawLine(canvas, landmarks, PoseLandmark.LEFT_HIP, PoseLandmark.RIGHT_HIP)
+
+        // Sol bacak
         drawLine(canvas, landmarks, PoseLandmark.LEFT_HIP, PoseLandmark.LEFT_KNEE)
         drawLine(canvas, landmarks, PoseLandmark.LEFT_KNEE, PoseLandmark.LEFT_ANKLE)
+
+        // Sağ bacak
         drawLine(canvas, landmarks, PoseLandmark.RIGHT_HIP, PoseLandmark.RIGHT_KNEE)
         drawLine(canvas, landmarks, PoseLandmark.RIGHT_KNEE, PoseLandmark.RIGHT_ANKLE)
     }
@@ -83,16 +102,10 @@ class PoseOverlayView @JvmOverloads constructor(
         val endLandmark = landmarks.find { it.landmarkType == endType }
 
         if (startLandmark != null && endLandmark != null) {
-            val startPoint = startLandmark.position
-            val endPoint = endLandmark.position
-
-            // --- AYNALAMA ---
-            // Hem başlangıç hem de bitiş noktalarının X koordinatlarını yansıt.
-            val startX = width - (startPoint.x * scaleX)
-            val startY = startPoint.y * scaleY
-            val endX = width - (endPoint.x * scaleX)
-            val endY = endPoint.y * scaleY
-
+            val startX = translateX(startLandmark.position.x)
+            val startY = translateY(startLandmark.position.y)
+            val endX = translateX(endLandmark.position.x)
+            val endY = translateY(endLandmark.position.y)
             canvas.drawLine(startX, startY, endX, endY, linePaint)
         }
     }

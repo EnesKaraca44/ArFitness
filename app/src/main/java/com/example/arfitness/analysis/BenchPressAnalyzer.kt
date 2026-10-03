@@ -5,7 +5,7 @@ import com.google.mlkit.vision.pose.PoseLandmark
 import kotlin.math.abs
 import kotlin.math.atan2
 
-class BenchPressAnalyzer : ExerciseAnalyzer {
+class BenchPressAnalyzer : ExerciseAnalyzer() {
 
     override val requiredLandmarks = listOf(
         PoseLandmark.RIGHT_SHOULDER, PoseLandmark.LEFT_SHOULDER,
@@ -13,12 +13,15 @@ class BenchPressAnalyzer : ExerciseAnalyzer {
         PoseLandmark.RIGHT_WRIST, PoseLandmark.LEFT_WRIST
     )
 
-    // Bench Press için durumlar: Kollar yukarıda, kilitli (UP) ve göğse inmiş (DOWN)
+    // Bench Press İdeal Zaman Serisi Şablonu (Kollar kilitli yukarıda -> Göğse iniş -> Yukarı itiş)
+    private val idealBenchTemplate = listOf(
+        170.0, 140.0, 100.0, 70.0, 50.0, 70.0, 100.0, 140.0, 170.0
+    )
+
     private var state: ExerciseState = ExerciseState.UP
     private var repCount = 0
 
     override fun analyze(pose: Pose): Feedback {
-        // Gerekli eklem noktaları
         val leftShoulder = pose.getPoseLandmark(PoseLandmark.LEFT_SHOULDER)
         val leftElbow = pose.getPoseLandmark(PoseLandmark.LEFT_ELBOW)
         val leftWrist = pose.getPoseLandmark(PoseLandmark.LEFT_WRIST)
@@ -26,64 +29,51 @@ class BenchPressAnalyzer : ExerciseAnalyzer {
         val rightElbow = pose.getPoseLandmark(PoseLandmark.RIGHT_ELBOW)
         val rightWrist = pose.getPoseLandmark(PoseLandmark.RIGHT_WRIST)
 
-        var feedbackMessage: String? = "Harika Form!"
+        var feedbackMessage = "Harika Form!"
         var repCounted = false
 
-        if (leftShoulder != null && leftElbow != null && leftWrist != null &&
-            rightShoulder != null && rightElbow != null && rightWrist != null) {
+        val isLeftVisible = isVisible(leftShoulder, leftElbow, leftWrist)
+        val isRightVisible = isVisible(rightShoulder, rightElbow, rightWrist)
 
-            // Dirsek açılarını hesapla
-            val leftElbowAngle = getAngle(leftShoulder, leftElbow, leftWrist)
-            val rightElbowAngle = getAngle(rightShoulder, rightElbow, rightWrist)
+        if (!isLeftVisible && !isRightVisible) {
+            return Feedback(state, "Kollarının net görünmesi lazım (Kameraya uzaklaş).", false, pose)
+        }
 
-            // --- FORM KONTROLÜ ---
-            // KURAL 1: İniş derinliği yeterli mi? (Sadece aşağıdayken kontrol et)
-            // Bileklerin dikey pozisyonu, dirseklerin altına inmeli.
-            if (state == ExerciseState.DOWN) {
-                if (leftWrist.position.y < leftElbow.position.y || rightWrist.position.y < rightElbow.position.y) {
-                    feedbackMessage = "Barı/Dumbbell'ları göğsüne daha çok yaklaştır!"
-                }
-            }
-            // KURAL 2: Kollar tepede tam kilitlendi mi?
-            else if (state == ExerciseState.UP) {
-                if (leftElbowAngle < 160 || rightElbowAngle < 160) {
-                    feedbackMessage = "Kollarını tepede tam kilitle!"
-                }
-            }
+        // Hangi kol net görünüyorsa onu kullan (Yan profil desteği)
+        val shoulder = if (isLeftVisible) leftShoulder!! else rightShoulder!!
+        val elbow = if (isLeftVisible) leftElbow!! else rightElbow!!
+        val wrist = if (isLeftVisible) leftWrist!! else rightWrist!!
 
-            // --- Tekrar Sayma Mantığı ---
-            // Kollar aşağıda, göğse yakın (DOWN durumu)
-            if (leftElbowAngle < 95 && rightElbowAngle < 95) {
-                if (state == ExerciseState.UP) {
-                    state = ExerciseState.DOWN
-                }
+        // 3D Matematik + Titreme (EMA) Filtresi
+        val rawElbowAngle = AnalysisUtils.getAngle(shoulder, elbow, wrist)
+        val elbowAngle = getSmoothedAngle("benchElbow", rawElbowAngle)
+
+        // FORM KONTROLÜ
+        if (state == ExerciseState.DOWN) {
+            // İniş yeterli mi? Bench press'te bilek dirseğin hemen üstündedir, y koordinatı olarak altındadır (Android'de Y aşağı artar).
+            if (wrist.position3D.y < elbow.position3D.y) {
+                feedbackMessage = "Barı göğsüne kadar indir!"
             }
-            // Kollar yukarıda, kilitli (UP durumu)
-            else if (leftElbowAngle > 160 && rightElbowAngle > 160) {
-                if (state == ExerciseState.DOWN) {
-                    state = ExerciseState.UP
-                    repCounted = true
-                    // Form hatası yoksa pozitif mesaj ver
-                    if (feedbackMessage == "Harika Form!") {
-                        repCount++
-                        feedbackMessage = "$repCount. tekrar tamamlandı!"
-                    }
-                }
+        } else if (state == ExerciseState.UP) {
+            if (elbowAngle < 150) {
+                feedbackMessage = "Kollarını tam kilitle!"
             }
+        }
+
+        // Merkezcil DTW Makine Öğrenmesi ile Bench Press Sayımı
+        if (matchPatternDTW("benchpress", elbowAngle, idealBenchTemplate, threshold = 22.0, bufferSize = 25, cooldownMs = 1500)) {
+            repCount++
+            repCounted = true
+            feedbackMessage = "MÜKEMMEL FORM! $repCount. tekrar"
         } else {
-            feedbackMessage = "Vücudunun üst kısmı tam görünmüyor."
+            // Anlık görsel geri bildirim (Sayımı etkilemez)
+            if (elbowAngle < 90) { // Daha derine inebilsin
+                state = ExerciseState.DOWN
+            } else if (elbowAngle > 150) { // Biraz daha esnek kilitlenme
+                state = ExerciseState.UP
+            }
         }
 
         return Feedback(state, feedbackMessage, repCounted, pose)
-    }
-
-    private fun getAngle(first: PoseLandmark, mid: PoseLandmark, last: PoseLandmark): Double {
-        val angleRad = atan2(last.position.y - mid.position.y, last.position.x - mid.position.x) -
-                atan2(first.position.y - mid.position.y, first.position.x - mid.position.x)
-        var angleDeg = Math.toDegrees(abs(angleRad.toDouble()))
-        if (angleDeg > 180) {
-            angleDeg = 360 - angleDeg
-        }
-        return angleDeg
     }
 }
