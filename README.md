@@ -32,6 +32,7 @@ Bu proje, modern Android geliştirme en iyi pratikleri ve kütüphaneleri kullan
 *   **Bilgisayarlı Görü (Computer Vision):**
     *   [Google ML Kit - Pose Detection](https://developers.google.com/ml-kit/vision/pose-detection)
     *   [CameraX](https://developer.android.com/training/camerax)
+*   **Hareket Analizi Algoritması:** Dynamic Time Warping (DTW) - Gelişmiş form takibi ve analizi için
 *   **Resim Yükleme:** Glide (GIF animasyonları için)
 *   **Grafik:** MPAndroidChart (İstatistikler için)
 
@@ -47,6 +48,12 @@ Bu proje, modern Android geliştirme en iyi pratikleri ve kütüphaneleri kullan
 4.  **Egzersiz Mantığı:** Her egzersiz (örn: `SquatAnalyzer`) için, özel bir analizör sınıfı ilgili eklemlerin açılarını ve pozisyonlarını değerlendirerek egzersiz durumunu (örn: YUKARI, AŞAĞI), geçerli tekrarları ve yaygın form hatalarını belirler.
 5.  **Geri Bildirim Döngüsü:** Analizörden gelen sonuçlar, `LiveData` aracılığıyla tekrar sayılarını ve geri bildirim mesajlarını güncelleyen `ExerciseViewModel`'e gönderilir. `TextToSpeech` motoru sesli ipuçları sağlar.
 6.  **Veri Kalıcılığı:** Tamamlanan antrenmanlar, `Repository` deseni aracılığıyla **Room** veritabanına kaydedilir.
+
+---
+
+### 🔒 Gizlilik Politikası
+
+Kullanıcı verilerinin nasıl işlendiği ve korunduğu hakkında detaylı bilgi için lütfen [Gizlilik Politikası](PRIVACY_POLICY.md) metnimizi inceleyin.
 
 ---
 
