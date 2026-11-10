@@ -6,8 +6,9 @@ bu test, daha önce doğru sayılan bir kaydın bozulup bozulmadığını göste
 
 ## Kayıt nasıl alınır
 
-1. Uygulamayı **debug** olarak telefona yükle (Android Studio > Run). Egzersiz ekranının sol üstünde
-   yeşil bir debug kutusu görünür: sinyal değeri, sayaç durumu, fps ve kayıt dosyasının adı.
+1. Uygulamayı **debug** olarak telefona yükle (Android Studio > Run). Debug derlemesinde her egzersiz
+   seansı arka planda otomatik kaydedilir (ekranda bir şey görünmez). Dosya adı Logcat'te
+   `SignalRecorder` etiketiyle yazılır.
 2. Hareketi yap ve **gerçek** tekrar sayını not et. "Bitir"e bastığında kayıt kapanır.
 3. Dosyayı bilgisayara al:
 

@@ -195,6 +195,11 @@
     <string name="hold_time_value">Tutma Süresi: %1$s</string>
     <string name="unknown_exercise">Bu hareket tanınamadı.</string>
     <string name="form_score_value">Form Puanı: %%%1$d</string>
+    <string name="voice_count_turn_off">Sesli sayımı kapat</string>
+    <string name="voice_count_turn_on">Sesli sayımı aç</string>
+    <string name="voice_count_on">Sesli sayım açık</string>
+    <string name="voice_count_off">Sesli sayım kapalı</string>
+    <string name="hold_seconds_spoken">%1$d saniye</string>
 
     <!-- Kamera yerleşimi: analizörlerin sinyalleri bu çekim açılarına göre seçildi -->
     <string name="camera_placement_title">📱 Kamera Yerleşimi</string>

@@ -1,5 +1,6 @@
 package com.example.arfitness.fragment
 
+import android.content.Context
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
 import android.os.Bundle
@@ -27,6 +28,7 @@ import com.example.arfitness.analysis.SignalCsv
 import com.example.arfitness.databinding.FragmentExerciseBinding
 import com.example.arfitness.debug.SignalRecorder
 import com.example.arfitness.entitiy.PoseAnalyzer
+import com.example.arfitness.entitiy.RepAnnouncer
 import com.example.arfitness.entitiy.WorkoutResult
 import com.example.arfitness.viewmodel.ExerciseViewModel
 import dagger.hilt.android.AndroidEntryPoint
@@ -50,11 +52,12 @@ class ExerciseFragment : Fragment() {
     // Kamera işlemleri için gerekli değişkenler
     private var kameraCalistirici: ExecutorService? = null
 
-    // Yalnızca debug derlemelerinde: ekranda sinyal/fps göstergesi ve sinyal kaydı (CSV)
-    private var isDebugBuild = false
+    // Yalnızca debug derlemelerinde: sayaca giden sinyalin kaydı (CSV, ekranda görünmez)
     private var signalRecorder: SignalRecorder? = null
-    private var lastFrameMs: Long? = null
-    private var smoothedFps = 0.0
+
+    // Sesli + titreşimli sayım
+    private var repAnnouncer: RepAnnouncer? = null
+    private var lastAnnouncedHoldSeconds = 0L
 
     // PoseAnalyzer callback
     private val poseAnalyzer = PoseAnalyzer { pose, width, height, timestampMs ->
@@ -68,12 +71,13 @@ class ExerciseFragment : Fragment() {
             viewModel.onHoldFrame(feedbackRaporu.isHolding, timestampMs)
         } else if (feedbackRaporu.isRepCounted) {
             viewModel.onRepCounted()
+            repAnnouncer?.announceRep(viewModel.getRepCount())
         }
         feedbackRaporu.message?.let { mesaj ->
             viewModel.updateFeedback(mesaj, feedbackRaporu.isWarning)
         }
 
-        if (isDebugBuild) onDebugFrame(feedbackRaporu, timestampMs)
+        signalRecorder?.let { recordSignal(it, feedbackRaporu, timestampMs) }
 
         // 3. İskeleti ekrana çizen OverlayView'ı UI Thread'de güncelle
         activity?.runOnUiThread {
@@ -81,22 +85,11 @@ class ExerciseFragment : Fragment() {
         }
     }
 
-    private fun onDebugFrame(feedback: Feedback, timestampMs: Long) {
+    private fun recordSignal(recorder: SignalRecorder, feedback: Feedback, timestampMs: Long) {
         val state = exerciseAnalyzer.debugState ?: return
-        signalRecorder?.record(
+        recorder.record(
             SignalCsv.Row(timestampMs, state.values, state.phase, feedback.isRepCounted, feedback.isHolding)
         )
-
-        lastFrameMs?.let { last ->
-            val dt = timestampMs - last
-            if (dt > 0) smoothedFps = 0.9 * smoothedFps + 0.1 * (1000.0 / dt)
-        }
-        lastFrameMs = timestampMs
-
-        val values = state.values.joinToString(" / ") { v -> v?.let { String.format(Locale.US, "%.2f", it) } ?: "—" }
-        val text = "v=$values\n${state.phase}\n${String.format(Locale.US, "%.1f", smoothedFps)} fps" +
-            (signalRecorder?.file?.let { "\nkayıt: ${it.name}" } ?: "")
-        activity?.runOnUiThread { _binding?.debugText?.text = text }
     }
 
     private val izinIstekBaslatici =
@@ -148,11 +141,11 @@ class ExerciseFragment : Fragment() {
         exerciseType = type
         exerciseAnalyzer = type.createAnalyzer()
 
-        isDebugBuild = (requireContext().applicationInfo.flags and ApplicationInfo.FLAG_DEBUGGABLE) != 0
+        val isDebugBuild = (requireContext().applicationInfo.flags and ApplicationInfo.FLAG_DEBUGGABLE) != 0
         if (isDebugBuild) {
-            binding.debugText.visibility = View.VISIBLE
             signalRecorder = SignalRecorder(requireContext(), type.name.lowercase())
         }
+        setupVoiceCounting()
 
         viewModel.reset()
         binding.exerciseTitle.text = getString(type.titleRes)
@@ -169,6 +162,36 @@ class ExerciseFragment : Fragment() {
             delay(1000L)
             kameraIzniniKontrolEt()
         }
+    }
+
+    /**
+     * Sesli sayım: tercih "arfitness_prefs" içinde saklanır (varsayılan açık).
+     * Seslendirme uygulamanın seçili dilinde yapılır.
+     */
+    private fun setupVoiceCounting() {
+        val prefs = requireContext().getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        val voiceOn = prefs.getBoolean(KEY_VOICE_COUNT, true)
+        val locale = resources.configuration.locales[0] ?: Locale.getDefault()
+        repAnnouncer = RepAnnouncer(requireContext(), locale, voiceOn)
+        updateVoiceToggleIcon(voiceOn)
+
+        binding.voiceToggleButton.setOnClickListener {
+            val enabled = !(repAnnouncer?.voiceEnabled ?: voiceOn)
+            repAnnouncer?.voiceEnabled = enabled
+            prefs.edit().putBoolean(KEY_VOICE_COUNT, enabled).apply()
+            updateVoiceToggleIcon(enabled)
+            Toast.makeText(
+                requireContext(),
+                if (enabled) R.string.voice_count_on else R.string.voice_count_off,
+                Toast.LENGTH_SHORT
+            ).show()
+        }
+    }
+
+    private fun updateVoiceToggleIcon(enabled: Boolean) {
+        binding.voiceToggleButton.setImageResource(if (enabled) R.drawable.ic_volume_up else R.drawable.ic_volume_off)
+        binding.voiceToggleButton.contentDescription =
+            getString(if (enabled) R.string.voice_count_turn_off else R.string.voice_count_turn_on)
     }
 
     /** Telefonun nereye konulacağını başlangıçta gösterir; dokununca ya da birkaç saniye sonra kapanır. */
@@ -262,6 +285,11 @@ class ExerciseFragment : Fragment() {
         if (exerciseAnalyzer.isTimed) {
             viewModel.holdSeconds.observe(viewLifecycleOwner) { seconds ->
                 binding.repCountText.text = String.format("%d:%02d", seconds / 60, seconds % 60)
+                // Plank: her 10 saniyede bir sesli bildirim ("30 saniye")
+                if (seconds > 0 && seconds % HOLD_ANNOUNCE_EVERY_S == 0L && seconds != lastAnnouncedHoldSeconds) {
+                    lastAnnouncedHoldSeconds = seconds
+                    repAnnouncer?.announceText(getString(R.string.hold_seconds_spoken, seconds.toInt()))
+                }
             }
         } else {
             viewModel.tekrarSayisi.observe(viewLifecycleOwner) { count ->
@@ -285,6 +313,8 @@ class ExerciseFragment : Fragment() {
         super.onDestroyView()
         signalRecorder?.close()
         signalRecorder = null
+        repAnnouncer?.release()
+        repAnnouncer = null
         _binding = null
     }
 
@@ -306,5 +336,8 @@ class ExerciseFragment : Fragment() {
 
     private companion object {
         const val CAMERA_HINT_MS = 10_000L
+        const val PREFS_NAME = "arfitness_prefs"
+        const val KEY_VOICE_COUNT = "voice_count_enabled"
+        const val HOLD_ANNOUNCE_EVERY_S = 10L
     }
 }

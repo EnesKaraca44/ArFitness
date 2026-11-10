@@ -27,7 +27,7 @@ class PoseAnalyzer(private val onPoseDetected: (Pose, Int, Int, Long) -> Unit) :
             if (USE_GPU) {
                 // Accurate model CPU'da orta seviye telefonlarda ~8–15 fps çalışıyor; düşük fps hızlı
                 // tekrarlarda dip noktanın kaçmasına yol açar. CPU_GPU: GPU varsa onu kullan, yoksa CPU'ya dön.
-                // Etkisi debug ekranındaki fps değeriyle ölçülmeli; sorun çıkarsa USE_GPU = false yap.
+                // Sorun çıkarsa (yanlış iskelet, çökme) USE_GPU = false yap.
                 builder.setPreferredHardwareConfigs(PoseDetectorOptionsBase.CPU_GPU)
             }
             val options = builder.build()

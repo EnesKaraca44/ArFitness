@@ -12,7 +12,7 @@ abstract class ExerciseAnalyzer {
     open val isTimed: Boolean = false
 
     /**
-     * Son karede sayaca giden sinyal ve sayaç durumu. Debug ekranı ve sinyal kaydı (CSV)
+     * Son karede sayaca giden sinyal ve sayaç durumu. Debug derlemelerindeki sinyal kaydı (CSV)
      * bunu kullanır; eşikler gerçek kayıtlarla buradan ayarlanır.
      */
     data class DebugState(val values: List<Double?>, val phase: String)

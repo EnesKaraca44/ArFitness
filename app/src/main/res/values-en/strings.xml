@@ -192,6 +192,11 @@
     <string name="hold_time_value">Hold Time: %1$s</string>
     <string name="unknown_exercise">This exercise could not be recognized.</string>
     <string name="form_score_value">Form Score: %1$d%%</string>
+    <string name="voice_count_turn_off">Turn off voice counting</string>
+    <string name="voice_count_turn_on">Turn on voice counting</string>
+    <string name="voice_count_on">Voice counting on</string>
+    <string name="voice_count_off">Voice counting off</string>
+    <string name="hold_seconds_spoken">%1$d seconds</string>
 
     <!-- Camera placement: each analyzer's signal was chosen for this camera angle -->
     <string name="camera_placement_title">📱 Camera Placement</string>
