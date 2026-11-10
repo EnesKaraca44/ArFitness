@@ -1,11 +1,14 @@
 package com.example.arfitness.analysis
 
-import com.google.mlkit.vision.pose.Pose
-
-data class Feedback(val state: ExerciseState,val message: String? = null,     val isRepCounted: Boolean = false, val pose: Pose   )
-
-
-// analysis paketi için
-// Artık elimizde standart bir "rapor" formatı var (Feedback).
-//Bu raporu dolduracak olan tüm analizörlerin uyması gereken bir "kural kitabı" var (ExerciseAnalyzer).
-//Ve kullanıcının durumunu takip etmek için standart "etiketlerimiz" var (ExerciseState).
+/**
+ * Bir analizörün tek bir kare için ürettiği rapor.
+ */
+data class Feedback(
+    val message: String?,
+    /** Bu karede bir tekrar tamamlandı. */
+    val isRepCounted: Boolean = false,
+    /** Form hatası veya görünürlük uyarısı: ekrandaki kart kırmızı gösterilir. */
+    val isWarning: Boolean = false,
+    /** Süreli hareketlerde (Plank) kullanıcı bu karede doğru pozisyonda mı; süre yalnızca o zaman işler. */
+    val isHolding: Boolean = false,
+)

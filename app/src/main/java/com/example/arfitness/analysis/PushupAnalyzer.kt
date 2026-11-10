@@ -3,74 +3,51 @@ package com.example.arfitness.analysis
 import com.google.mlkit.vision.pose.Pose
 import com.google.mlkit.vision.pose.PoseLandmark
 
-class PushupAnalyzer : ExerciseAnalyzer() {
-    private var state: ExerciseState = ExerciseState.UP
-    private var repCount = 0
+/**
+ * Şınav (yandan çekim): sinyal = kameraya yakın kolun dirsek açısı.
+ * Tekrar = kollar düz (>150°) → aşağı (<100°) → kollar düz.
+ * Gövde yere paralel değilse (ayakta, dizüstü vs.) sayaç dondurulur; ayakta kol oynatmak tekrar saymaz.
+ */
+class PushupAnalyzer : RepExerciseAnalyzer() {
 
-    // Şınav (Push-up) için ideal dirsek açısı şablonu (Yukarıda kilitli -> Aşağı in -> Yukarı Çık)
-    private val idealPushupTemplate = listOf(
-        170.0, 150.0, 120.0, 90.0, 75.0, 90.0, 120.0, 150.0, 170.0
-    )
+    override val counter = RepCounter(restThreshold = 150.0, peakThreshold = 100.0, minRepDurationMs = 500)
 
-    override fun analyze(pose: Pose): Feedback {
-        val leftShoulder = pose.getPoseLandmark(PoseLandmark.LEFT_SHOULDER)
-        val leftElbow = pose.getPoseLandmark(PoseLandmark.LEFT_ELBOW)
-        val leftWrist = pose.getPoseLandmark(PoseLandmark.LEFT_WRIST)
-        val leftHip = pose.getPoseLandmark(PoseLandmark.LEFT_HIP)
-        val leftAnkle = pose.getPoseLandmark(PoseLandmark.LEFT_ANKLE)
+    override val readyMessage = "Şınav pozisyonunda kollarını düz tut"
+    override val goMessage = "Göğsünü yere doğru indir"
+    override val returnMessage = "Şimdi yukarı it!"
+    override val partialMessage = "Biraz daha aşağı in"
 
-        val rightShoulder = pose.getPoseLandmark(PoseLandmark.RIGHT_SHOULDER)
-        val rightElbow = pose.getPoseLandmark(PoseLandmark.RIGHT_ELBOW)
-        val rightWrist = pose.getPoseLandmark(PoseLandmark.RIGHT_WRIST)
-        val rightHip = pose.getPoseLandmark(PoseLandmark.RIGHT_HIP)
-        val rightAnkle = pose.getPoseLandmark(PoseLandmark.RIGHT_ANKLE)
+    override fun read(pose: Pose): Reading {
+        val left = arrayOf(
+            pose.lm(PoseLandmark.LEFT_SHOULDER), pose.lm(PoseLandmark.LEFT_ELBOW), pose.lm(PoseLandmark.LEFT_WRIST),
+            pose.lm(PoseLandmark.LEFT_HIP), pose.lm(PoseLandmark.LEFT_ANKLE)
+        )
+        val right = arrayOf(
+            pose.lm(PoseLandmark.RIGHT_SHOULDER), pose.lm(PoseLandmark.RIGHT_ELBOW), pose.lm(PoseLandmark.RIGHT_WRIST),
+            pose.lm(PoseLandmark.RIGHT_HIP), pose.lm(PoseLandmark.RIGHT_ANKLE)
+        )
+        val side = pickSide("pushup", left, right)
+        if (side == null) {
+            clearSmoothing(KEY)
+            return Reading.unavailable("Vücudun tam görünmüyor, telefonu yanına koyup uzaklaş")
+        }
+        val (shoulder, elbow, wrist, hip, ankle) = if (side == Side.LEFT) left else right
 
-        val isLeftVisible = isVisible(leftShoulder, leftElbow, leftWrist, leftHip, leftAnkle)
-        val isRightVisible = isVisible(rightShoulder, rightElbow, rightWrist, rightHip, rightAnkle)
-
-        if (!isLeftVisible && !isRightVisible) {
-            return Feedback(state, "Vücudun tam görünmüyor (Kameraya uzaklaş!)", false, pose)
+        if (AnalysisUtils.inclinationDeg(shoulder!!, ankle!!) > MAX_BODY_INCLINATION) {
+            clearSmoothing(KEY)
+            return Reading.unavailable("Şınav pozisyonuna geç (telefon yanında olsun)")
         }
 
-        val shoulder = if (isLeftVisible) leftShoulder!! else rightShoulder!!
-        val elbow = if (isLeftVisible) leftElbow!! else rightElbow!!
-        val wrist = if (isLeftVisible) leftWrist!! else rightWrist!!
-        val hip = if (isLeftVisible) leftHip!! else rightHip!!
-        val ankle = if (isLeftVisible) leftAnkle!! else rightAnkle!!
+        val elbowAngle = smooth(KEY, AnalysisUtils.getAngle(shoulder, elbow!!, wrist!!))
+        val bodyAngle = AnalysisUtils.getAngle(shoulder, hip!!, ankle)
+        val warning = if (bodyAngle < 145) "Kalçanı düz tut, vücudun tek çizgi olsun" else null
 
-        // Açıları hesapla (3D Matematik + Low Pass Smoothing)
-        val rawElbowAngle = AnalysisUtils.getAngle(shoulder, elbow, wrist)
-        val rawBodyAngle = AnalysisUtils.getAngle(shoulder, hip, ankle)
+        return Reading.of(elbowAngle, warning)
+    }
 
-        val elbowAngle = getSmoothedAngle("pushupElbow", rawElbowAngle)
-        val bodyAngle = getSmoothedAngle("pushupBody", rawBodyAngle)
-
-        var feedbackMessage = ""
-        var repCounted = false
-
-        // Form kontrolü: Şınavda sırt/kalça düz olmalı
-        if (bodyAngle < 145) {
-            feedbackMessage = "Kalçanı düşürme, düz tut!"
-        }
-
-        // DTW ile Şınav Sayımı
-        if (matchPatternDTW("pushup", elbowAngle, idealPushupTemplate, threshold = 22.0, bufferSize = 25, cooldownMs = 1200)) {
-            repCount++
-            repCounted = true
-            feedbackMessage = "MÜKEMMEL FORM! $repCount. tekrar"
-        } else {
-            // Sadece görsel anlık yönlendirme (Sayımı etkilemez)
-            if (elbowAngle < 90) {
-                state = ExerciseState.DOWN
-            } else if (elbowAngle > 150) {
-                state = ExerciseState.UP
-            }
-        }
-
-        if (feedbackMessage.isEmpty()) {
-            feedbackMessage = if (state == ExerciseState.DOWN) "Şimdi yukarı it!" else "Formun harika, inmeye başla!"
-        }
-
-        return Feedback(state, feedbackMessage, repCounted, pose)
+    private companion object {
+        const val KEY = "pushupElbow"
+        /** Omuz–ayak bileği çizgisinin yatayla yapabileceği en büyük açı. */
+        const val MAX_BODY_INCLINATION = 40.0
     }
 }

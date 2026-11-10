@@ -2,72 +2,45 @@ package com.example.arfitness.analysis
 
 import com.google.mlkit.vision.pose.Pose
 import com.google.mlkit.vision.pose.PoseLandmark
-import kotlin.math.abs
-import kotlin.math.atan2
 
-class CablePushdownAnalyzer : ExerciseAnalyzer() {
+/**
+ * Cable Pushdown: sinyal = dirsek açısı.
+ * Tekrar = dirsek bükülü (<95°) → kollar düz (>155°) → dirsek bükülü.
+ */
+class CablePushdownAnalyzer : RepExerciseAnalyzer() {
 
-    override val requiredLandmarks = listOf(
-        PoseLandmark.RIGHT_SHOULDER, PoseLandmark.LEFT_SHOULDER,
-        PoseLandmark.RIGHT_ELBOW, PoseLandmark.LEFT_ELBOW,
-        PoseLandmark.RIGHT_WRIST, PoseLandmark.LEFT_WRIST
-    )
+    override val counter = RepCounter(restThreshold = 95.0, peakThreshold = 155.0, minRepDurationMs = 500)
 
-    private var state: ExerciseState = ExerciseState.UP
-    private var repCount = 0
+    override val readyMessage = "Dirseklerin bükülü, eller göğüs hizasında başla"
+    override val goMessage = "Kollarını tamamen düzelene kadar aşağı it"
+    override val returnMessage = "Kontrollü şekilde yukarı bırak"
+    override val partialMessage = "Kollarını sonuna kadar düzelt"
 
-    // İdeal Cable Pushdown Şablonu (Kollar bükülü yukarıda -> Aşağı itiş -> Yukarı bırakış)
-    private val idealPushdownTemplate = listOf(
-        70.0, 100.0, 140.0, 170.0, 140.0, 100.0, 70.0
-    )
-
-    override fun analyze(pose: Pose): Feedback {
-        val leftShoulder = pose.getPoseLandmark(PoseLandmark.LEFT_SHOULDER)
-        val leftElbow = pose.getPoseLandmark(PoseLandmark.LEFT_ELBOW)
-        val leftWrist = pose.getPoseLandmark(PoseLandmark.LEFT_WRIST)
-        val rightShoulder = pose.getPoseLandmark(PoseLandmark.RIGHT_SHOULDER)
-        val rightElbow = pose.getPoseLandmark(PoseLandmark.RIGHT_ELBOW)
-        val rightWrist = pose.getPoseLandmark(PoseLandmark.RIGHT_WRIST)
-
-        val isLeftVisible = isVisible(leftShoulder, leftElbow, leftWrist)
-        val isRightVisible = isVisible(rightShoulder, rightElbow, rightWrist)
-
-        if (!isLeftVisible && !isRightVisible) {
-            return Feedback(state, "Kolun net olarak görünmüyor (Kameraya uzaklaş).", false, pose)
+    override fun read(pose: Pose): Reading {
+        val left = arrayOf(
+            pose.lm(PoseLandmark.LEFT_SHOULDER), pose.lm(PoseLandmark.LEFT_ELBOW), pose.lm(PoseLandmark.LEFT_WRIST)
+        )
+        val right = arrayOf(
+            pose.lm(PoseLandmark.RIGHT_SHOULDER), pose.lm(PoseLandmark.RIGHT_ELBOW), pose.lm(PoseLandmark.RIGHT_WRIST)
+        )
+        val side = pickSide("pushdown", left, right)
+        if (side == null) {
+            clearSmoothing(KEY)
+            return Reading.unavailable("Kolun görünmüyor, kameradan biraz uzaklaş")
         }
+        val (shoulder, elbow, wrist) = if (side == Side.LEFT) left else right
+        val elbowAngle = smooth(KEY, AnalysisUtils.getAngle(shoulder!!, elbow!!, wrist!!))
 
-        // Hangi taraf net görünüyorsa onu kullan
-        val shoulder = if (isLeftVisible) leftShoulder!! else rightShoulder!!
-        val elbow = if (isLeftVisible) leftElbow!! else rightElbow!!
-        val wrist = if (isLeftVisible) leftWrist!! else rightWrist!!
+        // Üst kol gövdeye paralel kalmalı: kalça–omuz–dirsek açısı küçük olmalı
+        val hip = pose.lm(if (side == Side.LEFT) PoseLandmark.LEFT_HIP else PoseLandmark.RIGHT_HIP)
+        val warning = if (hip != null && isVisible(hip) && AnalysisUtils.getAngle(hip, shoulder, elbow) > 40) {
+            "Dirseğini gövdene sabitle"
+        } else null
 
-        // 3D Vektör açısı ve Smoothing (EMA)
-        val rawElbowAngle = AnalysisUtils.getAngle(shoulder, elbow, wrist)
-        val elbowAngle = getSmoothedAngle("pushdownElbow", rawElbowAngle)
+        return Reading.of(elbowAngle, warning)
+    }
 
-        var feedbackMessage = "Harika Form!"
-        var repCounted = false
-
-        // --- FORM KONTROLÜ ---
-        // KURAL 1: Dirsek vücuttan çok fazla ayrılıyor mu? (Omuz hizasından sapma)
-        if (abs(elbow.position3D.x - shoulder.position3D.x) > 120) {
-            feedbackMessage = "Dirseğini gövdene sabitle!"
-        }
-
-        // Merkezcil DTW Makine Öğrenmesi ile Sayım
-        if (matchPatternDTW("cablepushdown", elbowAngle, idealPushdownTemplate, threshold = 22.0, bufferSize = 20, cooldownMs = 1200)) {
-            repCount++
-            repCounted = true
-            feedbackMessage = "MÜKEMMEL FORM! $repCount. tekrar"
-        } else {
-            // Anlık görsel geri bildirim (Sayımı etkilemez)
-            if (elbowAngle > 160) { 
-                state = ExerciseState.DOWN
-            } else if (elbowAngle < 90) { 
-                state = ExerciseState.UP
-            }
-        }
-
-        return Feedback(state, feedbackMessage, repCounted, pose)
+    private companion object {
+        const val KEY = "pushdownElbow"
     }
 }

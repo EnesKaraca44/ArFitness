@@ -2,74 +2,47 @@ package com.example.arfitness.analysis
 
 import com.google.mlkit.vision.pose.Pose
 import com.google.mlkit.vision.pose.PoseLandmark
-import kotlin.math.abs
-import kotlin.math.atan2
 
-class PullupAnalyzer : ExerciseAnalyzer() {
-    override val requiredLandmarks = listOf(
-        PoseLandmark.RIGHT_SHOULDER, PoseLandmark.LEFT_SHOULDER,
-        PoseLandmark.RIGHT_ELBOW, PoseLandmark.LEFT_ELBOW,
-        PoseLandmark.RIGHT_WRIST, PoseLandmark.LEFT_WRIST,
-        PoseLandmark.NOSE
-    )
+/**
+ * Barfiks: sinyal = dirsek açısı.
+ * Tekrar = asılı, kollar açık (>150°) → yukarı çekiş (<90°) → asılı.
+ */
+class PullupAnalyzer : RepExerciseAnalyzer() {
 
-    private var state: ExerciseState = ExerciseState.DOWN
-    private var repCount = 0
+    override val counter = RepCounter(restThreshold = 150.0, peakThreshold = 90.0, minRepDurationMs = 700)
 
-    // İdeal Barfiks Zaman Serisi Şablonu (Kollar açık -> Yukarı Çekiş -> İniş)
-    private val idealPullupTemplate = listOf(
-        170.0, 140.0, 100.0, 70.0, 50.0, 70.0, 100.0, 140.0, 170.0
-    )
+    override val readyMessage = "Bara asıl, kolların tam açık olsun"
+    override val goMessage = "Göğsünü bara doğru çek"
+    override val returnMessage = "Yavaşça in, kollarını tam aç"
+    override val partialMessage = "Daha yukarı çek"
 
-    override fun analyze(pose: Pose): Feedback {
-        val leftShoulder = pose.getPoseLandmark(PoseLandmark.LEFT_SHOULDER)
-        val rightShoulder = pose.getPoseLandmark(PoseLandmark.RIGHT_SHOULDER)
-        val leftElbow = pose.getPoseLandmark(PoseLandmark.LEFT_ELBOW)
-        val rightElbow = pose.getPoseLandmark(PoseLandmark.RIGHT_ELBOW)
-        val leftWrist = pose.getPoseLandmark(PoseLandmark.LEFT_WRIST)
-        val rightWrist = pose.getPoseLandmark(PoseLandmark.RIGHT_WRIST)
-        val nose = pose.getPoseLandmark(PoseLandmark.NOSE)
-
-        val isLeftVisible = isVisible(leftShoulder, leftElbow, leftWrist)
-        val isRightVisible = isVisible(rightShoulder, rightElbow, rightWrist)
-
-        if (!isLeftVisible && !isRightVisible) {
-            return Feedback(state, "Vücudunun üst kısmı net görünmüyor.", false, pose)
+    override fun read(pose: Pose): Reading {
+        val left = arrayOf(
+            pose.lm(PoseLandmark.LEFT_SHOULDER), pose.lm(PoseLandmark.LEFT_ELBOW), pose.lm(PoseLandmark.LEFT_WRIST)
+        )
+        val right = arrayOf(
+            pose.lm(PoseLandmark.RIGHT_SHOULDER), pose.lm(PoseLandmark.RIGHT_ELBOW), pose.lm(PoseLandmark.RIGHT_WRIST)
+        )
+        val side = pickSide("pullup", left, right)
+        if (side == null) {
+            clearSmoothing(KEY)
+            return Reading.unavailable("Kolların ve başın görünmüyor, kameradan uzaklaş")
         }
+        val (shoulder, elbow, wrist) = if (side == Side.LEFT) left else right
+        val elbowAngle = smooth(KEY, AnalysisUtils.getAngle(shoulder!!, elbow!!, wrist!!))
 
-        val shoulder = if (isLeftVisible) leftShoulder!! else rightShoulder!!
-        val elbow = if (isLeftVisible) leftElbow!! else rightElbow!!
-        val wrist = if (isLeftVisible) leftWrist!! else rightWrist!!
+        // Tepe noktada çene barı (bilek hizasını) geçmeli; görüntüde y aşağı doğru artar
+        val nose = pose.lm(PoseLandmark.NOSE)
+        val warning = if (elbowAngle < 90 && nose != null && isVisible(nose) &&
+            nose.position.y > wrist!!.position.y
+        ) {
+            "Çeneni barın üstüne çıkar!"
+        } else null
 
-        // 3 Boyutlu Açı ve Smoothing (Titreme Önleyici)
-        val rawElbowAngle = AnalysisUtils.getAngle(shoulder, elbow, wrist)
-        val elbowAngle = getSmoothedAngle("pullupElbow", rawElbowAngle)
+        return Reading.of(elbowAngle, warning)
+    }
 
-        var feedbackMessage = "Pozisyon al!"
-        var repCounted = false
-
-        // DTW ile Barfiks Sayımı
-        if (matchPatternDTW("pullup", elbowAngle, idealPullupTemplate, threshold = 25.0, bufferSize = 25, cooldownMs = 1500)) {
-            repCount++
-            repCounted = true
-            feedbackMessage = "MÜKEMMEL FORM! $repCount. tekrar"
-        } else {
-            // Görsel / Anlık rehberlik ve form kontrolü
-            if (elbowAngle < 80) {
-                state = ExerciseState.UP
-                // Barfiks tepe noktasındayken çene bileği geçmeli (y koordinatı daha küçük olmalı)
-                if (nose != null && nose.position3D.y > wrist.position3D.y) {
-                    feedbackMessage = "Çeneni barın üstüne çıkar!"
-                } else {
-                    feedbackMessage = "Harika çekiş, yavaşça in!"
-                }
-            } else if (elbowAngle > 150) {
-                state = ExerciseState.DOWN
-                feedbackMessage = "Kolların tam açıldı, şimdi yukarı çek!"
-            }
-        }
-
-        return Feedback(state, feedbackMessage, repCounted, pose)
+    private companion object {
+        const val KEY = "pullupElbow"
     }
 }
-

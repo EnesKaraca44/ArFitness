@@ -26,6 +26,10 @@
     <color name="warning">#D29922</color>
     <color name="error">#F85149</color>
 
+    <!-- Egzersiz ekranı geri bildirim kartı (uyarı rengi beyaz yazıyla 4.5:1 kontrast verir) -->
+    <color name="feedback_info">#CC0A84FF</color>
+    <color name="feedback_warning">#E6DA3633</color>
+
     <!-- Eski isimlerin uyumluluğu (Eski layoutlar hata vermesin diye) -->
     <color name="light_primary">#1A2332</color>
     <color name="light_gray">#21262D</color>

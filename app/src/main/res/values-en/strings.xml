@@ -8,6 +8,7 @@
     <!-- Exercise Screen -->
     <string name="repetitions">Reps</string>
     <string name="duration">Duration</string>
+    <string name="elapsed_time">ELAPSED TIME</string>
     <string name="time">Time</string>
     <string name="live">LIVE</string>
     <string name="perfect_feedback">Perfect! Keep your back straight and maintain your pace.</string>
@@ -151,16 +152,79 @@
     <!-- User Profile Screen -->
     <string name="profile">Profile</string>
     <string name="settings">Settings</string>
+    <string name="back">Back</string>
+    <string name="app_language">App language</string>
+    <string-array name="language_names">
+        <item>Turkish</item>
+        <item>English</item>
+    </string-array>
     <string name="user_name">User Name</string>
     <string name="user_email">user@email.com</string>
     <string name="edit_profile">Edit Profile</string>
     <string name="profile_picture">Profile Picture</string>
+    <string name="required_field">This field is required.</string>
+    <string name="weight_kg">Weight (kg)</string>
+    <string name="height_cm">Height (cm)</string>
+    <string name="save">Save</string>
+    <string name="invalid_weight">Enter a valid weight.</string>
+    <string name="invalid_height">Enter a valid height.</string>
+    <string name="data_management">Data management</string>
+    <string name="clear_workout_history">Clear workout history</string>
+    <string name="support_and_about">Support and about</string>
+    <string name="privacy_policy">Privacy policy</string>
+    <string name="contact_support">Contact support</string>
+    <string name="share_app">Share app</string>
+    <string name="rate_app">Rate on Google Play</string>
+    <string name="app_version">Version %1$s</string>
+    <string name="clear_history_title">Clear workout history?</string>
+    <string name="clear_history_confirmation">All workout records and statistics will be permanently deleted.</string>
+    <string name="cancel">Cancel</string>
+    <string name="clear">Clear</string>
+    <string name="history_cleared">Workout history cleared.</string>
+    <string name="no_browser_available">No browser is available to open this link.</string>
+    <string name="no_email_app_available">No email app is available.</string>
+    <string name="support_email_subject">ArFitness support request</string>
+    <string name="share_app_message">Check out ArFitness: %1$s</string>
     <string name="total_workouts">Total Workouts</string>
     <string name="total_reps">Total Reps</string>
+    <string name="total_reps_value">Total Reps: %1$d</string>
+    <string name="hold_time_label">Hold Time</string>
+    <string name="hold_time_value">Hold Time: %1$s</string>
+    <string name="unknown_exercise">This exercise could not be recognized.</string>
+    <string name="form_score_value">Form Score: %1$d%%</string>
+
+    <!-- Camera placement: each analyzer's signal was chosen for this camera angle -->
+    <string name="camera_placement_title">📱 Camera Placement</string>
+    <string name="camera_hint_squat">Place the phone at waist height, 2–3 m in front of or beside you. You should be visible from head to feet.</string>
+    <string name="camera_hint_push_up">Place the phone on the floor, 1.5–2 m to your side. You should be visible from head to heels.</string>
+    <string name="camera_hint_curl">Place the phone at chest height, 2 m in front of you. Your arms and hips should be visible.</string>
+    <string name="camera_hint_shoulder_press">Place the phone at chest height, 2–2.5 m in front of you. Your arms should stay visible above your head.</string>
+    <string name="camera_hint_lunge">Place the phone at waist height, 2–3 m to your side. Both legs should be visible.</string>
+    <string name="camera_hint_dumbbell_fly">If lying on a bench, place the phone at bench height 1.5–2 m to your side. If standing, place it 2 m in front of you.</string>
+    <string name="camera_hint_bench_press">Place the phone at bench height, 1.5–2 m to your side. Your arm and torso should be visible from the side.</string>
+    <string name="camera_hint_plank">Place the phone on the floor, 1.5–2 m to your side. You should be visible from shoulders to heels.</string>
+    <string name="camera_hint_pull_up">Place the phone 2.5–3 m in front of you. The bar and your whole body should be visible.</string>
+    <string name="camera_hint_lat_pulldown">Place the phone 2 m in front of you. Your arms and hips should be visible with the bar up.</string>
+    <string name="camera_hint_cable_pushdown">Place the phone at waist height, 2 m to your side. Your arm and hips should be visible from the side.</string>
+    <string name="camera_hint_raise">Place the phone at chest height, 2–2.5 m in front of you. Your arms and hips should be visible.</string>
+    <string name="camera_hint_deadlift">Place the phone at waist height, 2–3 m to your side. You should be visible from head to feet.</string>
     <string name="personal_information">Personal Information</string>
+    <string name="body_metrics_title">About you</string>
+    <string name="body_metrics_optional">Age, height, and weight are optional. You can add them to your profile later.</string>
+    <string name="age_years">Age</string>
+    <string name="invalid_age">Enter an age between 1 and 120.</string>
+    <string name="invalid_weight_value">Enter a valid weight in kilograms.</string>
+    <string name="invalid_height_value">Enter a valid height in centimeters.</string>
+    <string name="enter_name_message">Please enter your name.</string>
+    <string name="invalid_email_message">Please enter a valid email address.</string>
+    <string name="select_goal_message">Choose a goal to continue.</string>
+    <string name="age_years_format">%1$d yrs</string>
+    <string name="weight_value_format">%1$.1f kg</string>
+    <string name="height_value_format">%1$d cm</string>
     <string name="preferences">Preferences</string>
     <string name="about">About</string>
     <string name="logout">Logout</string>
+    <string name="logout_confirmation">There is no account session. You will return to profile setup; your workout history will stay on this device. Continue?</string>
     
     <!-- Onboarding Screen -->
     <string name="welcome_to_arfitness">Welcome to ArFitness!</string>
@@ -179,4 +243,4 @@
     <string name="start_journey">Start Your Journey</string>
     <string name="please_fill_all_fields">Please fill all fields</string>
     
-</resources> 
+</resources>

@@ -34,8 +34,19 @@ class ResultFragment : Fragment() {
 
 
         binding.tvExerciseName.text = getString(R.string.exercise_label, result.exerciseName)
-        binding.tvTotalReps.text = getString(R.string.total_reps, result.totalReps)
-        binding.tvDuration.text = getString(R.string.duration_label, formatTime(result.durationInSeconds))
+        if (result.isTimed) {
+            // Plank: tekrar yok, doğru pozisyonda geçen süre gösterilir
+            binding.tvTotalReps.text = getString(R.string.hold_time_value, formatTime(result.durationInSeconds))
+            binding.tvDuration.visibility = View.GONE
+        } else {
+            // Not: "total_reps" etiketinde sayı yeri olmadığı için eskiden tekrar sayısı hiç görünmüyordu
+            binding.tvTotalReps.text = getString(R.string.total_reps_value, result.totalReps)
+            binding.tvDuration.text = getString(R.string.duration_label, formatTime(result.durationInSeconds))
+        }
+        result.formScore?.let { score ->
+            binding.tvFormScore.text = getString(R.string.form_score_value, score)
+            binding.tvFormScore.visibility = View.VISIBLE
+        }
 
 
         binding.btnGoHome.setOnClickListener {

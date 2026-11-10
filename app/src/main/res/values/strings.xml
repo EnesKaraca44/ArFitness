@@ -8,6 +8,7 @@
     <!-- Exercise Screen -->
     <string name="repetitions">Tekrar</string>
     <string name="duration">Süre</string>
+    <string name="elapsed_time">GEÇEN SÜRE</string>
     <string name="time">Süre</string>
     <string name="live">LIVE</string>
     <string name="perfect_feedback">Mükemmel! Sırtını dik tut ve temponu koru.</string>
@@ -154,16 +155,79 @@
     <!-- User Profile Screen -->
     <string name="profile">Profil</string>
     <string name="settings">Ayarlar</string>
+    <string name="back">Geri</string>
+    <string name="app_language">Uygulama Dili</string>
+    <string-array name="language_names">
+        <item>Türkçe</item>
+        <item>English</item>
+    </string-array>
     <string name="user_name">Kullanıcı Adı</string>
     <string name="user_email">user@email.com</string>
     <string name="edit_profile">Profili Düzenle</string>
     <string name="profile_picture">Profil Fotoğrafı</string>
+    <string name="required_field">Bu alan zorunludur.</string>
+    <string name="weight_kg">Kilo (kg)</string>
+    <string name="height_cm">Boy (cm)</string>
+    <string name="save">Kaydet</string>
+    <string name="invalid_weight">Geçerli bir kilo girin.</string>
+    <string name="invalid_height">Geçerli bir boy girin.</string>
+    <string name="data_management">Veri Yönetimi</string>
+    <string name="clear_workout_history">Antrenman Geçmişini Temizle</string>
+    <string name="support_and_about">Destek ve Hakkında</string>
+    <string name="privacy_policy">Gizlilik Politikası</string>
+    <string name="contact_support">Destekle İletişime Geç</string>
+    <string name="share_app">Uygulamayı Paylaş</string>
+    <string name="rate_app">Google Play’de Değerlendir</string>
+    <string name="app_version">Sürüm %1$s</string>
+    <string name="clear_history_title">Antrenman geçmişi silinsin mi?</string>
+    <string name="clear_history_confirmation">Tüm antrenman kayıtların ve istatistiklerin kalıcı olarak silinecek.</string>
+    <string name="cancel">Vazgeç</string>
+    <string name="clear">Temizle</string>
+    <string name="history_cleared">Antrenman geçmişi temizlendi.</string>
+    <string name="no_browser_available">Bağlantıyı açabilecek bir tarayıcı bulunamadı.</string>
+    <string name="no_email_app_available">E-posta uygulaması bulunamadı.</string>
+    <string name="support_email_subject">ArFitness destek talebi</string>
+    <string name="share_app_message">ArFitness’e göz at: %1$s</string>
     <string name="total_workouts">Toplam Antrenman</string>
     <string name="total_reps">Toplam Tekrar</string>
+    <string name="total_reps_value">Toplam Tekrar: %1$d</string>
+    <string name="hold_time_label">Tutma Süresi</string>
+    <string name="hold_time_value">Tutma Süresi: %1$s</string>
+    <string name="unknown_exercise">Bu hareket tanınamadı.</string>
+    <string name="form_score_value">Form Puanı: %%%1$d</string>
+
+    <!-- Kamera yerleşimi: analizörlerin sinyalleri bu çekim açılarına göre seçildi -->
+    <string name="camera_placement_title">📱 Kamera Yerleşimi</string>
+    <string name="camera_hint_squat">Telefonu bel hizasında, 2–3 m önüne ya da yanına koy. Başından ayaklarına kadar görünmelisin.</string>
+    <string name="camera_hint_push_up">Telefonu yere, 1.5–2 m yanına koy. Yandan baştan topuğa kadar görünmelisin.</string>
+    <string name="camera_hint_curl">Telefonu göğüs hizasında, 2 m önüne koy. Kolların ve kalçan görünmeli.</string>
+    <string name="camera_hint_shoulder_press">Telefonu göğüs hizasında, 2–2.5 m önüne koy. Kolların başının üzerindeyken de görünmeli.</string>
+    <string name="camera_hint_lunge">Telefonu bel hizasında, 2–3 m yanına koy. İki bacağın da görünmeli.</string>
+    <string name="camera_hint_dumbbell_fly">Bench\'e uzanıyorsan telefonu bench hizasında, 1.5–2 m yanına koy. Ayakta yapıyorsan 2 m önüne koy.</string>
+    <string name="camera_hint_bench_press">Telefonu bench hizasında, 1.5–2 m yanına koy. Kolun ve gövden yandan görünmeli.</string>
+    <string name="camera_hint_plank">Telefonu yere, 1.5–2 m yanına koy. Omuzlarından topuklarına kadar görünmelisin.</string>
+    <string name="camera_hint_pull_up">Telefonu 2.5–3 m önüne koy. Bar ve tüm vücudun görünmeli.</string>
+    <string name="camera_hint_lat_pulldown">Telefonu 2 m önüne koy. Bar yukarıdayken kolların ve kalçan görünmeli.</string>
+    <string name="camera_hint_cable_pushdown">Telefonu bel hizasında, 2 m yanına koy. Kolun ve kalçan yandan görünmeli.</string>
+    <string name="camera_hint_raise">Telefonu göğüs hizasında, 2–2.5 m önüne koy. Kolların ve kalçan görünmeli.</string>
+    <string name="camera_hint_deadlift">Telefonu bel hizasında, 2–3 m yanına koy. Yandan baştan ayağa kadar görünmelisin.</string>
     <string name="personal_information">Kişisel Bilgiler</string>
+    <string name="body_metrics_title">Seni tanıyalım</string>
+    <string name="body_metrics_optional">Yaş, boy ve kilo bilgileri isteğe bağlıdır; daha sonra profilinden ekleyebilirsin.</string>
+    <string name="age_years">Yaş</string>
+    <string name="invalid_age">Yaşını 1–120 arasında gir.</string>
+    <string name="invalid_weight_value">Kiloyu kilogram olarak geçerli bir sayı ile gir.</string>
+    <string name="invalid_height_value">Boyu santimetre olarak geçerli bir sayı ile gir.</string>
+    <string name="enter_name_message">Lütfen adını gir.</string>
+    <string name="invalid_email_message">Lütfen geçerli bir e-posta adresi gir.</string>
+    <string name="select_goal_message">Devam etmek için bir hedef seç.</string>
+    <string name="age_years_format">%1$d yaş</string>
+    <string name="weight_value_format">%1$.1f kg</string>
+    <string name="height_value_format">%1$d cm</string>
     <string name="preferences">Tercihler</string>
     <string name="about">Hakkında</string>
     <string name="logout">Çıkış Yap</string>
+    <string name="logout_confirmation">Hesap oturumu bulunmuyor. Profil kurulumuna dönülecek; antrenman geçmişin bu cihazda kalacak. Devam edilsin mi?</string>
     
     <!-- Onboarding Screen -->
     <string name="welcome_to_arfitness">ArFitness\'e Hoş Geldin!</string>

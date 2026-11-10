@@ -30,8 +30,9 @@ class PoseOverlayView @JvmOverloads constructor(
     private var pose: Pose? = null
     private var imageWidth: Int = 1
     private var imageHeight: Int = 1
-    private var scaleX: Float = 1f
-    private var scaleY: Float = 1f
+    private var scale: Float = 1f
+    private var offsetX: Float = 0f
+    private var offsetY: Float = 0f
     private var isFrontCamera: Boolean = true
 
     fun setPose(newPose: Pose, originalImageWidth: Int, originalImageHeight: Int, isFrontCamera: Boolean = true) {
@@ -43,25 +44,25 @@ class PoseOverlayView @JvmOverloads constructor(
     }
 
     private fun translateX(x: Float): Float {
-        val scaled = x * scaleX
-        return if (isFrontCamera) {
-            width.toFloat() - scaled
-        } else {
-            scaled
-        }
+        val viewX = x * scale + offsetX
+        // Ön kamera önizlemesi aynalı gösterilir; ML Kit koordinatları aynasız görüntüye aittir
+        return if (isFrontCamera) width.toFloat() - viewX else viewX
     }
 
-    private fun translateY(y: Float): Float {
-        return y * scaleY
-    }
+    private fun translateY(y: Float): Float = y * scale + offsetY
 
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
 
         val currentPose = pose ?: return
 
-        scaleX = width.toFloat() / imageWidth.toFloat()
-        scaleY = height.toFloat() / imageHeight.toFloat()
+        // PreviewView varsayılan olarak FILL_CENTER çizer: görüntüyü en-boy oranını koruyarak
+        // ekranı dolduracak kadar büyütür ve taşan kısmı ortadan kırpar. İskelet de aynı
+        // dönüşümle çizilmeli; aksi halde (eskisi gibi x ve y ayrı ayrı gerilirse) 20:9
+        // ekranlarda iskelet görüntüdeki vücuttan kayar.
+        scale = maxOf(width.toFloat() / imageWidth, height.toFloat() / imageHeight)
+        offsetX = (width - imageWidth * scale) / 2f
+        offsetY = (height - imageHeight * scale) / 2f
 
         val landmarks = currentPose.allPoseLandmarks
 

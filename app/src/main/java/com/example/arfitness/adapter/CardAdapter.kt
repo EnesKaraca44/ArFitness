@@ -34,7 +34,8 @@ class CardAdapter(var mContext: Context, var exercisesList: List<EgzersizDetay>)
         t.tvExerciseDescription.text = getExerciseDescription(egzersiz.gorunenAd) // Egzersiz açıklaması
 
         t.btnStart.setOnClickListener {
-            val geciss= AnasayfaFragmentDirections.anadanexercise(egzersiz.gorunenAd)
+            // Detay ekranıyla aynı şekilde kod adını gönder (eşleme ExerciseType üzerinden yapılır)
+            val geciss= AnasayfaFragmentDirections.anadanexercise(egzersiz.kodAdi)
             Navigation.findNavController(it).navigate(geciss)
         }
 

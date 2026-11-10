@@ -8,6 +8,7 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.arfitness.data.WorkoutSession
 import com.example.arfitness.R
+import com.example.arfitness.analysis.ExerciseType
 import com.example.arfitness.databinding.ItemWorkoutHistoryBinding
 import java.text.SimpleDateFormat
 import java.util.*
@@ -37,7 +38,9 @@ class HistoryAdapter : ListAdapter<WorkoutSession, HistoryAdapter.HistoryViewHol
 
                 // Stats Row
                 tvDuration.text = formatDuration(session.durationInSeconds)
-                tvReps.text = session.repCount.toString()
+                // Plank süreli bir harekettir; tekrar sütununda 0 yerine tire göster
+                val isTimed = ExerciseType.fromName(session.exerciseName) == ExerciseType.PLANK
+                tvReps.text = if (isTimed) "–" else session.repCount.toString()
 
                 // TODO: Bu alanlar için veritabanına yeni sütunlar eklemen gerekecek.
                 // Şimdilik varsayılan değerler koyalım.

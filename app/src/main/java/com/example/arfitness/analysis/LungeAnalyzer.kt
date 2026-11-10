@@ -3,62 +3,45 @@ package com.example.arfitness.analysis
 import com.google.mlkit.vision.pose.Pose
 import com.google.mlkit.vision.pose.PoseLandmark
 
-import kotlin.math.min
+/**
+ * Lunge: sinyal = daha çok bükülen dizin açısı (aktif diz).
+ * Tekrar = dik (>155°) → alçalma (<110°) → dik. Her bacak değişimi ayrı tekrar sayılır.
+ */
+class LungeAnalyzer : RepExerciseAnalyzer() {
 
-class LungeAnalyzer : ExerciseAnalyzer() {
+    override val counter = RepCounter(restThreshold = 155.0, peakThreshold = 110.0, minRepDurationMs = 700)
 
-    private var state: ExerciseState = ExerciseState.UP
-    private var repCount = 0
+    override val readyMessage = "Dik dur, iki bacağın da kamerada görünsün"
+    override val goMessage = "Öne adım at ve iki dizini bükerek alçal"
+    override val returnMessage = "Harika derinlik, öndeki ayağınla itip kalk!"
+    override val partialMessage = "Biraz daha alçal, diz 90°'ye yaklaşsın"
 
-    // İdeal lunge (adım atıp çömelme) aktif diz grafiği
-    private val idealLungeTemplate = listOf(
-        170.0, 150.0, 120.0, 95.0, 80.0, 80.0, 95.0, 120.0, 150.0, 170.0
-    )
+    override fun read(pose: Pose): Reading {
+        val lHip = pose.lm(PoseLandmark.LEFT_HIP)
+        val lKnee = pose.lm(PoseLandmark.LEFT_KNEE)
+        val lAnkle = pose.lm(PoseLandmark.LEFT_ANKLE)
+        val rHip = pose.lm(PoseLandmark.RIGHT_HIP)
+        val rKnee = pose.lm(PoseLandmark.RIGHT_KNEE)
+        val rAnkle = pose.lm(PoseLandmark.RIGHT_ANKLE)
 
-    override fun analyze(pose: Pose): Feedback {
-        val leftHip = pose.getPoseLandmark(PoseLandmark.LEFT_HIP)
-        val leftKnee = pose.getPoseLandmark(PoseLandmark.LEFT_KNEE)
-        val leftAnkle = pose.getPoseLandmark(PoseLandmark.LEFT_ANKLE)
+        val leftOk = isVisible(lHip, lKnee, lAnkle)
+        val rightOk = isVisible(rHip, rKnee, rAnkle)
+        if (!leftOk) clearSmoothing(LEFT_KEY)
+        if (!rightOk) clearSmoothing(RIGHT_KEY)
 
-        val rightHip = pose.getPoseLandmark(PoseLandmark.RIGHT_HIP)
-        val rightKnee = pose.getPoseLandmark(PoseLandmark.RIGHT_KNEE)
-        val rightAnkle = pose.getPoseLandmark(PoseLandmark.RIGHT_ANKLE)
-
-        val isLeftVisible = isVisible(leftHip, leftKnee, leftAnkle)
-        val isRightVisible = isVisible(rightHip, rightKnee, rightAnkle)
-
-        if (!isLeftVisible || !isRightVisible) {
-            return Feedback(state, "Bacaklarının tamamı net görünmüyor.", false, pose)
+        if (!leftOk && !rightOk) {
+            return Reading.unavailable("Bacakların görünmüyor, kameradan biraz uzaklaş")
         }
 
-        val rawLeftKneeAngle = AnalysisUtils.getAngle(leftHip!!, leftKnee!!, leftAnkle!!)
-        val rawRightKneeAngle = AnalysisUtils.getAngle(rightHip!!, rightKnee!!, rightAnkle!!)
+        val angles = listOfNotNull(
+            if (leftOk) smooth(LEFT_KEY, AnalysisUtils.getAngle(lHip!!, lKnee!!, lAnkle!!)) else null,
+            if (rightOk) smooth(RIGHT_KEY, AnalysisUtils.getAngle(rHip!!, rKnee!!, rAnkle!!)) else null,
+        )
+        return Reading.of(angles.min())
+    }
 
-        val leftKneeAngle = getSmoothedAngle("lungeLeft", rawLeftKneeAngle)
-        val rightKneeAngle = getSmoothedAngle("lungeRight", rawRightKneeAngle)
-
-        // Lunge yaparken her zaman bir diz daha çok bükülür (Aktif diz)
-        val activeKneeAngle = min(leftKneeAngle, rightKneeAngle)
-
-        var feedbackMessage = "Pozisyon al!"
-        var repCounted = false
-
-        // DTW Makine Öğrenmesi ile Lunge Sayımı
-        if (matchPatternDTW("lunge", activeKneeAngle, idealLungeTemplate, threshold = 22.0, bufferSize = 25, cooldownMs = 1500)) {
-            repCount++
-            repCounted = true
-            feedbackMessage = "MÜKEMMEL FORM! $repCount. tekrar"
-        } else {
-            // Görsel / Anlık rehberlik
-            if (activeKneeAngle < 100) {
-                state = ExerciseState.DOWN
-                feedbackMessage = "Harika derinlik, şimdi yukarı kalk!"
-            } else if (activeKneeAngle > 155) {
-                state = ExerciseState.UP
-                feedbackMessage = "Öne doğru adım at ve çömel"
-            }
-        }
-
-        return Feedback(state, feedbackMessage, repCounted, pose)
+    private companion object {
+        const val LEFT_KEY = "lungeLeftKnee"
+        const val RIGHT_KEY = "lungeRightKnee"
     }
 }

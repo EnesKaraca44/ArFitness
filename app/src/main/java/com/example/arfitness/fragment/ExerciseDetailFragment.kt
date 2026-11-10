@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import androidx.navigation.Navigation
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
+import com.example.arfitness.analysis.ExerciseType
 import com.example.arfitness.databinding.FragmentExerciseDetailBinding
 import com.example.arfitness.entitiy.EgzersizDetay
 import com.example.arfitness.R
@@ -53,6 +54,13 @@ class ExerciseDetailFragment : Fragment() {
             tvTargetMuscles.text = getStringResource(egzersiz.hedefKaslar)
             tvDuration.text = getStringResource(egzersiz.tahminiSure)
             tvDifficulty.text = getStringResource(egzersiz.zorlukSeviyesi)
+
+            val exerciseType = ExerciseType.fromName(egzersiz.kodAdi)
+            if (exerciseType != null) {
+                tvCameraPlacement.setText(exerciseType.cameraHintRes)
+            } else {
+                cardCameraPlacement.visibility = View.GONE
+            }
 
             // Glide kütüphanesi ile GIF'i yükle
             Glide.with(this@ExerciseDetailFragment)

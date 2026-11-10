@@ -152,6 +152,46 @@
 
             </com.google.android.material.card.MaterialCardView>
 
+            <!-- Kamera Yerleşimi: sayımın doğru çalışması için telefonun konumu -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cardCameraPlacement"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="24dp"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="0dp"
+                app:strokeColor="@color/divider"
+                app:strokeWidth="1dp"
+                android:backgroundTint="@color/card_bg">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="20dp">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/camera_placement_title"
+                        android:textSize="18sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/primary"
+                        android:layout_marginBottom="10dp" />
+
+                    <TextView
+                        android:id="@+id/tvCameraPlacement"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:lineSpacingExtra="6dp"
+                        android:textColor="@color/text_secondary"
+                        android:textSize="15sp"
+                        tools:text="@string/camera_hint_squat" />
+
+                </LinearLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+
             <!-- Süre ve Zorluk Kartları -->
             <LinearLayout
                 android:layout_width="match_parent"

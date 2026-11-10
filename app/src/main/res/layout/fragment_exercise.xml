@@ -42,6 +42,7 @@
 
     <!-- 2. ÜST BAR (Şeffaf ve Şık) -->
     <LinearLayout
+        android:id="@+id/topBar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="24dp"
@@ -94,16 +95,22 @@
             android:shadowDy="2"
             android:shadowRadius="5" />
 
-        <!-- Kapat (Bitir) Butonu (Sadece küçük bir çarpı veya Stop butonu) -->
-        <ImageView
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/finishButton"
-            android:layout_width="32dp"
-            android:layout_height="32dp"
-            android:padding="6dp"
-            android:background="@drawable/circle_background"
-            android:backgroundTint="#80000000"
-            android:src="@drawable/ic_launcher_foreground"
-            app:tint="@color/white" />
+            style="@style/Widget.Material3.Button"
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:minWidth="0dp"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            android:paddingHorizontal="12dp"
+            android:contentDescription="@string/finish_workout"
+            android:text="@string/finish_workout"
+            android:textColor="@color/white"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            app:backgroundTint="@color/error"
+            app:cornerRadius="20dp" />
     </LinearLayout>
 
     <!-- 3. SÜRE (Sağ ortada dikey tarzda veya sağ üstte kalabilir) -->
@@ -111,17 +118,17 @@
         android:id="@+id/timerContainer"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="8dp"
         android:layout_marginEnd="20dp"
         android:orientation="vertical"
         android:gravity="end"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/exerciseTitle">
+        app:layout_constraintTop_toBottomOf="@id/topBar">
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="SÜRE"
+            android:text="@string/elapsed_time"
             android:textColor="#E5E5E5"
             android:textSize="10sp"
             android:textStyle="bold"
@@ -141,6 +148,51 @@
             android:shadowRadius="4" />
     </LinearLayout>
 
+    <!-- Kamera yerleşim talimatı: başlangıçta birkaç saniye gösterilir, dokununca kapanır -->
+    <androidx.cardview.widget.CardView
+        android:id="@+id/cameraHintCard"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="24dp"
+        android:layout_marginTop="12dp"
+        android:visibility="gone"
+        app:cardBackgroundColor="#CC000000"
+        app:cardCornerRadius="16dp"
+        app:cardElevation="0dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/timerContainer"
+        tools:visibility="visible">
+
+        <TextView
+            android:id="@+id/cameraHintText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:drawablePadding="8dp"
+            android:padding="14dp"
+            android:textColor="@color/white"
+            android:textSize="14sp"
+            tools:text="@string/camera_hint_squat" />
+    </androidx.cardview.widget.CardView>
+
+    <!-- Yalnızca debug derlemelerinde: sayaca giden sinyal, sayaç durumu ve fps -->
+    <TextView
+        android:id="@+id/debugText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="8dp"
+        android:background="#99000000"
+        android:fontFamily="monospace"
+        android:padding="6dp"
+        android:textColor="#00FF88"
+        android:textSize="11sp"
+        android:visibility="gone"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/topBar"
+        tools:text="v=142.3 / 150.1\nMOVING\n14.2 fps\nkayıt: squat_….csv"
+        tools:visibility="visible" />
+
     <!-- 4. DEV TEKRAR SAYISI (Sol Alt) -->
     <LinearLayout
         android:layout_width="wrap_content"
@@ -153,9 +205,11 @@
         app:layout_constraintStart_toStartOf="parent">
 
         <TextView
+            android:id="@+id/repLabelText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="TEKRAR"
+            android:text="@string/repetitions"
+            android:textAllCaps="true"
             android:textColor="#E5E5E5"
             android:textSize="12sp"
             android:textStyle="bold"
@@ -184,7 +238,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="32dp"
-        app:cardBackgroundColor="#CC0A84FF"
+        app:cardBackgroundColor="@color/feedback_info"
         app:cardCornerRadius="20dp"
         app:cardElevation="0dp"
         app:layout_constraintBottom_toBottomOf="parent"

@@ -1,5 +1,6 @@
 package com.example.arfitness.fragment
 
+import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.util.Log
@@ -10,7 +11,6 @@ import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageAnalysis
-import androidx.camera.core.ImageCapture
 import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.content.ContextCompat
@@ -19,20 +19,20 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
-import com.example.arfitness.analysis.BicepCurlAnalyzer
-import com.example.arfitness.analysis.DumbbellFlyAnalyzer
+import com.example.arfitness.R
 import com.example.arfitness.analysis.ExerciseAnalyzer
-import com.example.arfitness.analysis.LungeAnalyzer
-import com.example.arfitness.analysis.PushupAnalyzer
-import com.example.arfitness.analysis.ShoulderPressAnalyzer
-import com.example.arfitness.analysis.SquatAnalyzer
+import com.example.arfitness.analysis.ExerciseType
+import com.example.arfitness.analysis.Feedback
+import com.example.arfitness.analysis.SignalCsv
 import com.example.arfitness.databinding.FragmentExerciseBinding
+import com.example.arfitness.debug.SignalRecorder
 import com.example.arfitness.entitiy.PoseAnalyzer
 import com.example.arfitness.entitiy.WorkoutResult
 import com.example.arfitness.viewmodel.ExerciseViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import java.util.Locale
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
@@ -44,31 +44,59 @@ class ExerciseFragment : Fragment() {
     private val viewModel: ExerciseViewModel by viewModels()
     private val args: ExerciseFragmentArgs by navArgs()
 
+    private lateinit var exerciseType: ExerciseType
     private lateinit var exerciseAnalyzer: ExerciseAnalyzer
 
     // Kamera işlemleri için gerekli değişkenler
-    private var resimYakala: ImageCapture? = null
     private var kameraCalistirici: ExecutorService? = null
 
+    // Yalnızca debug derlemelerinde: ekranda sinyal/fps göstergesi ve sinyal kaydı (CSV)
+    private var isDebugBuild = false
+    private var signalRecorder: SignalRecorder? = null
+    private var lastFrameMs: Long? = null
+    private var smoothedFps = 0.0
+
     // PoseAnalyzer callback
-    private val poseAnalyzer = PoseAnalyzer { pose, width, height ->
+    private val poseAnalyzer = PoseAnalyzer { pose, width, height, timestampMs ->
         if (!::exerciseAnalyzer.isInitialized) return@PoseAnalyzer
 
         // 1. Seçili egzersiz analizörünü çalıştır
-        val feedbackRaporu = exerciseAnalyzer.analyze(pose)
+        val feedbackRaporu = exerciseAnalyzer.analyze(pose, timestampMs)
 
         // 2. Rapordaki bilgileri ViewModel'e ilet (thread-safe postValue kullanılır)
-        if (feedbackRaporu.isRepCounted) {
+        if (exerciseAnalyzer.isTimed) {
+            viewModel.onHoldFrame(feedbackRaporu.isHolding, timestampMs)
+        } else if (feedbackRaporu.isRepCounted) {
             viewModel.onRepCounted()
         }
         feedbackRaporu.message?.let { mesaj ->
-            viewModel.updateFeedback(mesaj)
+            viewModel.updateFeedback(mesaj, feedbackRaporu.isWarning)
         }
+
+        if (isDebugBuild) onDebugFrame(feedbackRaporu, timestampMs)
 
         // 3. İskeleti ekrana çizen OverlayView'ı UI Thread'de güncelle
         activity?.runOnUiThread {
             _binding?.overlayView?.setPose(pose, width, height, isFrontCamera = true)
         }
+    }
+
+    private fun onDebugFrame(feedback: Feedback, timestampMs: Long) {
+        val state = exerciseAnalyzer.debugState ?: return
+        signalRecorder?.record(
+            SignalCsv.Row(timestampMs, state.values, state.phase, feedback.isRepCounted, feedback.isHolding)
+        )
+
+        lastFrameMs?.let { last ->
+            val dt = timestampMs - last
+            if (dt > 0) smoothedFps = 0.9 * smoothedFps + 0.1 * (1000.0 / dt)
+        }
+        lastFrameMs = timestampMs
+
+        val values = state.values.joinToString(" / ") { v -> v?.let { String.format(Locale.US, "%.2f", it) } ?: "—" }
+        val text = "v=$values\n${state.phase}\n${String.format(Locale.US, "%.1f", smoothedFps)} fps" +
+            (signalRecorder?.file?.let { "\nkayıt: ${it.name}" } ?: "")
+        activity?.runOnUiThread { _binding?.debugText?.text = text }
     }
 
     private val izinIstekBaslatici =
@@ -109,13 +137,29 @@ class ExerciseFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        val type = ExerciseType.fromName(args.exerciseName)
+        if (type == null) {
+            // Eskiden tanınmayan her isim sessizce Push-Up analizörüne düşüyordu
+            Log.e("ARFitForm", "Tanınmayan egzersiz: ${args.exerciseName}")
+            Toast.makeText(requireContext(), R.string.unknown_exercise, Toast.LENGTH_LONG).show()
+            findNavController().navigateUp()
+            return
+        }
+        exerciseType = type
+        exerciseAnalyzer = type.createAnalyzer()
+
+        isDebugBuild = (requireContext().applicationInfo.flags and ApplicationInfo.FLAG_DEBUGGABLE) != 0
+        if (isDebugBuild) {
+            binding.debugText.visibility = View.VISIBLE
+            signalRecorder = SignalRecorder(requireContext(), type.name.lowercase())
+        }
+
         viewModel.reset()
-        setupAnalyzer()
-        displayTitle()
+        binding.exerciseTitle.text = getString(type.titleRes)
+        showCameraHint(type)
+        binding.repLabelText.setText(if (exerciseAnalyzer.isTimed) R.string.hold_time_label else R.string.repetitions)
         observeViewModel()
         setupButtons()
-
-        viewModel.startTimer(60)
 
         kameraCalistirici = Executors.newSingleThreadExecutor()
 
@@ -127,29 +171,14 @@ class ExerciseFragment : Fragment() {
         }
     }
 
-    private fun displayTitle() {
-        val title = when (args.exerciseName.lowercase().trim()) {
-            "squat" -> "Squat"
-            "push_up", "push-up", "pushup", "push-ups" -> "Push-Up"
-            "bicep_curl", "bicep curl", "biceps" -> "Bicep Curl"
-            "shoulder_press", "shoulder press" -> "Shoulder Press"
-            "lunge" -> "Lunge"
-            "dumbbell_fly", "dumbbell fly", "dumbell fly" -> "Dumbbell Fly"
-            else -> args.exerciseName
-        }
-        binding.exerciseTitle.text = title
-    }
-
-    private fun setupAnalyzer() {
-        val rawName = args.exerciseName.lowercase().trim()
-        exerciseAnalyzer = when {
-            rawName.contains("squat") -> SquatAnalyzer()
-            rawName.contains("push") -> PushupAnalyzer()
-            rawName.contains("bicep") -> BicepCurlAnalyzer()
-            rawName.contains("shoulder") -> ShoulderPressAnalyzer()
-            rawName.contains("lunge") -> LungeAnalyzer()
-            rawName.contains("fly") || rawName.contains("dumb") -> DumbbellFlyAnalyzer()
-            else -> PushupAnalyzer()
+    /** Telefonun nereye konulacağını başlangıçta gösterir; dokununca ya da birkaç saniye sonra kapanır. */
+    private fun showCameraHint(type: ExerciseType) {
+        binding.cameraHintText.text = getString(R.string.camera_placement_title) + "\n" + getString(type.cameraHintRes)
+        binding.cameraHintCard.visibility = View.VISIBLE
+        binding.cameraHintCard.setOnClickListener { it.visibility = View.GONE }
+        viewLifecycleOwner.lifecycleScope.launch {
+            delay(CAMERA_HINT_MS)
+            _binding?.cameraHintCard?.visibility = View.GONE
         }
     }
 
@@ -170,16 +199,21 @@ class ExerciseFragment : Fragment() {
     private fun setupButtons() {
         binding.finishButton.setOnClickListener {
             viewModel.stopTimer()
-            val anlikTekrar = viewModel.tekrarSayisi.value ?: 0
-            val gecenSure = viewModel.getElapsedSeconds()
-            val egzersizAdi = binding.exerciseTitle.text.toString()
+            val isTimed = exerciseAnalyzer.isTimed
+            val anlikTekrar = if (isTimed) 0 else viewModel.getRepCount()
+            // Süreli hareketlerde (Plank) kaydedilen süre, doğru pozisyonda geçen tutma süresidir
+            val gecenSure = if (isTimed) viewModel.getHoldSeconds() else viewModel.getElapsedSeconds()
+            val egzersizAdi = getString(exerciseType.titleRes)
+            val formPuani = exerciseAnalyzer.sessionFormScore
 
-            viewModel.saveWorkout(egzersizAdi, anlikTekrar, gecenSure)
+            viewModel.saveWorkout(egzersizAdi, anlikTekrar, gecenSure, isTimed, formPuani)
 
             val sonuc = WorkoutResult(
                 exerciseName = egzersizAdi,
                 totalReps = anlikTekrar,
-                durationInSeconds = gecenSure
+                durationInSeconds = gecenSure,
+                isTimed = isTimed,
+                formScore = formPuani
             )
 
             val action = ExerciseFragmentDirections.exercisidenresulta(sonuc)
@@ -216,6 +250,7 @@ class ExerciseFragment : Fragment() {
                 kameraSaglayici.bindToLifecycle(
                     viewLifecycleOwner, kameraSecici, onizleme, goruntuAnalizi
                 )
+                viewModel.startTimer()
                 Log.d("Kamera", "Kamera ve görüntü analizi başarıyla bağlandı.")
             } catch (hata: Exception) {
                 Log.e("Kamera", "Kamera bağlanırken hata oluştu.", hata)
@@ -224,12 +259,21 @@ class ExerciseFragment : Fragment() {
     }
 
     private fun observeViewModel() {
-        viewModel.tekrarSayisi.observe(viewLifecycleOwner) { count ->
-            binding.repCountText.text = count.toString()
+        if (exerciseAnalyzer.isTimed) {
+            viewModel.holdSeconds.observe(viewLifecycleOwner) { seconds ->
+                binding.repCountText.text = String.format("%d:%02d", seconds / 60, seconds % 60)
+            }
+        } else {
+            viewModel.tekrarSayisi.observe(viewLifecycleOwner) { count ->
+                binding.repCountText.text = count.toString()
+            }
         }
 
-        viewModel.feedbackMessage.observe(viewLifecycleOwner) { message ->
-            binding.feedbackText.text = message
+        viewModel.feedback.observe(viewLifecycleOwner) { feedback ->
+            binding.feedbackText.text = feedback.message
+            // Form hatası / görünürlük uyarısı kırmızı, diğer mesajlar mavi
+            val renk = if (feedback.isWarning) R.color.feedback_warning else R.color.feedback_info
+            binding.feedbackCard.setCardBackgroundColor(ContextCompat.getColor(requireContext(), renk))
         }
 
         viewModel.timerValueString.observe(viewLifecycleOwner) { timeString ->
@@ -239,12 +283,28 @@ class ExerciseFragment : Fragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
+        signalRecorder?.close()
+        signalRecorder = null
         _binding = null
+    }
+
+    override fun onPause() {
+        viewModel.pauseTimer()
+        super.onPause()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        viewModel.resumeTimer()
     }
 
     override fun onDestroy() {
         super.onDestroy()
         kameraCalistirici?.shutdown()
         Log.d("Kamera", "Kamera Çalıştırıcı kapatıldı.")
+    }
+
+    private companion object {
+        const val CAMERA_HINT_MS = 10_000L
     }
 }

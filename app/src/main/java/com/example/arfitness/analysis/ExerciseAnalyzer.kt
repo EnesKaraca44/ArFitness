@@ -2,72 +2,91 @@ package com.example.arfitness.analysis
 
 import com.google.mlkit.vision.pose.Pose
 import com.google.mlkit.vision.pose.PoseLandmark
+import kotlin.math.abs
 
 abstract class ExerciseAnalyzer {
-    var lastRepTime: Long = 0
-    private var smoothedAngles = mutableMapOf<String, Double>()
-    
-    open val requiredLandmarks: List<Int>
-        get() = emptyList() // Default empty list for backward compatibility
 
-    // Uzuvların %60 üzerinde net görünme şartı
-    fun isVisible(vararg landmarks: PoseLandmark?): Boolean {
-        return landmarks.all { it != null && it.inFrameLikelihood > 0.6f }
-    }
+    enum class Side { LEFT, RIGHT }
 
-    // Titreme engelleyici Low-Pass (Hareketli Ortalama) filtresi
-    fun getSmoothedAngle(angleName: String, currentRawAngle: Double, alpha: Double = 0.3): Double {
-        val previousAngle = smoothedAngles[angleName]
-        if (previousAngle == null) {
-            smoothedAngles[angleName] = currentRawAngle
-            return currentRawAngle
-        }
-        val newSmoothed = (alpha * currentRawAngle) + ((1.0 - alpha) * previousAngle)
-        smoothedAngles[angleName] = newSmoothed
-        return newSmoothed
-    }
-
-    private var angleBuffers = mutableMapOf<String, MutableList<Double>>()
+    /** Tekrar yerine süre ölçülen hareketlerde (Plank) true. */
+    open val isTimed: Boolean = false
 
     /**
-     * DTW Zaman Serisi Eşleştirme Motoru
-     * Canlı kamera açılarını, ideal şablon grafiği ile karşılaştırır.
+     * Son karede sayaca giden sinyal ve sayaç durumu. Debug ekranı ve sinyal kaydı (CSV)
+     * bunu kullanır; eşikler gerçek kayıtlarla buradan ayarlanır.
      */
-    fun matchPatternDTW(
-        bufferKey: String,
-        currentAngle: Double,
-        template: List<Double>,
-        threshold: Double = 22.0,
-        bufferSize: Int = 25,
-        cooldownMs: Long = 1000
-    ): Boolean {
-        val buffer = angleBuffers.getOrPut(bufferKey) { mutableListOf() }
-        
-        buffer.add(currentAngle)
-        if (buffer.size > bufferSize) {
-            buffer.removeAt(0) // En eski veriyi sil (Sliding Window)
-        }
+    data class DebugState(val values: List<Double?>, val phase: String)
 
-        // Buffer en az yarı yarıya doluysa ve cooldown dolduysa analiz yap
-        if (buffer.size >= (bufferSize / 2) && canCountRep(cooldownMs)) {
-            val distance = DTWUtils.computeDTWDistance(buffer, template)
-            if (distance < threshold) {
-                buffer.clear() // Eşleşme olduysa buffer'ı temizle (Çift saymayı engeller)
-                return true
+    open val debugState: DebugState? get() = null
+
+    /** Seansın form puanı (0–100); henüz puanlanacak bir şey yoksa null. */
+    open val sessionFormScore: Int? get() = null
+
+    /**
+     * @param timestampMs karenin kamera zaman damgası (ms). Sayım kare sayısına değil
+     * bu zamana göre yapılır; böylece yavaş ve hızlı telefonlarda aynı davranır.
+     */
+    abstract fun analyze(pose: Pose, timestampMs: Long): Feedback
+
+    private val smoothedValues = mutableMapOf<String, Double>()
+    private val lastSides = mutableMapOf<String, Side>()
+
+    /**
+     * ML Kit, kişi bulduğunda 33 noktanın hepsini döndürür; bu yüzden null kontrolü yetmez.
+     * `inFrameLikelihood` noktanın kadrajda olma olasılığıdır (başka bir uzvun arkasında
+     * kalıp kalmadığını söylemez), o yüzden yan çekimde taraf seçimi [pickSide] ile yapılır.
+     */
+    protected fun isVisible(vararg landmarks: PoseLandmark?): Boolean =
+        landmarks.all { it != null && it.inFrameLikelihood >= MIN_IN_FRAME_LIKELIHOOD }
+
+    /** Üstel hareketli ortalama: eklem titremesini bastırır. */
+    protected fun smooth(key: String, raw: Double, alpha: Double = SMOOTHING_ALPHA): Double {
+        val previous = smoothedValues[key]
+        val value = if (previous == null) raw else alpha * raw + (1.0 - alpha) * previous
+        smoothedValues[key] = value
+        return value
+    }
+
+    /** Sinyal güvenilmez olduğunda eski değerin sonraki karelere sızmasını engeller. */
+    protected fun clearSmoothing(key: String) {
+        smoothedValues.remove(key)
+    }
+
+    /**
+     * İki taraftan hangisinin kullanılacağını seçer.
+     * - Yalnızca bir taraf kadrajdaysa o taraf.
+     * - İkisi de kadrajdaysa kameraya yakın olan (ML Kit'te z küçükse yakındır). Önden çekimde
+     *   iki tarafın z'si birbirine yakın olduğundan, fark [SIDE_SWITCH_MARGIN_Z]'den küçükse
+     *   önceki seçim korunur; böylece taraf kare kare zıplamaz.
+     */
+    protected fun pickSide(key: String, left: Array<PoseLandmark?>, right: Array<PoseLandmark?>): Side? {
+        val leftOk = isVisible(*left)
+        val rightOk = isVisible(*right)
+        val side = when {
+            leftOk && rightOk -> {
+                val dz = meanZ(left) - meanZ(right)
+                when {
+                    abs(dz) < SIDE_SWITCH_MARGIN_Z -> lastSides[key] ?: Side.LEFT
+                    dz < 0 -> Side.LEFT
+                    else -> Side.RIGHT
+                }
             }
+            leftOk -> Side.LEFT
+            rightOk -> Side.RIGHT
+            else -> null
         }
-        return false
+        if (side != null) lastSides[key] = side
+        return side
     }
 
-    // İnsani hız sınırı (Varsayılan 1 saniye bekleme)
-    fun canCountRep(cooldownMs: Long = 1000): Boolean {
-        val currentTime = System.currentTimeMillis()
-        if (currentTime - lastRepTime > cooldownMs) {
-            lastRepTime = currentTime
-            return true
-        }
-        return false
-    }
+    private fun meanZ(landmarks: Array<PoseLandmark?>): Float =
+        landmarks.filterNotNull().map { it.position3D.z }.average().toFloat()
 
-    abstract fun analyze(pose: Pose): Feedback
+    protected fun Pose.lm(type: Int): PoseLandmark? = getPoseLandmark(type)
+
+    companion object {
+        const val MIN_IN_FRAME_LIKELIHOOD = 0.6f
+        const val SMOOTHING_ALPHA = 0.4
+        const val SIDE_SWITCH_MARGIN_Z = 25f
+    }
 }

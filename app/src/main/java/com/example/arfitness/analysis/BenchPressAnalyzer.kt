@@ -2,78 +2,48 @@ package com.example.arfitness.analysis
 
 import com.google.mlkit.vision.pose.Pose
 import com.google.mlkit.vision.pose.PoseLandmark
-import kotlin.math.abs
-import kotlin.math.atan2
 
-class BenchPressAnalyzer : ExerciseAnalyzer() {
+/**
+ * Bench Press (yandan çekim): sinyal = kameraya yakın kolun dirsek açısı.
+ * Tekrar = kollar kilitli (>150°) → göğse iniş (<95°) → kollar kilitli.
+ * Kullanıcı yatmıyorsa (gövde yatay değilse) sayım yapılmaz.
+ */
+class BenchPressAnalyzer : RepExerciseAnalyzer() {
 
-    override val requiredLandmarks = listOf(
-        PoseLandmark.RIGHT_SHOULDER, PoseLandmark.LEFT_SHOULDER,
-        PoseLandmark.RIGHT_ELBOW, PoseLandmark.LEFT_ELBOW,
-        PoseLandmark.RIGHT_WRIST, PoseLandmark.LEFT_WRIST
-    )
+    override val counter = RepCounter(restThreshold = 150.0, peakThreshold = 95.0, minRepDurationMs = 600)
 
-    // Bench Press İdeal Zaman Serisi Şablonu (Kollar kilitli yukarıda -> Göğse iniş -> Yukarı itiş)
-    private val idealBenchTemplate = listOf(
-        170.0, 140.0, 100.0, 70.0, 50.0, 70.0, 100.0, 140.0, 170.0
-    )
+    override val readyMessage = "Ağırlığı kolların düz şekilde yukarıda tut"
+    override val goMessage = "Göğsüne doğru kontrollü indir"
+    override val returnMessage = "Şimdi yukarı it!"
+    override val partialMessage = "Göğsüne kadar indir"
 
-    private var state: ExerciseState = ExerciseState.UP
-    private var repCount = 0
+    override fun read(pose: Pose): Reading {
+        val left = arrayOf(
+            pose.lm(PoseLandmark.LEFT_SHOULDER), pose.lm(PoseLandmark.LEFT_ELBOW), pose.lm(PoseLandmark.LEFT_WRIST)
+        )
+        val right = arrayOf(
+            pose.lm(PoseLandmark.RIGHT_SHOULDER), pose.lm(PoseLandmark.RIGHT_ELBOW), pose.lm(PoseLandmark.RIGHT_WRIST)
+        )
+        val side = pickSide("bench", left, right)
+        if (side == null) {
+            clearSmoothing(KEY)
+            return Reading.unavailable("Kolların görünmüyor, telefonu yanına koy")
+        }
+        val (shoulder, elbow, wrist) = if (side == Side.LEFT) left else right
 
-    override fun analyze(pose: Pose): Feedback {
-        val leftShoulder = pose.getPoseLandmark(PoseLandmark.LEFT_SHOULDER)
-        val leftElbow = pose.getPoseLandmark(PoseLandmark.LEFT_ELBOW)
-        val leftWrist = pose.getPoseLandmark(PoseLandmark.LEFT_WRIST)
-        val rightShoulder = pose.getPoseLandmark(PoseLandmark.RIGHT_SHOULDER)
-        val rightElbow = pose.getPoseLandmark(PoseLandmark.RIGHT_ELBOW)
-        val rightWrist = pose.getPoseLandmark(PoseLandmark.RIGHT_WRIST)
-
-        var feedbackMessage = "Harika Form!"
-        var repCounted = false
-
-        val isLeftVisible = isVisible(leftShoulder, leftElbow, leftWrist)
-        val isRightVisible = isVisible(rightShoulder, rightElbow, rightWrist)
-
-        if (!isLeftVisible && !isRightVisible) {
-            return Feedback(state, "Kollarının net görünmesi lazım (Kameraya uzaklaş).", false, pose)
+        // Gövde yatay değilse (ayakta ağırlık ayarlıyor, bench'e oturuyor) sayaç dondurulur
+        val hip = pose.lm(if (side == Side.LEFT) PoseLandmark.LEFT_HIP else PoseLandmark.RIGHT_HIP)
+        if (hip != null && isVisible(hip) && AnalysisUtils.inclinationDeg(shoulder!!, hip) > MAX_TORSO_INCLINATION) {
+            clearSmoothing(KEY)
+            return Reading.unavailable("Bench'e sırt üstü uzan (telefon yanında olsun)")
         }
 
-        // Hangi kol net görünüyorsa onu kullan (Yan profil desteği)
-        val shoulder = if (isLeftVisible) leftShoulder!! else rightShoulder!!
-        val elbow = if (isLeftVisible) leftElbow!! else rightElbow!!
-        val wrist = if (isLeftVisible) leftWrist!! else rightWrist!!
+        return Reading.of(smooth(KEY, AnalysisUtils.getAngle(shoulder!!, elbow!!, wrist!!)))
+    }
 
-        // 3D Matematik + Titreme (EMA) Filtresi
-        val rawElbowAngle = AnalysisUtils.getAngle(shoulder, elbow, wrist)
-        val elbowAngle = getSmoothedAngle("benchElbow", rawElbowAngle)
-
-        // FORM KONTROLÜ
-        if (state == ExerciseState.DOWN) {
-            // İniş yeterli mi? Bench press'te bilek dirseğin hemen üstündedir, y koordinatı olarak altındadır (Android'de Y aşağı artar).
-            if (wrist.position3D.y < elbow.position3D.y) {
-                feedbackMessage = "Barı göğsüne kadar indir!"
-            }
-        } else if (state == ExerciseState.UP) {
-            if (elbowAngle < 150) {
-                feedbackMessage = "Kollarını tam kilitle!"
-            }
-        }
-
-        // Merkezcil DTW Makine Öğrenmesi ile Bench Press Sayımı
-        if (matchPatternDTW("benchpress", elbowAngle, idealBenchTemplate, threshold = 22.0, bufferSize = 25, cooldownMs = 1500)) {
-            repCount++
-            repCounted = true
-            feedbackMessage = "MÜKEMMEL FORM! $repCount. tekrar"
-        } else {
-            // Anlık görsel geri bildirim (Sayımı etkilemez)
-            if (elbowAngle < 90) { // Daha derine inebilsin
-                state = ExerciseState.DOWN
-            } else if (elbowAngle > 150) { // Biraz daha esnek kilitlenme
-                state = ExerciseState.UP
-            }
-        }
-
-        return Feedback(state, feedbackMessage, repCounted, pose)
+    private companion object {
+        const val KEY = "benchElbow"
+        /** Omuz–kalça çizgisinin yatayla yapabileceği en büyük açı (incline bench için pay bırakıldı). */
+        const val MAX_TORSO_INCLINATION = 45.0
     }
 }
