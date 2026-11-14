@@ -1,0 +1,250 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=540, initial-scale=1">
+<title>ArFitness Reels</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@500;600;700;800;900&display=block" rel="stylesheet">
+<!--
+  Tek dosya, birden fazla kare. Görünüm URL parametresiyle seçilir (render.cmd bunları 1080x1920 PNG'ye basar):
+    ?v=poster                         00:10  duvardaki neon afiş (opak)
+    ?v=hud&n=1&t=00:04                00:12-00:17  tekrar sayacı + "MÜKEMMEL FORM" (şeffaf)
+    ?v=hud&mode=warn&msg=curl&n=2     00:12-00:17  form uyarısı (şeffaf)   msg: curl
+    ?v=cap1 | cap2 | cap3             ekran yazıları (şeffaf)
+    ?v=end            / ?v=end&solid=1   00:17-00:20  kapanış kartı (şeffaf / opak)
+  Mesaj metinleri uygulamadaki analizörlerden birebir alındı (analysis/*Analyzer.kt).
+-->
+<style>
+:root{
+  --cobalt:#3B82F6; --cobalt-2:#60A5FA; --cobalt-3:#93C5FD; --app-blue:#0A84FF;
+  --cyan:#00FFFF; --red:#F85149; --red-2:#FF7B72; --green:#3FB950; --amber:#FFD54A;
+  --white:#F5F7FA; --muted:#9AA4B5;
+  --display:'Anton', Impact, 'Arial Narrow', sans-serif;
+  --ui:'Inter', 'Segoe UI', system-ui, sans-serif;
+  --emoji:'Segoe UI Emoji','Apple Color Emoji','Noto Color Emoji';
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:540px;height:960px;overflow:hidden;background:transparent}
+body{position:relative;font-family:var(--ui),var(--emoji);color:var(--white);-webkit-font-smoothing:antialiased}
+.view{display:none;position:absolute;inset:0}
+.view.on{display:block}
+.emoji{font-family:var(--emoji);font-weight:400}
+
+/* ---------- 00:10 NEON AFİŞ ---------- */
+#poster{background:#04060A;overflow:hidden}
+.p-bg{position:absolute;inset:0;
+  background:
+    radial-gradient(70% 38% at 50% 2%,rgba(59,130,246,.30),transparent 70%),
+    radial-gradient(55% 30% at 0% 18%,rgba(248,81,73,.16),transparent 70%),
+    radial-gradient(60% 34% at 50% 70%,rgba(0,200,255,.10),transparent 70%),
+    #04060A}
+.p-grid{position:absolute;inset:0;opacity:.5;
+  background:
+    repeating-linear-gradient(0deg,rgba(147,197,253,.07) 0 1px,transparent 1px 36px),
+    repeating-linear-gradient(90deg,rgba(147,197,253,.07) 0 1px,transparent 1px 36px);
+  -webkit-mask-image:radial-gradient(80% 60% at 50% 55%,#000 30%,transparent 85%);mask-image:radial-gradient(80% 60% at 50% 55%,#000 30%,transparent 85%)}
+.p-frame{position:absolute;inset:14px;border:2px solid #BFDBFE;border-radius:24px;
+  box-shadow:0 0 6px #93C5FD,0 0 18px var(--cobalt-2),0 0 40px rgba(59,130,246,.6),inset 0 0 6px #93C5FD,inset 0 0 26px rgba(59,130,246,.45)}
+.p-chip{position:absolute;top:44px;left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:9px;
+  padding:8px 16px;border-radius:999px;border:1px solid rgba(147,197,253,.35);background:rgba(10,20,40,.6);
+  font-size:11.5px;font-weight:800;letter-spacing:.22em;color:#CFE3FF;white-space:nowrap}
+.p-chip i{width:7px;height:7px;border-radius:50%;background:var(--cyan);box-shadow:0 0 8px var(--cyan)}
+.p-hl{position:absolute;left:0;right:0;top:90px;text-align:center;font-family:var(--display);line-height:.97}
+.p-hl > div{white-space:nowrap}
+.p-hl .r1{line-height:.93;margin-bottom:28px}
+.p-hl .l1{font-size:70px;position:relative;display:inline-block;color:#FFD9D5;
+  text-shadow:0 0 2px #fff,0 0 8px var(--red-2),0 0 18px var(--red),0 0 34px rgba(248,81,73,.55)}
+.p-hl .l1::after{content:'';position:absolute;left:-10px;right:-10px;top:52%;height:5px;margin-top:-2px;border-radius:3px;
+  background:#FFD9D5;transform:rotate(-4deg);box-shadow:0 0 3px #fff,0 0 10px var(--red-2),0 0 20px var(--red)}
+.p-hl .l2{font-size:110px;color:#fff;text-shadow:0 4px 30px rgba(0,0,0,.6)}
+.p-hl .l3{font-size:110px;color:#EAF3FF;
+  text-shadow:0 0 3px #fff,0 0 12px var(--cobalt-2),0 0 28px var(--cobalt),0 0 60px var(--cobalt)}
+
+.p-phone{position:absolute;left:50%;top:414px;width:202px;height:402px;margin-left:-101px;border-radius:34px;padding:6px;
+  background:linear-gradient(140deg,#8E959E,#2A2E35 30%,#16181C 60%,#5F656E);
+  box-shadow:0 0 0 1.5px #BFDBFE,0 0 14px var(--cobalt-2),0 0 40px rgba(59,130,246,.55),0 30px 60px rgba(0,0,0,.6)}
+.p-screen{position:relative;width:100%;height:100%;border-radius:28px;overflow:hidden;
+  background:
+    radial-gradient(90% 50% at 50% 30%,rgba(120,140,170,.20),transparent 70%),
+    linear-gradient(180deg,#1A2130 0%,#111722 62%,#0B0F16 63%,#080B10 100%)}
+.p-screen::before{content:'';position:absolute;top:8px;left:50%;width:58px;height:16px;margin-left:-29px;border-radius:10px;background:#000;z-index:3}
+.p-screen svg{position:absolute;inset:0;width:100%;height:100%}
+.ps-time{position:absolute;top:32px;right:12px;text-align:right;line-height:1}
+.ps-time small{display:block;font-size:5.5px;font-weight:800;letter-spacing:.1em;color:#E5E5E5}
+.ps-time b{font-size:13px;font-weight:800;color:var(--app-blue)}
+.ps-rep{position:absolute;left:13px;bottom:46px;line-height:1}
+.ps-rep small{display:block;font-size:6.5px;font-weight:800;letter-spacing:.1em;color:#E5E5E5;margin-bottom:2px}
+.ps-rep b{font-size:40px;font-weight:800;color:#fff;text-shadow:0 2px 6px #000,0 0 14px rgba(63,185,80,.75)}
+.ps-pill{position:absolute;left:50%;bottom:16px;transform:translateX(-50%);white-space:nowrap;
+  padding:6px 13px;border-radius:12px;background:rgba(10,132,255,.82);font-size:8px;font-weight:800}
+.p-tag{position:absolute;padding:7px 11px;border-radius:10px;border:1px solid rgba(147,197,253,.4);background:rgba(8,16,32,.75);
+  font-size:11px;font-weight:800;letter-spacing:.06em;white-space:nowrap;box-shadow:0 0 18px rgba(59,130,246,.25)}
+.p-tag em{font-style:normal;color:var(--cyan)}
+.p-tag.ok em{color:var(--green)}
+.p-tag::after{content:'';position:absolute;top:50%;width:26px;height:1px;background:linear-gradient(90deg,var(--cobalt-2),transparent)}
+.p-tag.l::after{left:100%}
+.p-tag.r::after{right:100%;transform:scaleX(-1)}
+.p-foot{position:absolute;left:0;right:0;top:838px;text-align:center}
+.p-foot .row{display:inline-flex;align-items:center;gap:12px}
+.p-foot img{width:40px;height:40px;border-radius:11px;box-shadow:0 0 0 1px rgba(255,255,255,.15),0 0 18px rgba(59,130,246,.6)}
+.p-foot h2{font-family:var(--display);font-weight:400;font-size:44px;line-height:1;letter-spacing:.01em;white-space:nowrap}
+.p-foot h2 span{color:var(--cobalt-2);text-shadow:0 0 16px rgba(59,130,246,.8)}
+.p-foot p{margin-top:9px;font-size:12.5px;font-weight:600;color:var(--muted)}
+
+/* ---------- 00:12-00:17 UYGULAMA HUD (şeffaf) ---------- */
+.h-time{position:absolute;top:300px;right:30px;text-align:right;line-height:1}
+.h-time small{display:block;font-size:11px;font-weight:800;letter-spacing:.1em;color:#E5E5E5;text-shadow:0 1px 4px #000}
+.h-time b{font-size:30px;font-weight:800;color:var(--app-blue);text-shadow:0 1px 5px #000}
+.h-rep{position:absolute;left:32px;top:560px;line-height:1}
+.h-rep small{display:block;font-size:14px;font-weight:800;letter-spacing:.1em;color:#E5E5E5;text-shadow:0 1px 6px #000;margin-bottom:2px}
+.h-rep .num{display:flex;align-items:flex-start;gap:10px}
+.h-rep b{font-size:112px;font-weight:800;color:#fff;letter-spacing:-.02em;text-shadow:0 4px 8px rgba(0,0,0,.85),0 0 30px rgba(63,185,80,.9),0 0 60px rgba(63,185,80,.5)}
+.h-rep .plus{margin-top:14px;padding:5px 10px;border-radius:9px;background:var(--green);color:#04210B;font-size:17px;font-weight:900;box-shadow:0 0 20px rgba(63,185,80,.8)}
+.h-pill{position:absolute;left:50%;top:722px;transform:translateX(-50%);max-width:440px;width:max-content;text-align:center;
+  padding:13px 26px;border-radius:22px;background:rgba(10,132,255,.84);font-size:18px;font-weight:800;line-height:1.3;
+  box-shadow:0 8px 30px rgba(0,0,0,.45)}
+#hud.warn .h-rep b{text-shadow:0 4px 8px rgba(0,0,0,.85)}
+#hud.warn .h-rep .plus{display:none}
+#hud.warn .h-pill{background:rgba(218,54,51,.9);box-shadow:0 0 0 2px rgba(255,180,175,.55),0 0 34px rgba(248,81,73,.75)}
+#hud.warn .h-pill::before{content:'⚠ ';font-family:var(--emoji)}
+#hud.warn .h-edge{position:absolute;inset:0;box-shadow:inset 0 0 50px rgba(248,81,73,.45),inset 0 0 0 3px rgba(248,81,73,.5)}
+
+/* ---------- EKRAN YAZILARI (şeffaf) ---------- */
+.cap{position:absolute;left:0;right:0;top:150px;text-align:center}
+#cap1 .cap span{display:inline;font-size:29px;font-weight:800;line-height:1.55;padding:5px 14px;border-radius:12px;
+  background:rgba(0,0,0,.78);-webkit-box-decoration-break:clone;box-decoration-break:clone}
+#cap2 .cap h1{font-family:var(--display);font-weight:400;font-size:72px;line-height:1;color:#FFF8DC;white-space:nowrap;
+  text-shadow:0 0 3px #fff,0 0 12px var(--amber),0 0 30px #FFB300,0 0 60px rgba(255,179,0,.7),0 4px 10px rgba(0,0,0,.6)}
+#cap2 .cap h1 .emoji{font-size:62px;text-shadow:none;vertical-align:4px}
+#cap3 .cap h1{font-family:var(--display);font-weight:400;font-size:62px;line-height:.98;color:#fff;
+  text-shadow:0 0 18px rgba(59,130,246,.75),0 4px 12px rgba(0,0,0,.8)}
+#cap3 .cap h1 .emoji{font-size:48px;text-shadow:none;vertical-align:6px}
+#cap3 .cap p{display:inline-flex;align-items:center;gap:9px;margin-top:12px;padding:7px 15px;border-radius:999px;
+  background:rgba(4,10,22,.72);border:1px solid rgba(147,197,253,.35);font-size:12.5px;font-weight:800;letter-spacing:.2em;color:#CFE3FF}
+#cap3 .cap p i{width:8px;height:8px;border-radius:50%;background:var(--red);box-shadow:0 0 8px var(--red)}
+
+/* ---------- 00:17-00:20 KAPANIŞ ---------- */
+.e-shade{position:absolute;inset:0;background:linear-gradient(180deg,transparent 0%,transparent 34%,rgba(3,5,10,.6) 46%,rgba(3,5,10,.93) 62%,#03050A 100%)}
+#end.solid{background:#04060A}
+#end.solid .e-shade{background:
+  radial-gradient(70% 40% at 50% 50%,rgba(59,130,246,.28),transparent 70%),
+  radial-gradient(60% 30% at 50% 0%,rgba(59,130,246,.18),transparent 70%),#04060A}
+.e-box{position:absolute;left:0;right:0;top:420px;text-align:center}
+.e-box img{width:108px;height:108px;border-radius:26px;box-shadow:0 0 0 1px rgba(255,255,255,.14),0 0 40px rgba(59,130,246,.75),0 18px 40px rgba(0,0,0,.6)}
+.e-box h1{margin-top:16px;font-family:var(--display);font-weight:400;font-size:74px;line-height:1;letter-spacing:.01em}
+.e-box h1 span{color:var(--cobalt-2);text-shadow:0 0 22px rgba(59,130,246,.85)}
+.e-pill{display:inline-block;margin-top:20px;padding:15px 30px;border-radius:999px;
+  background:linear-gradient(135deg,#60A5FA,#2563EB);font-size:21px;font-weight:900;letter-spacing:.01em;
+  box-shadow:0 0 0 1px rgba(255,255,255,.25),0 0 34px rgba(59,130,246,.7)}
+.e-bio{margin-top:16px;font-size:17px;font-weight:700;color:#C9D2E0}
+</style>
+</head>
+<body>
+
+<!-- 00:10 — NEON AFİŞ -->
+<section class="view" id="poster">
+  <div class="p-bg"></div><div class="p-grid"></div><div class="p-frame"></div>
+  <div class="p-chip"><i></i>AI POSE DETECTION</div>
+  <div class="p-hl">
+    <div class="r1"><span class="l1">YANLIŞ FORM</span></div>
+    <div class="l2">YAPMAYI</div>
+    <div class="l3">BIRAK!</div>
+  </div>
+
+  <div class="p-tag l" style="left:30px;top:560px">DİZ AÇISI <em>93°</em></div>
+  <div class="p-tag r ok" style="right:30px;top:500px">SIRT DÜZ <em>✓</em></div>
+  <div class="p-tag r ok" style="right:30px;top:690px">TEKRAR <em>+1</em></div>
+
+  <div class="p-phone"><div class="p-screen">
+    <svg viewBox="0 0 194 400" aria-hidden="true">
+      <!-- yer gölgesi -->
+      <ellipse cx="112" cy="328" rx="58" ry="6" fill="rgba(0,0,0,.45)"/>
+      <!-- arka taraf uzuvları (soluk) -->
+      <g stroke="rgba(255,255,255,.45)" stroke-width="2.4" stroke-linecap="round" fill="none">
+        <path d="M110 125 L142 155 L172 147"/><path d="M110 125 L80 223"/><path d="M80 223 L144 241 L128 315 L156 325"/>
+      </g>
+      <g fill="rgba(0,255,255,.55)">
+        <circle cx="142" cy="155" r="2.6"/><circle cx="172" cy="147" r="2.6"/><circle cx="144" cy="241" r="2.6"/><circle cx="128" cy="315" r="2.6"/>
+      </g>
+      <!-- ön taraf: uygulamadaki gibi beyaz çizgi + camgöbeği eklem -->
+      <g stroke="#fff" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" fill="none" style="filter:drop-shadow(0 0 3px rgba(150,220,255,.9))">
+        <circle cx="119" cy="92" r="15" stroke-width="2.4" stroke="rgba(255,255,255,.8)"/>
+        <path d="M112 106 L104 128"/>
+        <path d="M104 128 L110 125"/><path d="M74 226 L80 223"/>
+        <path d="M104 128 L136 158 L166 150"/>
+        <path d="M104 128 L74 226"/>
+        <path d="M74 226 L138 244 L122 318"/>
+        <path d="M122 318 L112 326 L150 328 Z"/>
+      </g>
+      <path d="M134.2 261.6 A18 18 0 0 1 120.7 239.1" stroke="#00FFFF" stroke-width="2" fill="none" style="filter:drop-shadow(0 0 3px #00FFFF)"/>
+      <text x="100" y="270" fill="#00FFFF" font-family="Inter,Segoe UI,sans-serif" font-size="9" font-weight="800">93°</text>
+      <g fill="#00FFFF" style="filter:drop-shadow(0 0 4px #00FFFF)">
+        <circle cx="128" cy="95" r="3.4"/><circle cx="123" cy="88" r="2.4"/><circle cx="112" cy="91" r="2.6"/>
+        <circle cx="104" cy="128" r="4.2"/><circle cx="136" cy="158" r="4.2"/><circle cx="166" cy="150" r="4.2"/>
+        <circle cx="74" cy="226" r="4.2"/><circle cx="138" cy="244" r="4.2"/><circle cx="122" cy="318" r="4.2"/>
+        <circle cx="112" cy="326" r="3"/><circle cx="150" cy="328" r="3"/>
+      </g>
+    </svg>
+    <div class="ps-time"><small>GEÇEN SÜRE</small><b>00:24</b></div>
+    <div class="ps-rep"><small>TEKRAR</small><b>3</b></div>
+    <div class="ps-pill">MÜKEMMEL FORM! 3. tekrar</div>
+  </div></div>
+
+  <div class="p-foot">
+    <div class="row"><img src="../../play_store_icon_512x512.png" alt=""><h2><span>ArFitness</span> CEBİNDE.</h2></div>
+    <p>Yapay zeka formunu anlık analiz eder, her tekrarı sayar.</p>
+  </div>
+</section>
+
+<!-- 00:12-00:17 — UYGULAMA HUD -->
+<section class="view" id="hud">
+  <div class="h-edge"></div>
+  <div class="h-time"><small>GEÇEN SÜRE</small><b id="hT">00:04</b></div>
+  <div class="h-rep"><small>TEKRAR</small><div class="num"><b id="hN">1</b><span class="plus">+1</span></div></div>
+  <div class="h-pill" id="hP">MÜKEMMEL FORM! 1. tekrar</div>
+</section>
+
+<!-- Ekran yazıları -->
+<section class="view" id="cap1"><div class="cap"><span>Salonda herkes yanlış<br>form yaparken ben...</span></div></section>
+<section class="view" id="cap2"><div class="cap"><h1>AYDINLANMA ANI... <span class="emoji">💡</span></h1></div></section>
+<section class="view" id="cap3"><div class="cap">
+  <h1>YAPAY ZEKA<br>SENİ İZLİYOR <span class="emoji">🤖✨</span></h1>
+  <p><i></i>REAL-TIME POSE ANALYSIS</p>
+</div></section>
+
+<!-- 00:17-00:20 — KAPANIŞ -->
+<section class="view" id="end">
+  <div class="e-shade"></div>
+  <div class="e-box">
+    <img src="../../play_store_icon_512x512.png" alt="">
+    <h1><span>Ar</span>Fitness</h1>
+    <div class="e-pill">GOOGLE PLAY'DE YAYINDA! <span class="emoji">🚀</span></div>
+    <div class="e-bio">Link bio'da <span class="emoji">👆</span></div>
+  </div>
+</section>
+
+<script>
+  const q = new URLSearchParams(location.search);
+  const v = q.get('v') || 'poster';
+  const el = document.getElementById(v);
+  el.classList.add('on');
+  if (v === 'hud') {
+    const n = q.get('n') || '1';
+    document.getElementById('hN').textContent = n;
+    document.getElementById('hT').textContent = q.get('t') || '00:0' + (2 + 2 * +n);
+    if (q.get('mode') === 'warn') {
+      const MSG = {
+        curl: 'Dirseğini sabit tut, omuzdan savurma (Hile yapma)!'   // BicepsCurlAnalyzer (uygulamada bağlı)
+      };
+      el.classList.add('warn');
+      document.getElementById('hP').textContent = MSG[q.get('msg')] || MSG.curl;
+    } else {
+      document.getElementById('hP').textContent = 'MÜKEMMEL FORM! ' + n + '. tekrar';
+    }
+  }
+  if (v === 'end' && q.get('solid') === '1') el.classList.add('solid');
+</script>
+</body>
+</html>

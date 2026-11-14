@@ -81,12 +81,20 @@ class OnboardingFragment : Fragment() {
         binding.btnStartJourney.setOnClickListener {
             val name = binding.etUserName.text.toString().trim()
             val email = binding.etUserEmail.text.toString().trim()
+            val ageText = binding.etAge.text?.toString()?.trim().orEmpty()
+            val weightText = binding.etWeight.text?.toString()?.trim().orEmpty()
+            val heightText = binding.etHeight.text?.toString()?.trim().orEmpty()
+            val age = ageText.toIntOrNull()
+            val weight = weightText.replace(',', '.').toDoubleOrNull()
+            val height = heightText.toIntOrNull()
 
             // O an seçili olan RadioButton'a göre hedef metnini al.
             updateSelectedGoal()
 
             // Veri Doğrulama (Validation)
-            if (!isDataValid(name, email, selectedGoal)) {
+            val basicDetailsValid = isDataValid(name, email, selectedGoal)
+            val bodyMetricsValid = isBodyMetricsValid(ageText, age, weightText, weight, heightText, height)
+            if (!basicDetailsValid || !bodyMetricsValid) {
                 return@setOnClickListener // Eğer veri geçersizse, işlemi durdur.
             }
 
@@ -95,8 +103,9 @@ class OnboardingFragment : Fragment() {
                 name = name,
                 email = email,
                 goal = selectedGoal!!, // Null olamayacağını doğruladığımız için '!!' kullanabiliriz.
-                weight = 0.0, // Diğer bilgiler daha sonra profilden güncellenebilir.
-                height = 0
+                weight = weight ?: 0.0,
+                height = height ?: 0,
+                age = age ?: 0
             )
 
             // ViewModel aracılığıyla profili veritabanına kaydet.
@@ -131,18 +140,37 @@ class OnboardingFragment : Fragment() {
      */
     private fun isDataValid(name: String, email: String, goal: String?): Boolean {
         if (name.isBlank()) {
-            Toast.makeText(requireContext(), "Lütfen adınızı girin.", Toast.LENGTH_SHORT).show()
+            Toast.makeText(requireContext(), R.string.enter_name_message, Toast.LENGTH_SHORT).show()
             return false
         }
         if (email.isBlank() || !android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-            Toast.makeText(requireContext(), "Lütfen geçerli bir e-posta adresi girin.", Toast.LENGTH_SHORT).show()
+            Toast.makeText(requireContext(), R.string.invalid_email_message, Toast.LENGTH_SHORT).show()
             return false
         }
         if (goal == null) {
-            Toast.makeText(requireContext(), "Lütfen bir hedef seçin.", Toast.LENGTH_SHORT).show()
+            Toast.makeText(requireContext(), R.string.select_goal_message, Toast.LENGTH_SHORT).show()
             return false
         }
         return true
+    }
+
+    private fun isBodyMetricsValid(
+        ageText: String,
+        age: Int?,
+        weightText: String,
+        weight: Double?,
+        heightText: String,
+        height: Int?
+    ): Boolean {
+        val invalidAge = ageText.isNotBlank() && (age == null || age !in 1..120)
+        val invalidWeight = weightText.isNotBlank() && (weight == null || weight !in 1.0..500.0)
+        val invalidHeight = heightText.isNotBlank() && (height == null || height !in 50..300)
+
+        binding.ageInputLayout.error = if (invalidAge) getString(R.string.invalid_age) else null
+        binding.weightInputLayout.error = if (invalidWeight) getString(R.string.invalid_weight_value) else null
+        binding.heightInputLayout.error = if (invalidHeight) getString(R.string.invalid_height_value) else null
+
+        return !invalidAge && !invalidWeight && !invalidHeight
     }
 
     /**

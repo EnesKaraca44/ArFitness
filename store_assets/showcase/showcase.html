@@ -1,0 +1,652 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ArFitness Showcase</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700;800&display=block" rel="stylesheet">
+<style>
+:root{
+  --black:#050608; --graphite:#121824; --cobalt:#3B82F6; --cobalt-2:#60A5FA; --cobalt-3:#93C5FD;
+  --white:#F5F7FA; --muted:#8B95A7;
+  --display:'Anton', Impact, 'Arial Narrow', sans-serif;
+  --ui:'Inter', 'Segoe UI', system-ui, sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:#020304;overflow:hidden}
+body{width:1920px;height:1080px;position:relative;font-family:var(--ui);color:var(--white);transform-origin:0 0;-webkit-font-smoothing:antialiased}
+body.part{width:960px}
+
+/* Full 16:9 scene; showcase mode cuts it into two rounded cards, export mode shows one half full-bleed */
+.stage{position:absolute;left:0;top:0;width:1920px;height:1080px;overflow:hidden;
+  clip-path:path('M50,22 H923 A28,28 0 0 1 951,50 V1030 A28,28 0 0 1 923,1058 H50 A28,28 0 0 1 22,1030 V50 A28,28 0 0 1 50,22 Z M997,22 H1870 A28,28 0 0 1 1898,50 V1030 A28,28 0 0 1 1870,1058 H997 A28,28 0 0 1 969,1030 V50 A28,28 0 0 1 997,22 Z')}
+.part .stage{clip-path:none}
+.part-right .stage{left:-960px}
+.layer{position:absolute;left:0;top:0;width:1920px;height:1080px}
+.cardline{position:absolute;top:22px;width:929px;height:1036px;border-radius:28px;box-shadow:inset 0 0 0 1px rgba(255,255,255,.07);pointer-events:none}
+.part .cardline{display:none}
+
+/* Typography */
+.brand{position:absolute;left:72px;top:70px;display:flex;align-items:center;gap:14px}
+.brand img{width:44px;height:44px;border-radius:12px;box-shadow:0 0 0 1px rgba(255,255,255,.1),0 8px 22px rgba(59,130,246,.35)}
+.brand b{font-weight:700;font-size:20px;letter-spacing:.01em}
+.brand .sep{width:1px;height:20px;background:rgba(255,255,255,.18);margin:0 4px}
+.eyebrow{font-weight:600;font-size:13px;letter-spacing:.28em;color:#7DAAFB}
+.hl{font-family:var(--display);font-weight:400;line-height:.9;color:var(--white)}
+.hl > div{white-space:nowrap;position:relative}
+.striped{color:transparent;-webkit-text-stroke:2.5px var(--white)}
+.striped::before{content:attr(data-text);position:absolute;left:0;top:0;color:transparent;-webkit-text-stroke:0;
+  background:repeating-linear-gradient(180deg,var(--white) 0 3px,transparent 3px 9px);
+  -webkit-background-clip:text;background-clip:text;
+  -webkit-mask-image:linear-gradient(180deg,transparent 10%,#000 72%);mask-image:linear-gradient(180deg,transparent 10%,#000 72%)}
+.accent{color:var(--cobalt)}
+.left-hl{position:absolute;left:68px;top:150px}
+.left-hl .l1{font-size:104px}
+.left-hl .l2,.left-hl .l3{font-size:150px}
+.left-hl .l2{-webkit-text-stroke-width:3px}
+.sub{position:absolute;left:72px;top:566px;width:410px;font-size:20px;line-height:1.5;color:#A3ADBE}
+.sub b{color:var(--white);font-weight:600}
+.caption{position:absolute;bottom:64px;display:flex;align-items:center;gap:14px;font-size:12px;font-weight:600;letter-spacing:.3em;color:#6F7A8C}
+.caption::before{content:'';width:28px;height:1px;background:var(--cobalt)}
+.right-copy{position:absolute;left:1062px;top:84px}
+.right-copy .eyebrow{display:flex;align-items:center;gap:12px;margin-bottom:26px}
+.right-copy .eyebrow::before{content:'';width:28px;height:1px;background:var(--cobalt)}
+.right-hl{font-size:56px;line-height:1.04}
+.right-copy p{margin-top:20px;width:250px;font-size:16px;line-height:1.55;color:#9AA4B5}
+
+/* Phone */
+.phone-wrap{position:absolute;left:1362px;top:104px;width:418px;height:872px;perspective:2400px}
+.phone{position:relative;width:100%;height:100%;transform-style:preserve-3d;transform:rotateY(-17deg) rotateX(5deg) rotateZ(-3deg)}
+.edge{position:absolute;inset:0;border-radius:66px;background:linear-gradient(90deg,#4a4e55,#202226 30%,#17191c 70%,#3d4147);transform:translateZ(var(--z))}
+.frame{position:absolute;inset:0;border-radius:66px;padding:13px;
+  background:linear-gradient(140deg,#9aa0a8 0%,#43474e 16%,#1c1e22 42%,#2a2d32 68%,#7b8088 100%);
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.22),inset 4px 0 3px -1px rgba(255,255,255,.55),inset -3px 0 3px -1px rgba(96,165,250,.6)}
+.bezel{width:100%;height:100%;border-radius:54px;background:#000;padding:5px}
+.btn{position:absolute;width:4px;border-radius:2px;background:linear-gradient(90deg,#6a6f77,#2a2d32)}
+.glare{position:absolute;inset:18px;border-radius:49px;pointer-events:none;
+  background:linear-gradient(112deg,rgba(255,255,255,.13) 0%,rgba(255,255,255,.03) 28%,rgba(255,255,255,0) 40%)}
+.screen{position:relative;width:100%;height:100%;border-radius:49px;overflow:hidden;
+  background:radial-gradient(120% 55% at 50% -12%,rgba(59,130,246,.18),transparent 60%),#0A0E15;color:var(--white)}
+.sb{height:48px;display:flex;align-items:center;justify-content:space-between;padding:6px 30px 0 36px;font-size:15px;font-weight:600}
+.sb .ic{display:flex;gap:6px;align-items:center}
+.island{position:absolute;top:12px;left:50%;width:108px;height:31px;margin-left:-54px;background:#000;border-radius:20px}
+.app{padding:8px 18px 0}
+.hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+.hdr small{display:block;font-size:12px;color:var(--muted);font-weight:500;margin-bottom:3px}
+.hdr h3{font-size:22px;font-weight:700;letter-spacing:-.01em}
+.avatar{width:42px;height:42px;border-radius:50%;padding:2px;background:conic-gradient(var(--cobalt) 0 290deg,rgba(59,130,246,.2) 0)}
+.avatar span{display:grid;place-items:center;width:100%;height:100%;border-radius:50%;background:#1A2232;font-weight:700;font-size:15px;border:2px solid #0A0E15}
+.card{background:linear-gradient(180deg,#161D2B,var(--graphite));border:1px solid rgba(255,255,255,.06);border-radius:20px}
+.cal{padding:12px 10px 10px;margin-bottom:10px}
+.row{display:flex;justify-content:space-between;align-items:center}
+.cal .row{padding:0 6px 10px}
+.t{font-size:14px;font-weight:700}
+.pill{font-size:11px;font-weight:600;color:var(--cobalt-2);background:rgba(59,130,246,.13);padding:4px 9px;border-radius:99px}
+.days{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+.d{display:flex;flex-direction:column;align-items:center;gap:4px;padding:7px 0 6px;border-radius:13px}
+.d i{font-style:normal;font-size:10.5px;color:var(--muted);font-weight:500}
+.d b{font-size:15px;font-weight:700}
+.d u{width:5px;height:5px;border-radius:50%}
+.d.done u{background:var(--cobalt);box-shadow:0 0 6px var(--cobalt)}
+.d.rest b{color:#5E6878}
+.d.today{background:linear-gradient(180deg,#4F8FF9,#2563EB);box-shadow:0 6px 16px rgba(59,130,246,.45)}
+.d.today i{color:rgba(255,255,255,.8)}
+.d.today u{background:#fff}
+.rings{display:flex;align-items:center;gap:14px;padding:13px 14px;margin-bottom:10px}
+.ringbox{position:relative;width:126px;height:126px;flex:none}
+.ringbox .c{position:absolute;inset:0;display:grid;place-items:center;font-size:15px;font-weight:800}
+.legend{flex:1;display:flex;flex-direction:column;gap:12px}
+.legend h4{font-size:13px;font-weight:700;margin-bottom:-2px}
+.lg{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted)}
+.lg i{width:8px;height:8px;border-radius:50%;background:var(--c);box-shadow:0 0 8px var(--c)}
+.lg span{flex:1}
+.lg b{color:var(--white);font-size:13px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+.pr{padding:12px 13px}
+.pr-top{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--muted);font-weight:600}
+.pr-top svg{width:15px;height:15px}
+.pr-val{font-size:28px;font-weight:800;margin:6px 0 2px;letter-spacing:-.02em}
+.pr-val small{font-size:13px;color:var(--muted);font-weight:600;letter-spacing:0}
+.pr-sub{font-size:11px;color:var(--muted)}
+.bars{display:flex;align-items:flex-end;gap:4px;height:18px;margin-top:3px}
+.bars i{flex:1;border-radius:3px;background:rgba(59,130,246,.25)}
+.bars i.on{background:var(--cobalt)}
+.sec{display:flex;justify-content:space-between;align-items:center;margin:0 2px 8px}
+.sec span{font-size:14px;font-weight:700}
+.sec a{font-size:12px;color:var(--cobalt-2);font-weight:600}
+.log{display:flex;align-items:center;gap:11px;padding:9px 12px;margin-bottom:8px}
+.log .ic{width:38px;height:38px;border-radius:12px;background:rgba(59,130,246,.14);display:grid;place-items:center}
+.log .m{flex:1}
+.log .m b{display:block;font-size:14px;font-weight:700;margin-bottom:1px}
+.log .m span{font-size:11.5px;color:var(--muted)}
+.score{font-size:13px;font-weight:800;color:var(--cobalt-2);border:1.5px solid rgba(96,165,250,.45);border-radius:10px;padding:5px 8px}
+.cta{position:absolute;left:18px;right:18px;bottom:90px;height:58px;border-radius:18px;background:linear-gradient(180deg,#4F8FF9,#2563EB);
+  display:flex;align-items:center;justify-content:center;gap:14px;font-weight:800;font-size:16px;letter-spacing:.18em;
+  box-shadow:0 14px 30px rgba(37,99,235,.5),inset 0 1px 0 rgba(255,255,255,.35)}
+.cta .go{width:30px;height:30px;border-radius:50%;background:rgba(255,255,255,.2);display:grid;place-items:center}
+.nav{position:absolute;left:0;right:0;bottom:0;height:78px;display:flex;justify-content:space-around;padding-top:12px;background:#0A0E15;border-top:1px solid rgba(255,255,255,.05)}
+.nav div{display:flex;flex-direction:column;align-items:center;gap:4px;font-size:10.5px;font-weight:600;color:#5E6878}
+.nav div.on{color:var(--cobalt)}
+.nav svg{width:22px;height:22px}
+.homebar{position:absolute;bottom:8px;left:50%;width:120px;height:4px;margin-left:-60px;border-radius:4px;background:rgba(255,255,255,.55)}
+.phone-shadow{position:absolute;left:1394px;top:958px;width:360px;height:38px;border-radius:50%;background:rgba(0,0,0,.9);filter:blur(14px)}
+
+/* Floating glass chips */
+.chip{position:absolute;display:flex;align-items:center;gap:12px;padding:13px 18px 13px 13px;border-radius:20px;
+  background:rgba(16,22,34,.7);-webkit-backdrop-filter:blur(16px) saturate(140%);backdrop-filter:blur(16px) saturate(140%);
+  border:1px solid rgba(255,255,255,.1);box-shadow:0 24px 60px rgba(0,0,0,.55),inset 0 1px 0 rgba(255,255,255,.08)}
+.chip small{display:block;font-size:11px;color:var(--muted);font-weight:600;letter-spacing:.04em;margin-bottom:2px}
+.chip b{font-size:16px;font-weight:800}
+.chip .mini{position:relative;width:46px;height:46px}
+.chip .mini span{position:absolute;inset:0;display:grid;place-items:center;font-size:14px;font-weight:800}
+.chip .medal{width:42px;height:42px;border-radius:13px;display:grid;place-items:center;background:linear-gradient(180deg,#4F8FF9,#2563EB);box-shadow:0 8px 20px rgba(59,130,246,.45)}
+.chipA{left:1146px;top:700px}
+.chipB{left:1214px;top:478px}
+
+.grain{mix-blend-mode:overlay;opacity:.14;pointer-events:none}
+.vignette{pointer-events:none;background:radial-gradient(ellipse 75% 85% at 50% 46%,transparent 52%,rgba(0,0,0,.6) 100%)}
+</style>
+</head>
+<body>
+<div class="stage">
+
+  <!-- Environment: wall, carbon, equipment, light -->
+  <svg class="layer" id="env" viewBox="0 0 1920 1080" width="1920" height="1080">
+    <defs>
+      <linearGradient id="wall" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#090c12"/><stop offset="1" stop-color="#06080b"/></linearGradient>
+      <linearGradient id="floor" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#0c0f14"/><stop offset=".3" stop-color="#07090c"/><stop offset="1" stop-color="#030405"/></linearGradient>
+      <linearGradient id="cw1" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1c2029"/><stop offset="1" stop-color="#0b0d11"/></linearGradient>
+      <linearGradient id="cw2" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#161a21"/><stop offset="1" stop-color="#090b0e"/></linearGradient>
+      <pattern id="carbon" width="10" height="10" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+        <rect width="10" height="10" fill="#0a0c10"/>
+        <rect width="5" height="5" fill="url(#cw1)"/><rect x="5" y="5" width="5" height="5" fill="url(#cw1)"/>
+        <rect x="5" width="5" height="5" fill="url(#cw2)"/><rect y="5" width="5" height="5" fill="url(#cw2)"/>
+      </pattern>
+      <radialGradient id="litL" cx="690" cy="420" r="620" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#fff" stop-opacity=".95"/><stop offset="1" stop-color="#fff" stop-opacity=".12"/></radialGradient>
+      <radialGradient id="litR" cx="1548" cy="420" r="520" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#fff" stop-opacity=".7"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient>
+      <mask id="carbonMask"><rect width="1920" height="820" fill="url(#litL)"/><rect width="1920" height="820" fill="url(#litR)"/></mask>
+      <linearGradient id="metal" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2a2f37"/><stop offset=".12" stop-color="#14171c"/><stop offset="1" stop-color="#0a0b0e"/></linearGradient>
+      <linearGradient id="metalV" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#1d2128"/><stop offset=".35" stop-color="#101318"/><stop offset="1" stop-color="#0a0b0e"/></linearGradient>
+      <linearGradient id="steel" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#6b727c"/><stop offset=".5" stop-color="#2a2e35"/><stop offset="1" stop-color="#121418"/></linearGradient>
+      <linearGradient id="coneW" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".26"/><stop offset=".55" stop-color="#eef3ff" stop-opacity=".07"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient>
+      <linearGradient id="coneB" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#bcd4ff" stop-opacity=".2"/><stop offset=".55" stop-color="#3B82F6" stop-opacity=".07"/><stop offset="1" stop-color="#3B82F6" stop-opacity="0"/></linearGradient>
+      <radialGradient id="poolW"><stop offset="0" stop-color="#fff" stop-opacity=".2"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient>
+      <radialGradient id="poolB"><stop offset="0" stop-color="#3B82F6" stop-opacity=".42"/><stop offset="1" stop-color="#3B82F6" stop-opacity="0"/></radialGradient>
+      <radialGradient id="glowB" cx="1548" cy="560" r="600" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#3B82F6" stop-opacity=".34"/><stop offset=".45" stop-color="#2563EB" stop-opacity=".1"/><stop offset="1" stop-color="#1d4ed8" stop-opacity="0"/></radialGradient>
+      <radialGradient id="bridge" cx="1150" cy="640" r="720" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#3B82F6" stop-opacity=".12"/><stop offset="1" stop-color="#3B82F6" stop-opacity="0"/></radialGradient>
+      <radialGradient id="wallSpot" cx="690" cy="430" r="430" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#dfe7f5" stop-opacity=".09"/><stop offset="1" stop-color="#dfe7f5" stop-opacity="0"/></radialGradient>
+      <filter id="b30" x="-60%" y="-20%" width="220%" height="140%"><feGaussianBlur stdDeviation="30"/></filter>
+      <filter id="b8" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="8"/></filter>
+      <filter id="b3" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="3"/></filter>
+      <linearGradient id="hex" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#20252d"/><stop offset=".25" stop-color="#11141a"/><stop offset="1" stop-color="#08090c"/></linearGradient>
+    </defs>
+
+    <rect width="1920" height="820" fill="url(#wall)"/>
+    <rect width="1920" height="820" fill="url(#carbon)" mask="url(#carbonMask)"/>
+    <g id="slats" stroke="#fff" stroke-opacity=".03" stroke-width="1"></g>
+    <rect width="1920" height="820" fill="url(#wallSpot)"/>
+    <rect y="804" width="1920" height="16" fill="#040506"/>
+    <rect y="820" width="1920" height="260" fill="url(#floor)"/>
+    <line x1="0" y1="820.5" x2="1920" y2="820.5" stroke="#fff" stroke-opacity=".07"/>
+    <g id="floorSeams" stroke="#fff" stroke-opacity=".028" stroke-width="1" fill="none"></g>
+
+    <!-- Dumbbell rack, back left -->
+    <g id="rack">
+      <rect x="34" y="724" width="350" height="7" rx="2" fill="url(#metal)"/>
+      <rect x="34" y="796" width="350" height="7" rx="2" fill="url(#metal)"/>
+      <rect x="44" y="724" width="10" height="96" fill="url(#metalV)"/>
+      <rect x="364" y="724" width="10" height="96" fill="url(#metalV)"/>
+    </g>
+
+    <!-- Power rack straddling the seam -->
+    <g id="power">
+      <rect x="894" y="168" width="22" height="652" fill="url(#metalV)"/>
+      <rect x="1004" y="168" width="22" height="652" fill="url(#metalV)"/>
+      <rect x="880" y="160" width="160" height="16" rx="2" fill="url(#metal)"/>
+      <line x1="894.5" y1="176" x2="894.5" y2="820" stroke="#fff" stroke-opacity=".09"/>
+      <line x1="1004.5" y1="176" x2="1004.5" y2="820" stroke="#fff" stroke-opacity=".09"/>
+      <rect x="884" y="812" width="42" height="8" fill="#0d0f13"/>
+      <rect x="994" y="812" width="42" height="8" fill="#0d0f13"/>
+      <g id="holes" fill="#040506"></g>
+      <!-- racked barbell -->
+      <rect x="770" y="427" width="380" height="6" fill="url(#steel)"/>
+      <rect x="770" y="424" width="70" height="12" rx="2" fill="url(#steel)"/>
+      <rect x="1080" y="424" width="70" height="12" rx="2" fill="url(#steel)"/>
+      <rect x="840" y="355" width="20" height="150" rx="5" fill="url(#hex)"/>
+      <rect x="862" y="372" width="16" height="116" rx="4" fill="url(#hex)"/>
+      <rect x="1042" y="372" width="16" height="116" rx="4" fill="url(#hex)"/>
+      <rect x="1060" y="355" width="20" height="150" rx="5" fill="url(#hex)"/>
+      <g stroke="#fff" stroke-opacity=".12" stroke-width="1" fill="none">
+        <path d="M843,356 h14 M865,373 h10 M1045,373 h10 M1063,356 h14"/>
+      </g>
+      <rect x="888" y="420" width="10" height="20" rx="2" fill="#15181d"/>
+      <rect x="1022" y="420" width="10" height="20" rx="2" fill="#15181d"/>
+    </g>
+
+    <!-- Plates leaning on the wall, far right -->
+    <g id="plates">
+      <circle cx="1846" cy="752" r="66" fill="url(#hex)" stroke="#fff" stroke-opacity=".05"/>
+      <circle cx="1846" cy="752" r="48" fill="none" stroke="#000" stroke-opacity=".5" stroke-width="2"/>
+      <circle cx="1846" cy="752" r="11" fill="#040506" stroke="#2a2f37" stroke-width="2"/>
+      <circle cx="1792" cy="772" r="48" fill="url(#hex)" stroke="#fff" stroke-opacity=".05"/>
+      <circle cx="1792" cy="772" r="9" fill="#040506" stroke="#2a2f37" stroke-width="2"/>
+    </g>
+
+    <!-- Light -->
+    <rect width="1920" height="1080" fill="url(#bridge)"/>
+    <rect width="1920" height="1080" fill="url(#glowB)"/>
+    <g id="rings" fill="none">
+      <circle cx="1548" cy="540" r="300" stroke="#3B82F6" stroke-opacity=".14"/>
+      <circle cx="1548" cy="540" r="385" stroke="#3B82F6" stroke-opacity=".09"/>
+      <circle cx="1548" cy="540" r="470" stroke="#3B82F6" stroke-opacity=".05"/>
+      <circle cx="1548" cy="540" r="385" stroke="#3B82F6" stroke-opacity=".5" stroke-width="3" stroke-linecap="round" stroke-dasharray="560 1860" transform="rotate(-62 1548 540)"/>
+    </g>
+    <polygon points="650,-10 730,-10 1010,1000 370,1000" fill="url(#coneW)" filter="url(#b30)"/>
+    <polygon points="1508,-10 1588,-10 1860,1000 1236,1000" fill="url(#coneB)" filter="url(#b30)"/>
+    <ellipse cx="600" cy="984" rx="420" ry="58" fill="url(#poolW)"/>
+    <ellipse cx="1548" cy="996" rx="340" ry="46" fill="url(#poolB)"/>
+    <g id="haze"></g>
+    <ellipse cx="690" cy="2" rx="120" ry="26" fill="#fff" opacity=".35" filter="url(#b8)"/>
+    <ellipse cx="690" cy="3" rx="46" ry="7" fill="#fff"/>
+    <ellipse cx="1548" cy="2" rx="110" ry="24" fill="#9cc0ff" opacity=".35" filter="url(#b8)"/>
+    <ellipse cx="1548" cy="3" rx="42" ry="6" fill="#e6efff"/>
+  </svg>
+
+  <!-- Left card copy (athlete layer sits on top of it) -->
+  <div class="brand">
+    <img src="../../play_store_icon_512x512.png" alt="">
+    <b>ArFitness</b><span class="sep"></span><span class="eyebrow">01 — AI FORM KOÇU</span>
+  </div>
+  <div class="hl left-hl">
+    <div class="l1">HER TEKRAR</div>
+    <div class="l2 striped" data-text="KUSURSUZ">KUSURSUZ</div>
+    <div class="l3">FORM<span class="accent">.</span></div>
+  </div>
+  <p class="sub">Kameranı aç, hareketi yap. <b>Yapay zeka koçun</b> formunu anlık analiz eder, her tekrarı sayar.</p>
+  <div class="caption" style="left:72px">BULGARIAN SPLIT SQUAT · 3 × 12 · 24 KG</div>
+
+  <!-- Athlete -->
+  <svg class="layer" id="fig" viewBox="0 0 1920 1080" width="1920" height="1080">
+    <defs>
+      <linearGradient id="skin" gradientUnits="userSpaceOnUse" x1="0" y1="200" x2="0" y2="520"><stop offset="0" stop-color="#6a5143"/><stop offset=".28" stop-color="#3a2b23"/><stop offset=".7" stop-color="#1f1713"/><stop offset="1" stop-color="#110d0b"/></linearGradient>
+      <linearGradient id="cloth" gradientUnits="userSpaceOnUse" x1="0" y1="290" x2="0" y2="640"><stop offset="0" stop-color="#2c313a"/><stop offset=".35" stop-color="#16191e"/><stop offset="1" stop-color="#060708"/></linearGradient>
+      <linearGradient id="clothFar" gradientUnits="userSpaceOnUse" x1="0" y1="440" x2="0" y2="640"><stop offset="0" stop-color="#14171c"/><stop offset="1" stop-color="#040405"/></linearGradient>
+      <linearGradient id="hair" gradientUnits="userSpaceOnUse" x1="0" y1="190" x2="0" y2="300"><stop offset="0" stop-color="#3a3532"/><stop offset=".4" stop-color="#14110f"/><stop offset="1" stop-color="#070606"/></linearGradient>
+      <linearGradient id="bell" gradientUnits="userSpaceOnUse" x1="0" y1="314" x2="0" y2="406"><stop offset="0" stop-color="#3a3f48"/><stop offset=".2" stop-color="#15181d"/><stop offset="1" stop-color="#07080a"/></linearGradient>
+      <linearGradient id="bench" gradientUnits="userSpaceOnUse" x1="0" y1="472" x2="0" y2="640"><stop offset="0" stop-color="#2a2f37"/><stop offset=".08" stop-color="#14171c"/><stop offset="1" stop-color="#07080a"/></linearGradient>
+      <linearGradient id="reflFade" gradientUnits="userSpaceOnUse" x1="0" y1="640" x2="0" y2="760"><stop offset="0" stop-color="#fff" stop-opacity=".55"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient>
+      <mask id="reflMask"><rect x="0" y="640" width="700" height="200" fill="url(#reflFade)"/></mask>
+      <filter id="rim" x="-30%" y="-30%" width="160%" height="160%" color-interpolation-filters="sRGB">
+        <feOffset in="SourceAlpha" dy="2.6" result="o1"/>
+        <feComposite in="SourceAlpha" in2="o1" operator="out" result="e1"/>
+        <feGaussianBlur in="e1" stdDeviation=".8" result="e1b"/>
+        <feFlood flood-color="#ffffff" flood-opacity=".95"/>
+        <feComposite in2="e1b" operator="in" result="topRim"/>
+        <feOffset in="SourceAlpha" dy="11" result="o2"/>
+        <feComposite in="SourceAlpha" in2="o2" operator="out" result="e2"/>
+        <feGaussianBlur in="e2" stdDeviation="4.5" result="e2b"/>
+        <feComposite in="e2b" in2="SourceAlpha" operator="in" result="e2c"/>
+        <feFlood flood-color="#e4ecff" flood-opacity=".3"/>
+        <feComposite in2="e2c" operator="in" result="topSoft"/>
+        <feOffset in="SourceAlpha" dx="-2.6" result="o3"/>
+        <feComposite in="SourceAlpha" in2="o3" operator="out" result="e3"/>
+        <feGaussianBlur in="e3" stdDeviation=".9" result="e3b"/>
+        <feFlood flood-color="#4d8ff8"/>
+        <feComposite in2="e3b" operator="in" result="blueRim"/>
+        <feOffset in="SourceAlpha" dx="2" result="o4"/>
+        <feComposite in="SourceAlpha" in2="o4" operator="out" result="e4"/>
+        <feGaussianBlur in="e4" stdDeviation=".9" result="e4b"/>
+        <feFlood flood-color="#b8c6dc" flood-opacity=".28"/>
+        <feComposite in2="e4b" operator="in" result="leftRim"/>
+        <feOffset in="SourceAlpha" dy="-14" result="o5"/>
+        <feComposite in="SourceAlpha" in2="o5" operator="out" result="e5"/>
+        <feGaussianBlur in="e5" stdDeviation="6" result="e5b"/>
+        <feComposite in="e5b" in2="SourceAlpha" operator="in" result="e5c"/>
+        <feFlood flood-color="#000" flood-opacity=".6"/>
+        <feComposite in2="e5c" operator="in" result="underShade"/>
+        <feMerge><feMergeNode in="SourceGraphic"/><feMergeNode in="underShade"/><feMergeNode in="topSoft"/><feMergeNode in="leftRim"/><feMergeNode in="blueRim"/><feMergeNode in="topRim"/></feMerge>
+      </filter>
+      <filter id="rimFar" x="-30%" y="-30%" width="160%" height="160%" color-interpolation-filters="sRGB">
+        <feOffset in="SourceAlpha" dy="2.4" result="o1"/>
+        <feComposite in="SourceAlpha" in2="o1" operator="out" result="e1"/>
+        <feGaussianBlur in="e1" stdDeviation=".9" result="e1b"/>
+        <feFlood flood-color="#dfe7f5" flood-opacity=".45"/>
+        <feComposite in2="e1b" operator="in" result="topRim"/>
+        <feOffset in="SourceAlpha" dx="-2.4" result="o3"/>
+        <feComposite in="SourceAlpha" in2="o3" operator="out" result="e3"/>
+        <feGaussianBlur in="e3" stdDeviation="1" result="e3b"/>
+        <feFlood flood-color="#3B82F6" flood-opacity=".6"/>
+        <feComposite in2="e3b" operator="in" result="blueRim"/>
+        <feMerge><feMergeNode in="SourceGraphic"/><feMergeNode in="blueRim"/><feMergeNode in="topRim"/></feMerge>
+      </filter>
+      <filter id="soft" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="1.4"/></filter>
+      <filter id="soft3" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="3"/></filter>
+      <filter id="glow" x="-100%" y="-100%" width="300%" height="300%"><feGaussianBlur stdDeviation="2.2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+    </defs>
+    <g id="figRoot" transform="translate(180,84) scale(1.4)"></g>
+  </svg>
+
+  <!-- Right card copy -->
+  <div class="right-copy">
+    <div class="eyebrow">02 — İLERLEME TAKİBİ</div>
+    <div class="hl right-hl">
+      <div>HER GÜN</div>
+      <div class="striped" data-text="DAHA GÜÇLÜ">DAHA GÜÇLÜ</div>
+    </div>
+    <p>Takvim, kişisel rekorlar ve form skoru — gelişimin tek ekranda.</p>
+  </div>
+  <div class="caption" style="left:1062px">TAKVİM · REKORLAR · FORM SKORU</div>
+
+  <!-- Phone -->
+  <div class="phone-shadow"></div>
+  <div class="phone-wrap">
+    <div class="phone">
+      <div class="edge" style="--z:-2px"></div><div class="edge" style="--z:-4px"></div><div class="edge" style="--z:-6px"></div>
+      <div class="edge" style="--z:-8px"></div><div class="edge" style="--z:-10px"></div><div class="edge" style="--z:-12px"></div>
+      <div class="edge" style="--z:-14px"></div><div class="edge" style="--z:-16px"></div>
+      <div class="btn" style="left:-3px;top:190px;height:34px"></div>
+      <div class="btn" style="left:-3px;top:250px;height:62px"></div>
+      <div class="btn" style="left:-3px;top:326px;height:62px"></div>
+      <div class="btn" style="right:-3px;top:270px;height:96px"></div>
+      <div class="frame">
+        <div class="bezel">
+          <div class="screen">
+            <div class="island"></div>
+            <div class="sb">
+              <span>9:41</span>
+              <span class="ic">
+                <svg width="17" height="11" viewBox="0 0 17 11" fill="#fff"><rect x="0" y="7" width="3" height="4" rx="1"/><rect x="4.5" y="5" width="3" height="6" rx="1"/><rect x="9" y="2.5" width="3" height="8.5" rx="1"/><rect x="13.5" y="0" width="3" height="11" rx="1"/></svg>
+                <svg width="15" height="11" viewBox="0 0 15 11" fill="none" stroke="#fff" stroke-width="1.6" stroke-linecap="round"><path d="M1 4a9 9 0 0 1 13 0M3.5 6.6a5.5 5.5 0 0 1 8 0"/><circle cx="7.5" cy="9.4" r="1.1" fill="#fff" stroke="none"/></svg>
+                <svg width="25" height="12" viewBox="0 0 25 12"><rect x=".5" y=".5" width="21" height="11" rx="3.5" fill="none" stroke="#fff" stroke-opacity=".45"/><rect x="2" y="2" width="16" height="8" rx="2" fill="#fff"/><rect x="22.5" y="4" width="2" height="4" rx="1" fill="#fff" fill-opacity=".45"/></svg>
+              </span>
+            </div>
+            <div class="app">
+              <div class="hdr">
+                <div><small>Cuma, 23 Ekim</small><h3>Hoş Geldin, Elif</h3></div>
+                <div class="avatar"><span>E</span></div>
+              </div>
+
+              <div class="card cal">
+                <div class="row"><span class="t">Ekim 2026</span><span class="pill">4 / 5 antrenman</span></div>
+                <div class="days">
+                  <div class="d done"><i>Pzt</i><b>19</b><u></u></div>
+                  <div class="d done"><i>Sal</i><b>20</b><u></u></div>
+                  <div class="d rest"><i>Çar</i><b>21</b><u></u></div>
+                  <div class="d done"><i>Per</i><b>22</b><u></u></div>
+                  <div class="d today"><i>Cum</i><b>23</b><u></u></div>
+                  <div class="d"><i>Cmt</i><b>24</b><u></u></div>
+                  <div class="d"><i>Paz</i><b>25</b><u></u></div>
+                </div>
+              </div>
+
+              <div class="card rings">
+                <div class="ringbox">
+                  <svg width="126" height="126" viewBox="0 0 126 126" fill="none" stroke-linecap="round">
+                    <g transform="rotate(-90 63 63)">
+                      <circle cx="63" cy="63" r="56" stroke="#3B82F6" stroke-opacity=".16" stroke-width="11"/>
+                      <circle cx="63" cy="63" r="56" stroke="#3B82F6" stroke-width="11" stroke-dasharray="288.5 351.9"/>
+                      <circle cx="63" cy="63" r="42" stroke="#60A5FA" stroke-opacity=".16" stroke-width="11"/>
+                      <circle cx="63" cy="63" r="42" stroke="#60A5FA" stroke-width="11" stroke-dasharray="184.7 263.9"/>
+                      <circle cx="63" cy="63" r="28" stroke="#93C5FD" stroke-opacity=".16" stroke-width="11"/>
+                      <circle cx="63" cy="63" r="28" stroke="#93C5FD" stroke-width="11" stroke-dasharray="165.4 175.9"/>
+                    </g>
+                  </svg>
+                  <div class="c">82%</div>
+                </div>
+                <div class="legend">
+                  <h4>Bu Hafta</h4>
+                  <div class="lg" style="--c:#3B82F6"><i></i><span>Hedef</span><b>82%</b></div>
+                  <div class="lg" style="--c:#60A5FA"><i></i><span>Aktif Süre</span><b>3s 20dk</b></div>
+                  <div class="lg" style="--c:#93C5FD"><i></i><span>Form Skoru</span><b>94</b></div>
+                </div>
+              </div>
+
+              <div class="grid2">
+                <div class="card pr">
+                  <div class="pr-top"><svg viewBox="0 0 24 24" fill="none" stroke="#60A5FA" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0V4z"/><path d="M17 5h3v2a3 3 0 0 1-3 3M7 5H4v2a3 3 0 0 0 3 3"/></svg>Kişisel Rekor</div>
+                  <div class="pr-val">98<small> /100</small></div>
+                  <div class="pr-sub">Lunge · Form Skoru</div>
+                </div>
+                <div class="card pr">
+                  <div class="pr-top"><svg viewBox="0 0 24 24" fill="none" stroke="#60A5FA" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22c4 0 7-2.7 7-7 0-3-2-5.5-3.5-7 0 2-1 3.5-2.5 4 .5-3-1-6.5-4-9 0 3-4 5.5-4 12 0 4.3 3 7 7 7z"/></svg>Seri</div>
+                  <div class="pr-val">12<small> gün</small></div>
+                  <div class="bars"><i class="on" style="height:60%"></i><i class="on" style="height:85%"></i><i style="height:30%"></i><i class="on" style="height:70%"></i><i class="on" style="height:100%"></i><i style="height:22%"></i><i style="height:22%"></i></div>
+                </div>
+              </div>
+
+              <div class="sec"><span>Son Antrenmanlar</span><a>Tümü</a></div>
+              <div class="card log">
+                <div class="ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#60A5FA" stroke-width="2.2" stroke-linecap="round"><path d="M6.5 6.5l11 11M3 10l7-7M14 21l7-7M5 12l7-7M12 19l7-7"/></svg></div>
+                <div class="m"><b>Lunge</b><span>3 set · 36 tekrar · 12:40</span></div>
+                <div class="score">96</div>
+              </div>
+              <div class="card log">
+                <div class="ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#60A5FA" stroke-width="2.2" stroke-linecap="round"><path d="M6.5 6.5l11 11M3 10l7-7M14 21l7-7M5 12l7-7M12 19l7-7"/></svg></div>
+                <div class="m"><b>Squat</b><span>4 set · 40 tekrar · 15:05</span></div>
+                <div class="score">92</div>
+              </div>
+            </div>
+
+            <div class="cta"><span>BAŞLANGIÇ</span><span class="go"><svg width="12" height="12" viewBox="0 0 12 12"><path d="M3 1.5v9l7-4.5z" fill="#fff"/></svg></span></div>
+            <div class="nav">
+              <div class="on"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 3l9 7.5V21h-6v-6H9v6H3V10.5z"/></svg>Ana Sayfa</div>
+              <div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5M12 7v5l3 2"/></svg>Geçmiş</div>
+              <div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>Profil</div>
+            </div>
+            <div class="homebar"></div>
+          </div>
+        </div>
+      </div>
+      <div class="glare"></div>
+    </div>
+  </div>
+
+  <div class="chip chipA">
+    <div class="mini">
+      <svg width="46" height="46" viewBox="0 0 46 46" fill="none" stroke-linecap="round"><g transform="rotate(-90 23 23)"><circle cx="23" cy="23" r="19" stroke="#3B82F6" stroke-opacity=".2" stroke-width="5"/><circle cx="23" cy="23" r="19" stroke="#3B82F6" stroke-width="5" stroke-dasharray="117 119.4"/></g></svg>
+      <span>98</span>
+    </div>
+    <div><small>Form Skoru</small><b>Mükemmel Form</b></div>
+  </div>
+  <div class="chip chipB">
+    <div class="medal"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0V4z"/><path d="M17 5h3v2a3 3 0 0 1-3 3M7 5H4v2a3 3 0 0 0 3 3"/></svg></div>
+    <div><small>Yeni Rekor</small><b>36 tekrar</b></div>
+  </div>
+
+  <svg class="layer grain" viewBox="0 0 1920 1080"><filter id="noise"><feTurbulence type="fractalNoise" baseFrequency=".85" numOctaves="2" stitchTiles="stitch"/><feColorMatrix type="saturate" values="0"/></filter><rect width="1920" height="1080" filter="url(#noise)"/></svg>
+  <div class="layer vignette"></div>
+</div>
+<div class="cardline" style="left:22px"></div>
+<div class="cardline" style="left:969px"></div>
+
+<script>
+(function(){
+  const q = new URLSearchParams(location.search), part = q.get('part');
+  if (part) document.body.classList.add('part', 'part-' + part);
+  const fit = () => {
+    const s = Math.min(innerWidth / (part ? 960 : 1920), innerHeight / 1080);
+    document.body.style.transform = Math.abs(s - 1) > .001 ? 'scale(' + s + ')' : '';
+  };
+  fit(); addEventListener('resize', fit);
+
+  const NS = 'http://www.w3.org/2000/svg';
+  const r1 = v => Math.round(v * 10) / 10;
+  const pt = p => r1(p[0]) + ',' + r1(p[1]);
+  const el = (tag, attrs, parent) => {
+    const e = document.createElementNS(NS, tag);
+    for (const k in attrs) e.setAttribute(k, attrs[k]);
+    if (parent) parent.appendChild(e);
+    return e;
+  };
+  let seed = 11;
+  const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+
+  // Catmull-Rom through the points, as cubic Beziers
+  function smooth(pts, closed = true) {
+    const n = pts.length, g = i => closed ? pts[(i + n) % n] : pts[Math.max(0, Math.min(n - 1, i))];
+    let d = 'M' + pt(pts[0]);
+    for (let i = 0; i < (closed ? n : n - 1); i++) {
+      const p0 = g(i - 1), p1 = g(i), p2 = g(i + 1), p3 = g(i + 2);
+      d += ' C' + pt([p1[0] + (p2[0] - p0[0]) / 6, p1[1] + (p2[1] - p0[1]) / 6]) + ' ' +
+                  pt([p2[0] - (p3[0] - p1[0]) / 6, p2[1] - (p3[1] - p1[1]) / 6]) + ' ' + pt(p2);
+    }
+    return d + (closed ? ' Z' : '');
+  }
+
+  // Tapered limb from joint a to joint b with radii ra/rb; sa/sb add muscle bulges [t, extra] on each side
+  function limb(a, b, ra, rb, sa = [], sb = []) {
+    const dx = b[0] - a[0], dy = b[1] - a[1], L = Math.hypot(dx, dy), ux = dx / L, uy = dy / L, nx = -uy, ny = ux, c = .7071;
+    const P = (t, o) => [a[0] + dx * t + nx * o, a[1] + dy * t + ny * o], R = t => ra + (rb - ra) * t;
+    const at = (p, s, f, rad) => [p[0] + (ux * f + nx * s) * rad, p[1] + (uy * f + ny * s) * rad];
+    const pts = [P(0, ra)];
+    sa.forEach(([t, e]) => pts.push(P(t, R(t) + e)));
+    pts.push(P(1, rb), at(b, c, c, rb), at(b, 0, 1, rb), at(b, -c, c, rb), P(1, -rb));
+    [...sb].reverse().forEach(([t, e]) => pts.push(P(t, -(R(t) + e))));
+    pts.push(P(0, -ra), at(a, -c, -c, ra), at(a, 0, -1, ra), at(a, c, -c, ra));
+    return smooth(pts);
+  }
+
+  // ---------- Environment details ----------
+  const slats = document.getElementById('slats');
+  for (let x = 80; x < 1920; x += 120) el('line', { x1: x + .5, y1: 0, x2: x + .5, y2: 804 }, slats);
+  const seams = document.getElementById('floorSeams');
+  [846, 884, 940, 1024].forEach(y => el('line', { x1: 0, y1: y, x2: 1920, y2: y }, seams));
+  for (let i = -6; i <= 6; i++) el('line', { x1: 960 + i * 120, y1: 820, x2: 960 + i * 420, y2: 1080 }, seams);
+  const holes = document.getElementById('holes');
+  for (let y = 200; y < 800; y += 26) { el('circle', { cx: 905, cy: y, r: 2.6 }, holes); el('circle', { cx: 1015, cy: y, r: 2.6 }, holes); }
+
+  const rack = document.getElementById('rack');
+  const hexagon = (cx, cy, r) => {
+    const p = [];
+    for (let i = 0; i < 6; i++) { const a = Math.PI / 6 + i * Math.PI / 3; p.push(pt([cx + r * Math.cos(a), cy + r * Math.sin(a)])); }
+    return p.join(' ');
+  };
+  [[724, 13, 19], [796, 17, 25]].forEach(([railY, r0, r1x]) => {
+    let x = 66;
+    for (let i = 0; i < 9 && x < 362; i++) {
+      const r = r0 + (r1x - r0) * i / 8;
+      el('polygon', { points: hexagon(x + r, railY - r * .87, r), fill: 'url(#hex)', stroke: '#fff', 'stroke-opacity': .05 }, rack);
+      x += r * 2 + 4;
+    }
+  });
+
+  const haze = document.getElementById('haze');
+  const dust = (cx, n, color) => {
+    for (let i = 0; i < n; i++) {
+      const y = 30 + rnd() * 900, hw = 40 + y * .29;
+      el('circle', { cx: r1(cx + (rnd() * 2 - 1) * hw * .85), cy: r1(y), r: r1(.5 + rnd() * 1.5), fill: color, opacity: r1(.06 + rnd() * .34) }, haze);
+    }
+  };
+  dust(690, 150, '#ffffff');
+  dust(1548, 90, '#9cc0ff');
+
+  // ---------- Athlete: Bulgarian split squat, bottom position, goblet hold, facing right ----------
+  const root = document.getElementById('figRoot');
+  const J = {
+    hip: [305, 478], sh: [345, 304], el: [374, 404], wr: [414, 338],
+    kF: [455, 470], aF: [462.5, 612], kR: [219, 603], aR: [154, 468], head: [364, 236]
+  };
+  const H = J.hip, S = J.sh, TX = S[0] - H[0], TY = S[1] - H[1], TL = Math.hypot(TX, TY), fx = -TY / TL, fy = TX / TL;
+  const T = (t, o) => [H[0] + TX * t + fx * o, H[1] + TY * t + fy * o];
+  const C = J.head, Hd = (x, y) => [C[0] + x, C[1] + y];
+
+  const torsoD = smooth([
+    T(-.16, 8), T(-.06, 28), T(.06, 34), T(.26, 30), T(.45, 32), T(.6, 41), T(.72, 47), T(.82, 42), T(.92, 30), T(.99, 18),
+    T(1.05, 4), T(1.04, -14), T(.97, -28), T(.86, -36), T(.7, -37), T(.52, -31), T(.36, -26), T(.2, -34), T(.06, -48),
+    T(-.08, -50), T(-.2, -36), T(-.24, -14)
+  ]);
+
+  // reflection + contact shadows
+  const refl = el('g', { mask: 'url(#reflMask)', opacity: .5 }, root);
+  el('use', { href: '#athlete', transform: 'matrix(1,0,0,-1,0,1282)', filter: 'url(#soft)' }, refl);
+  el('ellipse', { cx: 478, cy: 641, rx: 62, ry: 6, fill: '#000', opacity: .9, filter: 'url(#soft3)' }, root);
+  el('ellipse', { cx: 126, cy: 641, rx: 104, ry: 5, fill: '#000', opacity: .85, filter: 'url(#soft3)' }, root);
+  el('ellipse', { cx: 222, cy: 640, rx: 34, ry: 4, fill: '#000', opacity: .6, filter: 'url(#soft3)' }, root);
+
+  const fig = el('g', { id: 'athlete' }, root);
+
+  // bench
+  const bench = el('g', {}, fig);
+  [[52, 494, 10, 146], [190, 494, 10, 146], [57, 560, 140, 7], [40, 632, 32, 8], [178, 632, 34, 8]].forEach(([x, y, w, h]) =>
+    el('rect', { x, y, width: w, height: h, rx: 1.5, fill: 'url(#bench)' }, bench));
+  el('rect', { x: 26, y: 472, width: 198, height: 22, rx: 7, fill: 'url(#bench)' }, bench);
+  el('path', { d: 'M33,472.8 H217', stroke: '#fff', 'stroke-opacity': .22, 'stroke-width': 1 }, bench);
+
+  // rear (far) leg
+  const rear = el('g', { filter: 'url(#rimFar)' }, fig);
+  el('path', { d: limb(J.hip, J.kR, 33, 20, [[.4, 5]], [[.45, 6]]), fill: 'url(#clothFar)' }, rear);
+  el('path', { d: limb(J.kR, J.aR, 19, 10, [[.22, 8], [.42, 5]], [[.5, 1]]), fill: 'url(#clothFar)' }, rear);
+  el('path', { d: limb([158, 466], [97, 476], 14, 9, [[.5, 1]], [[.5, 2]]), fill: '#0b0c0f' }, rear);
+
+  // torso, neck, head
+  const body = el('g', { filter: 'url(#rim)' }, fig);
+  const cp = el('clipPath', { id: 'torsoClip' }, root);
+  el('path', { d: torsoD }, cp);
+  el('path', { d: limb([350, 302], [359, 262], 15, 13), fill: 'url(#skin)' }, body);
+  el('path', { d: torsoD, fill: 'url(#skin)' }, body);
+  const clothes = el('g', { 'clip-path': 'url(#torsoClip)' }, body);
+  el('path', { d: 'M' + [T(.56, -90), T(.56, 90), T(.93, 90), T(.9, 0), T(.86, -90)].map(pt).join(' L') + ' Z', fill: 'url(#cloth)' }, clothes);
+  el('path', { d: 'M' + [T(.22, -90), T(.22, 90), T(-.7, 90), T(-.7, -90)].map(pt).join(' L') + ' Z', fill: 'url(#cloth)' }, clothes);
+  el('path', { d: 'M' + pt(T(.22, -60)) + ' L' + pt(T(.22, 60)), stroke: '#fff', 'stroke-opacity': .14, 'stroke-width': 1.2 }, clothes);
+  el('path', { d: 'M' + pt(T(.56, -60)) + ' L' + pt(T(.56, 60)), stroke: '#fff', 'stroke-opacity': .1, 'stroke-width': 1.2 }, clothes);
+  el('path', { d: smooth([Hd(-22, -34), Hd(-40, -35), Hd(-58, -22), Hd(-68, 2), Hd(-66, 30), Hd(-58, 56), Hd(-60, 30), Hd(-56, 6), Hd(-44, -12), Hd(-30, -18)]), fill: 'url(#hair)' }, body);
+  el('path', { d: smooth([Hd(-2, -42), Hd(18, -36), Hd(29, -18), Hd(31, -6), Hd(30, 1), Hd(37, 11), Hd(31, 17), Hd(32, 23), Hd(27, 33), Hd(14, 39), Hd(-4, 31), Hd(-24, 16), Hd(-32, -6), Hd(-24, -30)]), fill: 'url(#skin)' }, body);
+  el('path', { d: smooth([Hd(25, -30), Hd(6, -45), Hd(-18, -41), Hd(-34, -20), Hd(-33, 4), Hd(-24, 20), Hd(-14, 24), Hd(-9, 12), Hd(-4, -4), Hd(8, -16), Hd(20, -24)]), fill: 'url(#hair)' }, body);
+  el('ellipse', { cx: C[0] - 3, cy: C[1] + 4, rx: 5, ry: 8, fill: 'url(#skin)', stroke: '#000', 'stroke-opacity': .18, 'stroke-width': .6 }, body);
+  el('ellipse', { cx: C[0] - 31, cy: C[1] - 29, rx: 4, ry: 6, fill: '#1b1d22', transform: `rotate(-30 ${C[0] - 31} ${C[1] - 29})` }, body);
+
+  // front (near) leg
+  const front = el('g', { filter: 'url(#rim)' }, fig);
+  el('path', { d: limb(J.hip, J.kF, 36, 23, [[.3, 5]], [[.5, 6]]), fill: 'url(#cloth)' }, front);
+  el('circle', { cx: J.kF[0], cy: J.kF[1], r: 22, fill: 'url(#cloth)' }, front);
+  el('path', { d: limb(J.kF, J.aF, 22, 10, [[.22, 9], [.42, 6]], [[.3, 1.5]]), fill: 'url(#cloth)' }, front);
+  el('path', { d: smooth([[444, 598], [476, 604], [503, 616], [526, 628], [529, 640], [436, 641], [432, 620]]), fill: '#0c0d10' }, front);
+  el('path', { d: 'M436,637 L528,637', stroke: '#3a404a', 'stroke-width': 1.6, 'stroke-linecap': 'round' }, front);
+
+  // near arm with goblet dumbbell
+  const arm = el('g', { filter: 'url(#rim)' }, fig);
+  [[398, 316, 46, 22, 4], [415, 336, 12, 48, 2], [398, 382, 46, 22, 4]].forEach(([x, y, w, h, rx]) =>
+    el('rect', { x, y, width: w, height: h, rx, fill: 'url(#bell)' }, arm));
+  el('path', { d: limb([346, 310], J.el, 16, 11, [[.45, 4]], [[.6, 3]]), fill: 'url(#skin)' }, arm);
+  el('ellipse', { cx: 347, cy: 314, rx: 19, ry: 25, transform: 'rotate(-12 347 314)', fill: 'url(#skin)' }, arm);
+  el('path', { d: limb(J.el, J.wr, 11, 8, [[.3, 4]], [[.3, 3]]), fill: 'url(#skin)' }, arm);
+  el('ellipse', { cx: 420, cy: 343, rx: 14, ry: 10, transform: 'rotate(-10 420 343)', fill: 'url(#skin)' }, arm);
+
+  // muscle definition and sweat sheen under the top spotlight
+  const sheen = el('g', { fill: 'none', stroke: '#fff', 'stroke-linecap': 'round' }, fig);
+  const stroke = (d, o, w, blur) => el('path', { d, 'stroke-opacity': o, 'stroke-width': w, filter: blur ? 'url(#soft)' : '' }, sheen);
+  stroke('M334,300 Q348,288 364,298', .55, 2.4, true);           // deltoid cap
+  stroke('M337,333 Q343,360 352,382', .16, 2.5, true);           // triceps
+  stroke('M384,394 Q396,372 408,350', .22, 2, true);             // forearm
+  stroke('M324,451 Q392,436 448,447', .1, 5, true);              // quad sweep
+  stroke('M426,452 Q440,446 452,452', .22, 2.6, true);           // vastus medialis
+  stroke('M437,492 Q428,520 437,560', .1, 3, true);              // front calf
+  stroke('M248,580 Q232,552 196,505', .07, 3, true);             // rear calf
+  stroke('M268,452 Q262,430 278,412', .12, 3, true);             // glute
+  stroke('M' + pt(T(.42, 28)) + ' Q' + pt(T(.32, 33)) + ' ' + pt(T(.2, 30)), .1, 2, true); // obliques
+  const specks = el('g', { fill: '#fff' }, fig);
+  [[342, 296, 1.3, .8], [351, 293, 1, .7], [357, 299, 1.1, .6], [339, 318, .9, .5], [346, 342, 1, .4], [399, 360, .9, .5],
+   [404, 352, .8, .5], [372, 318, 1, .45], [388, 210, .9, .55], [381, 214, .7, .5], [360, 312, .8, .5]].forEach(([cx, cy, r, o]) =>
+    el('circle', { cx, cy, r, opacity: o, filter: 'url(#glow)' }, specks));
+
+  // pose-tracking HUD (the app's own feature), kept subtle
+  const hud = el('g', {}, root);
+  const lineG = el('g', { stroke: '#3B82F6', 'stroke-opacity': .55, 'stroke-width': 1.1, fill: 'none' }, hud);
+  [[J.sh, J.hip], [J.hip, J.kF], [J.kF, J.aF], [J.hip, J.kR], [J.kR, J.aR], [J.sh, J.el], [J.el, J.wr]].forEach(([a, b]) =>
+    el('line', { x1: a[0], y1: a[1], x2: b[0], y2: b[1] }, lineG));
+  [J.sh, J.el, J.wr, J.hip, J.kF, J.aF, J.kR, J.aR].forEach(([x, y]) => {
+    el('circle', { cx: x, cy: y, r: 4.2, fill: '#3B82F6', opacity: .9, filter: 'url(#glow)' }, hud);
+    el('circle', { cx: x, cy: y, r: 1.7, fill: '#fff' }, hud);
+  });
+  const a1 = Math.atan2(J.hip[1] - J.kF[1], J.hip[0] - J.kF[0]), a2 = Math.atan2(J.aF[1] - J.kF[1], J.aF[0] - J.kF[0]);
+  const rA = 30, p1 = [J.kF[0] + rA * Math.cos(a2), J.kF[1] + rA * Math.sin(a2)], p2 = [J.kF[0] + rA * Math.cos(a1), J.kF[1] + rA * Math.sin(a1)];
+  el('path', { d: 'M' + pt(p1) + ' A' + rA + ',' + rA + ' 0 0 1 ' + pt(p2), stroke: '#60A5FA', 'stroke-width': 1.6, fill: 'none' }, hud);
+  const deg = Math.round((a1 - a2) * 180 / Math.PI);
+  el('rect', { x: 366, y: 518, width: 56, height: 19, rx: 9.5, fill: 'rgba(10,14,21,.75)', stroke: '#3B82F6', 'stroke-opacity': .7, 'stroke-width': .8 }, hud);
+  el('text', { x: 394, y: 531.2, 'text-anchor': 'middle', 'font-family': 'Inter, Segoe UI, sans-serif', 'font-size': 9.6, 'font-weight': 700, fill: '#F5F7FA', 'letter-spacing': .6 }, hud).textContent = 'DİZ ' + deg + '°';
+})();
+</script>
+</body>
+</html>

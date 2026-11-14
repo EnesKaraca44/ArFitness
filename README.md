@@ -1,67 +1,42 @@
-# ArFitness: Yapay Zeka Destekli Fitness Koçu
+# ArFitness
 
+**Kameranla egzersizini takip et, tekrarlarını say ve formun için anlık ipuçları al.** ArFitness, Android telefonunun kamerasıyla hareketini analiz eden ve antrenman geçmişini cihazında saklayan bir fitness uygulamasıdır.
 
+[![Google Play'den indir](https://img.shields.io/badge/Google%20Play-%C4%B0ndir-34A853?logo=googleplay&logoColor=white)](https://play.google.com/store/apps/details?id=com.enes.arfitness&hl=tr)
 
-**ArFitness**, kişisel bir yapay zeka fitness koçu olarak hareket eden modern bir Android uygulamasıdır. Cihazınızın kamerasını kullanarak egzersiz formunuzu gerçek zamanlı olarak analiz eder, hareketleri doğru yapmanıza, tekrarlarınızı saymanıza ve gelişiminizi takip etmenize yardımcı olmak için anında geri bildirim sağlar.
+![ArFitness](play_store_banner_1024x500.png)
 
----
+## Neler yapabilirsin?
 
-### ✨ Temel Özellikler
+- **15 egzersizde hareket takibi:** Squat, şınav, lunge, plank, biceps curl, shoulder press ve daha fazlası.
+- **Tekrar ve süre sayımı:** Egzersiz sırasında canlı sayaç, sesli ve titreşimli bildirim seçenekleri.
+- **Form ipuçları:** Hareket analizine göre ekranda egzersize özel yönlendirmeler.
+- **Egzersiz rehberleri:** Hareket animasyonları, hedef kas grupları ve uygulama içi talimatlar.
+- **Antrenman geçmişi:** Tamamlanan antrenmanların süresi, tekrarları ve form puanı cihazda saklanır.
 
-*   **Gerçek Zamanlı Duruş Tespiti:** Google ML Kit kullanarak 33 temel vücut noktasını takip eder ve kamera görüntüsü üzerine canlı bir iskelet çizer.
-*   **Yapay Zeka ile Form Düzeltme:** Özel olarak geliştirilmiş egzersiz analizörleri, "Sırtını dik tut!" veya "Daha derine in!" gibi anlık sesli ve yazılı geri bildirimler sunar.
-*   **Geniş Egzersiz Kütüphanesi:** Squat, Şınav, Lunge, Bicep Curl, Shoulder Press ve daha fazlasını içeren, sürekli genişleyen bir egzersiz listesi.
-*   **Kategorilere Ayrılmış Antrenmanlar:** Kolay gezinme için kas gruplarına göre düzenlenmiş egzersizler.
-*   **Animasyonlu Rehberler:** Her egzersizin, doğru tekniği sağlamak için animasyonlu bir GIF ve talimatlar içeren bir detay sayfası vardır.
-*   **Antrenman Geçmişi ve İstatistikler:** Tekrar sayıları, süre ve form skoru dahil olmak üzere tamamlanan her antrenman, Room Veritabanı kullanılarak yerel olarak kaydedilir.
-*   **Kullanıcı Profili:** Genel ilerlemenizi, toplam antrenman sürenizi takip edin ve haftalık aktivitenizi bir grafikte görüntüleyin.
+## Gizlilik
 
----
+Kamera görüntüleri egzersiz sırasında cihaz üzerinde işlenir; uygulama bunları kaydetmez veya sunucuya göndermez. Antrenman geçmişi ve profil bilgileri cihazda saklanır. Ayrıntılar için [Gizlilik Politikası](privacy_policy.md) sayfasına bak.
 
-### 🚀 Kullanılan Teknolojiler ve Mimari
+## Kullanılan teknolojiler
 
-Bu proje, modern Android geliştirme en iyi pratikleri ve kütüphaneleri kullanılarak oluşturulmuştur.
+- Kotlin, AndroidX, MVVM, ViewBinding
+- CameraX ve Google ML Kit Pose Detection
+- Room, Hilt, Coroutines, Navigation Component
+- Egzersize özel hareket analizörleri ve tekrar sayımı
 
-*   **Dil:** [Kotlin](https://kotlinlang.org/)
-*   **Mimari:** MVVM (Model-View-ViewModel)
-*   **Arayüz (UI):** XML ile ViewBinding
-*   **Asenkron Programlama:** Kotlin Coroutines & Flow
-*   **Bağımlılık Enjeksiyonu (DI):** Hilt
-*   **Navigasyon:** Navigation Component ile Safe Args
-*   **Veritabanı:** Room Persistence Library
-*   **Bilgisayarlı Görü (Computer Vision):**
-    *   [Google ML Kit - Pose Detection](https://developers.google.com/ml-kit/vision/pose-detection)
-    *   [CameraX](https://developer.android.com/training/camerax)
-*   **Hareket Analizi Algoritması:** Dynamic Time Warping (DTW) - Gelişmiş form takibi ve analizi için
-*   **Resim Yükleme:** Glide (GIF animasyonları için)
-*   **Grafik:** MPAndroidChart (İstatistikler için)
+## Geliştirme
 
----
+Projeyi Android Studio'da açıp `app` yapılandırmasını çalıştırabilirsin. Komut satırından debug APK oluşturmak için:
 
+```powershell
+.\gradlew.bat assembleDebug
+```
 
+## Geri bildirim
 
-### 🛠️ Nasıl Çalışır?
-
-1.  **Kamera Girdisi:** `CameraX` API'si, stabil bir görüntü akışı sağlar.
-2.  **Duruş Analizi:** Her görüntü karesi, insan vücudu eklem noktalarını bulmak için **ML Kit Pose Detection** modelini kullanan özel bir `PoseAnalyzer` sınıfına iletilir.
-3.  **İskelet Çizimi:** Özel bir `PoseOverlayView`, eklem noktası koordinatlarını alır, ekran boyutuna göre ölçeklendirir, ön kamera için yansıtır (aynlar) ve iskeleti kamera önizlemesinin üzerine çizer.
-4.  **Egzersiz Mantığı:** Her egzersiz (örn: `SquatAnalyzer`) için, özel bir analizör sınıfı ilgili eklemlerin açılarını ve pozisyonlarını değerlendirerek egzersiz durumunu (örn: YUKARI, AŞAĞI), geçerli tekrarları ve yaygın form hatalarını belirler.
-5.  **Geri Bildirim Döngüsü:** Analizörden gelen sonuçlar, `LiveData` aracılığıyla tekrar sayılarını ve geri bildirim mesajlarını güncelleyen `ExerciseViewModel`'e gönderilir. `TextToSpeech` motoru sesli ipuçları sağlar.
-6.  **Veri Kalıcılığı:** Tamamlanan antrenmanlar, `Repository` deseni aracılığıyla **Room** veritabanına kaydedilir.
+Bir hata bulduysan veya geliştirme önerin varsa [GitHub Issues](https://github.com/EnesKaraca44/ArFitness/issues) üzerinden paylaşabilirsin. Uygulamayı denemek için [Google Play sayfasını aç](https://play.google.com/store/apps/details?id=com.enes.arfitness&hl=tr).
 
 ---
 
-### 🔒 Gizlilik Politikası
-
-Kullanıcı verilerinin nasıl işlendiği ve korunduğu hakkında detaylı bilgi için lütfen [Gizlilik Politikası](PRIVACY_POLICY.md) metnimizi inceleyin.
-
----
-
-### 👨‍💻 Geliştirici
-
-**Enes KARACA **
-
-*   **LinkedIn:** https://www.linkedin.com/in/enes-karaca-277655299/
-*   **GitHub:** https://github.com/EnesKaraca44
-
----
+**ArFitness** is an Android workout companion that uses the phone camera for exercise tracking, rep counting and form cues. Workout history and profile data are stored locally on the device.

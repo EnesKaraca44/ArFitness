@@ -1,0 +1,203 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=540, initial-scale=1">
+<title>Yanlış vs Doğru Form – katmanlar</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;600;700;800;900&display=block" rel="stylesheet">
+<!--
+  "Sakatlanmayı Önle – Yanlış vs Doğru Form" reels'i: yapay zekâ ile üretilen gerçekçi kliplerin ÜSTÜNE
+  bindirilecek katmanlar. Video modelleri ekrandaki yazıyı bozduğu için çerçeve, uygulama arayüzü ve
+  son kart buradan basılır (render.cmd). Hepsi 540x960 CSS px = 1080x1920 PNG.
+
+    ?v=frame                      Bölünmüş ekran çerçevesi: başlık + YANLIŞ/DOĞRU pencereleri + alt bant
+                                  (pencerelerin içi şeffaf; klipler çerçevenin ALTINA konur)
+    ?v=hud&p1=go                  Üst pencere (YANLIŞ): TEKRAR 0 + mavi yönlendirme
+    ?v=hud&p1=warn                Üst pencere: TEKRAR 0 + kırmızı form uyarısı      (warn:1 -> sayaç 1)
+    ?v=hud&p1=rep:1:45            Üst pencere: "1. tekrar! Form %45"
+    ?v=hud&p2=go | rep:1:98       Alt pencere (DOĞRU) için aynıları
+    ?v=cap&k=kanca | urun         Altyazı (şeffaf)
+    ?v=end                        Son kart (opak)
+    &ex=pushup|squat|curl|deadlift  Hareket (varsayılan pushup): başlık etiketi ve HUD metinleri
+
+  HUD metinleri uygulamadan birebir: *Analyzer.goMessage, form uyarısı / partialMessage ve
+  RepExerciseAnalyzer'daki "N. tekrar! Form %S". Pencere geometrisi (1080x1920 px):
+    üst pencere y 220–880, alt pencere y 892–1552 (ikisi de 1080x660).
+-->
+<style>
+:root{
+  --app-blue:#0A84FF; --green:#3FB950; --red:#DF1625; --warn:#F85149; --black:#070707;
+  --p1:110px; --p2:446px; --ph:330px;
+  --ui:'Inter','Segoe UI',system-ui,sans-serif;
+  --emoji:'Segoe UI Emoji','Apple Color Emoji','Noto Color Emoji';
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:540px;height:960px;overflow:hidden;background:transparent}
+body{position:relative;font-family:var(--ui),var(--emoji);color:#F5F7FA;-webkit-font-smoothing:antialiased}
+.view{position:absolute;inset:0;display:none;overflow:hidden}
+.view.on{display:block}
+.emoji{font-family:var(--emoji);font-weight:400}
+
+/* ---------- ÇERÇEVE (pencereler şeffaf) ---------- */
+.f-head{position:absolute;left:0;right:0;top:0;height:var(--p1);background:var(--black);text-align:center;
+  background-image:radial-gradient(70% 120% at 50% 0%,rgba(223,22,37,.16),transparent 70%)}
+.f-head small{position:absolute;left:0;right:0;top:40px;font-size:10.5px;font-weight:800;letter-spacing:.24em;color:#9BA1A8}
+.f-head h1{position:absolute;left:0;right:0;top:57px;font-size:33px;font-weight:900;letter-spacing:-.01em;line-height:1.2}
+.f-head h1 em{font-style:normal;color:var(--red);text-shadow:0 0 22px rgba(223,22,37,.55)}
+.f-win{position:absolute;left:0;width:540px;height:var(--ph)}
+.f-win.bad{top:var(--p1);box-shadow:inset 0 0 0 3px rgba(248,81,73,.95)}
+.f-win.good{top:var(--p2);box-shadow:inset 0 0 0 3px rgba(63,185,80,.95)}
+.f-badge{position:absolute;left:12px;top:12px;display:inline-flex;align-items:center;gap:7px;padding:6px 12px 6px 9px;
+  border-radius:10px;font-size:15px;font-weight:900;letter-spacing:.04em;color:#fff;box-shadow:0 4px 14px rgba(0,0,0,.5)}
+.f-badge svg{width:15px;height:15px;display:block}
+.bad .f-badge{background:#DA3633}
+.good .f-badge{background:#238636}
+.f-div{position:absolute;left:0;right:0;top:calc(var(--p1) + var(--ph));height:calc(var(--p2) - var(--p1) - var(--ph));background:var(--black)}
+.f-foot{position:absolute;left:0;right:0;top:calc(var(--p2) + var(--ph));bottom:0;background:var(--black);
+  background-image:radial-gradient(70% 90% at 50% 100%,rgba(223,22,37,.14),transparent 70%)}
+.f-brand{position:absolute;left:0;right:0;top:16px;display:flex;align-items:center;justify-content:center;gap:12px}
+.f-mark{width:76px;height:38px;background:url(../squat_challenge/logo_kirmizi.png) no-repeat;background-size:116px 116px;
+  background-position:-20px -26px;mix-blend-mode:lighten}
+.f-brand b{font-size:25px;font-weight:700;color:var(--red);letter-spacing:-.01em}
+.f-brand i{font-style:normal;width:1px;height:22px;background:#3A3A3A}
+.f-brand span{display:inline-flex;align-items:center;gap:7px;font-size:13px;font-weight:800;letter-spacing:.06em;color:#E8E8E8}
+.f-brand span svg{width:11px;height:12px;display:block}
+
+/* ---------- UYGULAMA HUD (şeffaf, pencere içine) ---------- */
+.pan{position:absolute;left:0;width:540px;height:var(--ph);display:none}
+.pan.on{display:block}
+#h1{top:var(--p1)} #h2{top:var(--p2)}
+.h-time{position:absolute;top:13px;right:16px;text-align:right;line-height:1}
+.h-time small{display:block;font-size:8px;font-weight:800;letter-spacing:.1em;color:#E5E5E5;text-shadow:0 1px 4px #000;margin-bottom:2px}
+.h-time b{font-size:19px;font-weight:800;color:var(--app-blue);text-shadow:0 1px 5px #000}
+.h-rep{position:absolute;left:18px;bottom:52px;line-height:1}
+.h-rep small{display:block;font-size:10px;font-weight:800;letter-spacing:.1em;color:#E5E5E5;text-shadow:0 1px 6px #000;margin-bottom:2px}
+.h-rep .num{display:flex;align-items:flex-start;gap:7px}
+.h-rep b{font-size:62px;font-weight:800;color:#fff;letter-spacing:-.02em;text-shadow:0 3px 7px rgba(0,0,0,.85)}
+.h-rep .plus{display:none;margin-top:8px;padding:3px 7px;border-radius:7px;background:var(--green);color:#04210B;font-size:12px;font-weight:900;
+  box-shadow:0 0 16px rgba(63,185,80,.8)}
+.h-pill{position:absolute;left:50%;bottom:12px;transform:translateX(-50%);white-space:nowrap;text-align:center;
+  padding:8px 18px;border-radius:17px;background:rgba(10,132,255,.86);font-size:14.5px;font-weight:800;line-height:1.3;
+  box-shadow:0 6px 22px rgba(0,0,0,.45)}
+.pan.good-rep .h-rep b{text-shadow:0 3px 7px rgba(0,0,0,.85),0 0 24px rgba(63,185,80,.9),0 0 48px rgba(63,185,80,.5)}
+.pan.good-rep .h-rep .plus{display:block}
+.pan.warn .h-pill{background:rgba(218,54,51,.92);box-shadow:0 0 0 2px rgba(255,180,175,.55),0 0 26px rgba(248,81,73,.75)}
+.pan.warn .h-pill::before{content:'⚠ ';font-family:var(--emoji)}
+.pan.warn .h-edge{position:absolute;inset:0;box-shadow:inset 0 0 44px rgba(248,81,73,.42)}
+
+/* ---------- ALTYAZI (şeffaf) ---------- */
+.cap{position:absolute;left:22px;right:22px;top:150px;text-align:center}
+.cap span{display:inline;font-size:28px;font-weight:800;line-height:1.6;padding:5px 14px;border-radius:12px;color:#fff;
+  background:rgba(0,0,0,.78);-webkit-box-decoration-break:clone;box-decoration-break:clone}
+
+/* ---------- SON KART (opak) ---------- */
+#end{background:var(--black)}
+.e-glow{position:absolute;inset:0;background:
+  radial-gradient(62% 26% at 50% 53%,rgba(223,22,37,.20),transparent 72%),
+  radial-gradient(80% 22% at 50% 0%,rgba(223,22,37,.10),transparent 70%)}
+.e-tag{position:absolute;left:36px;right:36px;top:168px;text-align:center;font-weight:900;font-size:50px;line-height:1.12;letter-spacing:-.02em}
+.e-tag em{font-style:normal;color:var(--red);text-shadow:0 0 28px rgba(223,22,37,.55)}
+.e-logo{position:absolute;left:50%;top:300px;width:420px;height:420px;margin-left:-210px;mix-blend-mode:lighten}
+.e-cta{position:absolute;left:0;right:0;top:650px;text-align:center}
+.e-pill{display:inline-flex;align-items:center;gap:12px;padding:15px 30px;border-radius:999px;background:var(--red);
+  font-size:21px;font-weight:900;letter-spacing:.02em;box-shadow:0 0 0 1px rgba(255,255,255,.22),0 0 36px rgba(223,22,37,.6)}
+.e-pill svg{width:18px;height:20px;display:block}
+.e-feat{margin-top:18px;font-size:14.5px;font-weight:700;color:#C9C9C9;letter-spacing:.01em}
+.e-feat i{font-style:normal;color:#5A5A5A;margin:0 7px}
+</style>
+</head>
+<body>
+
+<section class="view" id="frame">
+  <div class="f-head"><small id="fEx">ŞINAV · FORM KONTROLÜ</small><h1>SAKATLANMAYI <em>ÖNLE</em></h1></div>
+  <div class="f-win bad"><span class="f-badge"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 3l10 10M13 3L3 13" stroke="#fff" stroke-width="2.8" stroke-linecap="round"/></svg>YANLIŞ</span></div>
+  <div class="f-div"></div>
+  <div class="f-win good"><span class="f-badge"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M2.5 8.5l3.8 3.8 7.2-8" fill="none" stroke="#fff" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg>DOĞRU</span></div>
+  <div class="f-foot">
+    <div class="f-brand">
+      <div class="f-mark"></div><b>ArFitness</b><i></i>
+      <span><svg viewBox="0 0 18 20" aria-hidden="true"><path d="M1 1.2v17.6a1 1 0 0 0 1.5.86l15-8.8a1 1 0 0 0 0-1.72l-15-8.8A1 1 0 0 0 1 1.2z" fill="#fff"/></svg>GOOGLE PLAY'DE</span>
+    </div>
+  </div>
+</section>
+
+<section class="view" id="hud">
+  <div class="pan" id="h1"><div class="h-edge"></div>
+    <div class="h-time"><small>GEÇEN SÜRE</small><b class="t">00:04</b></div>
+    <div class="h-rep"><small>TEKRAR</small><div class="num"><b class="n">0</b><span class="plus">+1</span></div></div>
+    <div class="h-pill"></div></div>
+  <div class="pan" id="h2"><div class="h-edge"></div>
+    <div class="h-time"><small>GEÇEN SÜRE</small><b class="t">00:04</b></div>
+    <div class="h-rep"><small>TEKRAR</small><div class="num"><b class="n">0</b><span class="plus">+1</span></div></div>
+    <div class="h-pill"></div></div>
+</section>
+
+<section class="view" id="cap"><div class="cap"><span id="capT"></span></div></section>
+
+<section class="view" id="end">
+  <div class="e-glow"></div>
+  <div class="e-tag">Formunu<br>şansa <em>bırakma.</em></div>
+  <img class="e-logo" src="../squat_challenge/logo_kirmizi.png" alt="ArFitness">
+  <div class="e-cta">
+    <div class="e-pill"><svg viewBox="0 0 18 20" aria-hidden="true"><path d="M1 1.2v17.6a1 1 0 0 0 1.5.86l15-8.8a1 1 0 0 0 0-1.72l-15-8.8A1 1 0 0 0 1 1.2z" fill="#fff"/></svg>ŞİMDİ GOOGLE PLAY'DE</div>
+    <div class="e-feat">15 hareket<i>·</i>Canlı form analizi<i>·</i>Sesli tekrar sayımı</div>
+  </div>
+</section>
+
+<script>
+  // Metinler uygulamadan birebir (app/src/main/java/com/example/arfitness/analysis/*Analyzer.kt)
+  const EX = {
+    pushup:   { label: 'ŞINAV',       go: 'Göğsünü yere doğru indir',              warn: 'Kalçanı düz tut, vücudun tek çizgi olsun' },
+    squat:    { label: 'SQUAT',       go: 'Kalçanı geriye iterek çömel',           warn: 'Biraz daha derine in' },
+    curl:     { label: 'BICEPS CURL', go: 'Dirseğini sabit tutarak yukarı kaldır', warn: 'Dirseğini sabit tut, omuzdan savurma' },
+    deadlift: { label: 'DEADLIFT',    go: 'Kalçanı geriye iterek eğil',            warn: 'Çömelme, hareketi kalçadan yap' },
+  };
+  const CAPS = {
+    kanca: 'Şınavda bu hatayı\nsen de yapıyor musun?',
+    urun:  'Telefonu yere koy.\nYapay zekâ formunu izlesin.',
+  };
+
+  const q = new URLSearchParams(location.search);
+  const v = q.get('v') || 'end';
+  const ex = EX[q.get('ex')] || EX.pushup;
+  document.getElementById(v).classList.add('on');
+
+  document.getElementById('fEx').textContent = ex.label + ' · FORM KONTROLÜ';
+  // &mock=1: çerçeve + HUD üst üste, pencerelerde gri yer tutucu (yalnızca yerleşimi görmek için)
+  if (q.get('mock')) {
+    document.getElementById('frame').classList.add('on');
+    document.body.style.background = 'linear-gradient(#3a4048,#22262c)';
+  }
+
+  if (v === 'hud') {
+    for (const id of ['1', '2']) {
+      const spec = q.get('p' + id);
+      if (!spec) continue;
+      const [mode, n = '0', score = '98'] = spec.split(':');
+      const pan = document.getElementById('h' + id);
+      pan.classList.add('on');
+      pan.querySelector('.n').textContent = n;
+      let text = ex.go, time = '00:02';
+      if (mode === 'warn') { pan.classList.add('warn'); text = ex.warn; time = '00:04'; }
+      if (mode === 'rep') {
+        text = n + '. tekrar! Form %' + score;                 // RepExerciseAnalyzer'daki tekrar mesajı
+        time = '00:05';
+        if (+score >= 80) pan.classList.add('good-rep');
+      }
+      pan.querySelector('.h-pill').textContent = text;
+      pan.querySelector('.t').textContent = q.get('t') || time;
+    }
+  }
+
+  if (v === 'cap') {
+    const span = document.getElementById('capT');
+    (CAPS[q.get('k')] || q.get('t') || '').split('\n').forEach((line, i) => {
+      if (i) span.appendChild(document.createElement('br'));
+      span.appendChild(document.createTextNode(line));
+    });
+  }
+</script>
+</body>
+</html>

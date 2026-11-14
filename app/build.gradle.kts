@@ -1,3 +1,6 @@
+import java.io.FileInputStream
+import java.util.Properties
+
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
@@ -11,6 +14,12 @@ android {
     namespace = "com.example.arfitness"
     compileSdk = 36
 
+    val localProperties = Properties()
+    val localPropertiesFile = rootProject.file("local.properties")
+    if (localPropertiesFile.exists()) {
+        localProperties.load(FileInputStream(localPropertiesFile))
+    }
+
     buildFeatures {
         viewBinding = true
     }
@@ -19,17 +28,21 @@ android {
         applicationId = "com.enes.arfitness"
         minSdk = 24
         targetSdk = 36
-        versionCode = 2
-        versionName = "1.0.1"
+        versionCode = 5
+        versionName = "1.0.4"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
     signingConfigs {
         create("release") {
-            storeFile = file("arfitness-release-key.jks")
-            storePassword = "REMOVED"
-            keyAlias = "arfitness"
-            keyPassword = "REMOVED"
+            val keyStorePath = localProperties.getProperty("RELEASE_STORE_FILE") ?: "arfitness-release-key.jks"
+            val keyStoreFile = file(keyStorePath)
+            if (keyStoreFile.exists()) {
+                storeFile = keyStoreFile
+                storePassword = localProperties.getProperty("RELEASE_STORE_PASSWORD") ?: System.getenv("RELEASE_STORE_PASSWORD") ?: ""
+                keyAlias = localProperties.getProperty("RELEASE_KEY_ALIAS") ?: System.getenv("RELEASE_KEY_ALIAS") ?: "arfitness"
+                keyPassword = localProperties.getProperty("RELEASE_KEY_PASSWORD") ?: System.getenv("RELEASE_KEY_PASSWORD") ?: ""
+            }
         }
     }
 
@@ -37,7 +50,17 @@ android {
         release {
             isMinifyEnabled = false
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
-            signingConfig = signingConfigs.getByName("release")
+            val releaseSigning = signingConfigs.findByName("release")
+            if (releaseSigning?.storeFile != null) {
+                signingConfig = releaseSigning
+            }
+        }
+    }
+
+    packaging {
+        jniLibs {
+            // AGP 8.5.1+ aligns uncompressed shared libraries for 16 KB pages.
+            useLegacyPackaging = false
         }
     }
 
@@ -81,7 +104,7 @@ dependencies {
     kapt("androidx.room:room-compiler:$room_version")
 
     // CameraX
-    val camerax_version = "1.3.1"
+    val camerax_version = "1.4.2"
     implementation("androidx.camera:camera-core:$camerax_version")
     implementation("androidx.camera:camera-camera2:$camerax_version")
     implementation("androidx.camera:camera-lifecycle:$camerax_version")
@@ -89,7 +112,7 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.7.3")
 
     // ML Kit
-    implementation("com.google.mlkit:pose-detection-accurate:18.0.0-beta3")
+    implementation("com.google.mlkit:pose-detection-accurate:18.0.0-beta5")
 
     implementation("com.github.bumptech.glide:glide:4.13.2")
     implementation ("androidx.core:core-splashscreen:1.0.1")

@@ -1,0 +1,555 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=540, initial-scale=1">
+<title>ArFitness Reel</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@500;600;700;800;900&display=block" rel="stylesheet">
+<!--
+  Reels'in devam bölümü (orijinal videonun bittiği andan itibaren ~9.85 sn).
+  build_reel.py bu sayfayı Playwright ile açar, init(cfg) çağırır, sonra her kare için
+  renderAt(u) (u = devam bölümündeki saniye) çağırıp 1080x1920 ekran görüntüsü alır.
+  Zaman çizelgesi build_reel.py içindeki ses efektleriyle birebir aynı olmalı.
+    A 0.00-0.70  son karede donma + "Dur bir dakika..."
+    B 0.70-2.40  POV: duvardaki neon ArFitness afişi yanıyor
+    C 2.40-3.15  Ersoy'un yüzü mavi neonla aydınlanıyor + "AYDINLANMA ANI..."
+    D 3.15-7.35  uygulama görünümü: iskelet takibi, tekrar sayacı (mesajlar uygulamadaki SquatAnalyzer'dan)
+    E 7.35-9.85  kapanış: koşu bandındaki Ersoy arkada, logo + Google Play çağrısı
+-->
+<style>
+:root{
+  --cobalt:#3B82F6; --cobalt-2:#60A5FA; --cobalt-3:#93C5FD; --app-blue:#0A84FF;
+  --cyan:#00FFFF; --red:#F85149; --red-2:#FF7B72; --green:#3FB950; --amber:#FFD54A;
+  --white:#F5F7FA; --muted:#9AA4B5;
+  --display:'Anton', Impact, 'Arial Narrow', sans-serif;
+  --ui:'Inter', 'Segoe UI', system-ui, sans-serif;
+  --emoji:'Segoe UI Emoji','Apple Color Emoji','Noto Color Emoji';
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:540px;height:960px;overflow:hidden;background:#000}
+body{position:relative;font-family:var(--ui),var(--emoji);color:var(--white);-webkit-font-smoothing:antialiased}
+#stage{position:absolute;inset:0;overflow:hidden;background:#000}
+.scene{position:absolute;inset:0;overflow:hidden;display:none}
+.fill{position:absolute;left:0;top:0;width:540px;height:960px}
+img.fill{object-fit:cover;display:block}
+.emoji{font-family:var(--emoji);font-weight:400;display:inline-block}
+.vig{background:radial-gradient(ellipse 80% 70% at 50% 45%,transparent 50%,rgba(0,0,0,.6) 100%)}
+
+/* ortak altyazı kutusu */
+.cap-wrap{position:absolute;left:0;right:0;top:150px;text-align:center;transform-origin:50% 0}
+.cap-box{display:inline;font-size:29px;font-weight:800;line-height:1.55;padding:5px 14px;border-radius:12px;color:#fff;
+  background:rgba(0,0,0,.8);-webkit-box-decoration-break:clone;box-decoration-break:clone}
+.cap-box .emoji{font-size:28px}
+#intro{display:none}
+
+/* ---------- A: donma ---------- */
+#aImg{transform-origin:50% 39%}
+
+/* ---------- B: neon afiş ---------- */
+#bGroup{transform-origin:50% 48%}
+.wall{background-color:#0b0909;background-size:540px 960px}
+#bWall{filter:brightness(.8)}
+.spill{position:absolute;left:-180px;top:-170px;width:900px;height:1300px;mix-blend-mode:screen;
+  background:radial-gradient(closest-side,rgba(59,130,246,.62),rgba(59,130,246,.2) 58%,transparent 100%)}
+.spill.red{left:-90px;top:-60px;width:720px;height:520px;background:radial-gradient(closest-side,rgba(248,81,73,.5),transparent)}
+.poster{position:absolute;left:0;top:0;width:540px;height:960px;transform-origin:50% 50%;transform:translateY(-6px) scale(.74);
+  border-radius:26px;overflow:hidden;box-shadow:0 0 0 3px #07080b,0 40px 90px rgba(0,0,0,.9)}
+.pz-bg{position:absolute;inset:0;background:#05070B}
+.pz-glow{position:absolute;inset:0;background:
+  radial-gradient(70% 38% at 50% 2%,rgba(59,130,246,.32),transparent 70%),
+  radial-gradient(55% 30% at 0% 18%,rgba(248,81,73,.18),transparent 70%),
+  radial-gradient(60% 34% at 50% 70%,rgba(0,200,255,.12),transparent 70%)}
+.pz-grid{position:absolute;inset:0;opacity:.5;
+  background:repeating-linear-gradient(0deg,rgba(147,197,253,.07) 0 1px,transparent 1px 36px),
+             repeating-linear-gradient(90deg,rgba(147,197,253,.07) 0 1px,transparent 1px 36px);
+  -webkit-mask-image:radial-gradient(80% 60% at 50% 55%,#000 30%,transparent 85%);mask-image:radial-gradient(80% 60% at 50% 55%,#000 30%,transparent 85%)}
+.pz-frame{position:absolute;inset:14px;border-radius:24px}
+.pz-frame.dim{border:2px solid rgba(210,225,255,.13)}
+.pz-frame.lit{border:2px solid #BFDBFE;box-shadow:0 0 6px #93C5FD,0 0 18px var(--cobalt-2),0 0 40px rgba(59,130,246,.6),inset 0 0 6px #93C5FD,inset 0 0 26px rgba(59,130,246,.45)}
+.pz-chip{position:absolute;top:44px;left:0;right:0;margin:auto;width:max-content;display:flex;align-items:center;gap:9px;
+  padding:8px 16px;border-radius:999px;border:1px solid rgba(147,197,253,.35);background:rgba(10,20,40,.6);
+  font-size:11.5px;font-weight:800;letter-spacing:.22em;color:#CFE3FF;white-space:nowrap}
+.pz-chip i{width:7px;height:7px;border-radius:50%;background:var(--cyan);box-shadow:0 0 8px var(--cyan)}
+.pz-hl{position:absolute;left:0;right:0;top:90px;text-align:center;font-family:var(--display);line-height:.97}
+.pz-line{white-space:nowrap}
+.nw{position:relative;display:inline-block}
+.nw .lit{position:absolute;left:0;top:0;white-space:nowrap}
+.pz-r1{font-size:70px;line-height:.93;margin-bottom:28px}
+.pz-r1 .dim{color:#2b1d1d}
+.pz-r1 .lit{color:#FFD9D5;text-shadow:0 0 2px #fff,0 0 8px var(--red-2),0 0 18px var(--red),0 0 34px rgba(248,81,73,.55)}
+.strike{position:absolute;left:-10px;right:-10px;top:52%;height:5px;margin-top:-2px;border-radius:3px;transform:rotate(-4deg)}
+.strike.dim{background:#2b1d1d}
+.strike.lit{background:#FFD9D5;box-shadow:0 0 3px #fff,0 0 10px var(--red-2),0 0 20px var(--red)}
+.pz-r2,.pz-r3{font-size:110px}
+.pz-r2 .dim{color:#141922}
+.pz-r2 .lit{color:#fff;text-shadow:0 4px 30px rgba(0,0,0,.6)}
+.pz-r3 .dim{color:#192233}
+.pz-r3 .lit{color:#EAF3FF;text-shadow:0 0 3px #fff,0 0 12px var(--cobalt-2),0 0 28px var(--cobalt),0 0 60px var(--cobalt)}
+.p-phone{position:absolute;left:50%;top:414px;width:202px;height:402px;margin-left:-101px;border-radius:34px;padding:6px;
+  background:linear-gradient(140deg,#8E959E,#2A2E35 30%,#16181C 60%,#5F656E);
+  box-shadow:0 0 0 1.5px #3a4a66,0 30px 60px rgba(0,0,0,.6)}
+.p-phone.on{box-shadow:0 0 0 1.5px #BFDBFE,0 0 14px var(--cobalt-2),0 0 40px rgba(59,130,246,.55),0 30px 60px rgba(0,0,0,.6)}
+.p-screen{position:relative;width:100%;height:100%;border-radius:28px;overflow:hidden;background:#06080c}
+.p-screen::before{content:'';position:absolute;top:8px;left:50%;width:58px;height:16px;margin-left:-29px;border-radius:10px;background:#000;z-index:3}
+.p-content{position:absolute;inset:0;background:
+  radial-gradient(90% 50% at 50% 30%,rgba(120,140,170,.20),transparent 70%),
+  linear-gradient(180deg,#1A2130 0%,#111722 62%,#0B0F16 63%,#080B10 100%)}
+.p-content svg{position:absolute;inset:0;width:100%;height:100%}
+.ps-time{position:absolute;top:32px;right:12px;text-align:right;line-height:1}
+.ps-time small{display:block;font-size:5.5px;font-weight:800;letter-spacing:.1em;color:#E5E5E5}
+.ps-time b{font-size:13px;font-weight:800;color:var(--app-blue)}
+.ps-rep{position:absolute;left:13px;bottom:46px;line-height:1}
+.ps-rep small{display:block;font-size:6.5px;font-weight:800;letter-spacing:.1em;color:#E5E5E5;margin-bottom:2px}
+.ps-rep b{font-size:40px;font-weight:800;color:#fff;text-shadow:0 2px 6px #000,0 0 14px rgba(63,185,80,.75)}
+.ps-pill{position:absolute;left:50%;bottom:16px;transform:translateX(-50%);white-space:nowrap;
+  padding:6px 13px;border-radius:12px;background:rgba(10,132,255,.82);font-size:8px;font-weight:800}
+.p-tag{position:absolute;padding:7px 11px;border-radius:10px;border:1px solid rgba(147,197,253,.4);background:rgba(8,16,32,.75);
+  font-size:11px;font-weight:800;letter-spacing:.06em;white-space:nowrap;box-shadow:0 0 18px rgba(59,130,246,.25)}
+.p-tag em{font-style:normal;color:var(--cyan)}
+.p-tag.ok em{color:var(--green)}
+.p-tag::after{content:'';position:absolute;top:50%;width:26px;height:1px;background:linear-gradient(90deg,var(--cobalt-2),transparent)}
+.p-tag.l::after{left:100%}
+.p-tag.r::after{right:100%;transform:scaleX(-1)}
+.p-foot{position:absolute;left:0;right:0;top:838px;text-align:center}
+.p-foot .row{display:inline-flex;align-items:center;gap:12px}
+.p-foot img{width:40px;height:40px;border-radius:11px;box-shadow:0 0 0 1px rgba(255,255,255,.15),0 0 18px rgba(59,130,246,.6)}
+.p-foot h2{font-family:var(--display);font-weight:400;font-size:44px;line-height:1;letter-spacing:.01em;white-space:nowrap}
+.p-foot h2 span{color:var(--cobalt-2);text-shadow:0 0 16px rgba(59,130,246,.8)}
+.p-foot p{margin-top:9px;font-size:12.5px;font-weight:600;color:var(--muted)}
+
+/* ---------- C: aydınlanma ---------- */
+#cImg{transform-origin:50% 39%}
+#cWash{mix-blend-mode:screen;background:
+  radial-gradient(90% 55% at 50% 12%,rgba(70,140,255,.62),rgba(40,110,255,.22) 55%,transparent 80%),
+  linear-gradient(180deg,rgba(40,120,255,.18),rgba(40,120,255,.06))}
+#cCap{position:absolute;left:0;right:0;top:598px;text-align:center;transform-origin:50% 50%;
+  font-family:var(--display);font-weight:400;font-size:84px;line-height:.95;color:#FFF8DC;
+  text-shadow:0 0 3px #fff,0 0 12px var(--amber),0 0 30px #FFB300,0 0 60px rgba(255,179,0,.7),0 4px 10px rgba(0,0,0,.6)}
+#cBulbBox{position:absolute;left:372px;top:96px;width:150px;height:150px}
+#cBulb{position:absolute;left:0;right:0;top:22px;text-align:center;font-size:92px;line-height:1;z-index:2;
+  filter:drop-shadow(0 0 18px rgba(255,213,74,.9))}
+#cRays{position:absolute;left:50%;top:50%;width:300px;height:300px;margin:-150px 0 0 -150px;border-radius:50%;z-index:1;
+  background:repeating-conic-gradient(rgba(255,213,74,.6) 0deg 7deg,transparent 7deg 22.5deg);
+  -webkit-mask-image:radial-gradient(closest-side,#000 18%,transparent 100%);mask-image:radial-gradient(closest-side,#000 18%,transparent 100%)}
+
+/* ---------- D: uygulama görünümü ---------- */
+#dWall{filter:brightness(1.18) saturate(.9)}
+.d-light{background:radial-gradient(70% 45% at 50% 0%,rgba(255,226,190,.16),transparent 70%),
+  radial-gradient(60% 40% at 50% 62%,rgba(59,130,246,.10),transparent 70%)}
+.floor{position:absolute;left:0;right:0;top:610px;bottom:0;border-top:2px solid rgba(255,255,255,.05);
+  background:linear-gradient(180deg,#181b20 0%,#0e1014 55%,#08090b 100%)}
+.mat{position:absolute;left:140px;top:640px;width:320px;height:72px;clip-path:polygon(13% 0,87% 0,100% 100%,0 100%);
+  background:linear-gradient(180deg,#1a2740,#121c30)}
+.d-tint{background:radial-gradient(ellipse 85% 75% at 50% 48%,transparent 55%,rgba(0,0,0,.55) 100%)}
+#fig{position:absolute;left:0;top:0;width:540px;height:960px;overflow:visible}
+#figBody{filter:drop-shadow(0 0 1.5px rgba(147,197,253,.55)) drop-shadow(0 0 12px rgba(59,130,246,.3))}
+#figSkel{filter:drop-shadow(0 0 3px rgba(150,220,255,.85))}
+#figDots{filter:drop-shadow(0 0 4px #00FFFF)}
+#kneeTag{position:absolute;padding:5px 9px;border-radius:9px;background:rgba(6,12,24,.78);border:1px solid rgba(0,255,255,.45);
+  font-size:13px;font-weight:800;letter-spacing:.04em;white-space:nowrap;color:#fff}
+#kneeTag b{color:var(--cyan)}
+#kneeTag.deep{border-color:rgba(63,185,80,.7)}
+#kneeTag.deep b{color:#56d364}
+#dEdge{box-shadow:inset 0 0 60px rgba(248,81,73,.55),inset 0 0 0 3px rgba(248,81,73,.6)}
+#dCap{position:absolute;left:0;right:0;top:136px;text-align:center;transform-origin:50% 0;
+  font-family:var(--display);font-weight:400;font-size:56px;line-height:.98;color:#fff;
+  text-shadow:0 0 18px rgba(59,130,246,.75),0 4px 12px rgba(0,0,0,.8)}
+#dCap .emoji{font-size:44px;text-shadow:none;vertical-align:6px}
+#dChip{position:absolute;left:0;right:0;top:256px;margin:auto;width:max-content;display:flex;align-items:center;gap:9px;padding:7px 15px;
+  border-radius:999px;background:rgba(4,10,22,.72);border:1px solid rgba(147,197,253,.35);font-size:12.5px;font-weight:800;letter-spacing:.2em;color:#CFE3FF}
+#dChip i{width:8px;height:8px;border-radius:50%;background:var(--red);box-shadow:0 0 8px var(--red)}
+.h-time{position:absolute;top:318px;right:30px;text-align:right;line-height:1}
+.h-time small{display:block;font-size:11px;font-weight:800;letter-spacing:.1em;color:#E5E5E5;text-shadow:0 1px 4px #000}
+.h-time b{font-size:30px;font-weight:800;color:var(--app-blue);text-shadow:0 1px 5px #000}
+.h-rep{position:absolute;left:32px;top:536px;line-height:1}
+.h-rep small{display:block;font-size:14px;font-weight:800;letter-spacing:.1em;color:#E5E5E5;text-shadow:0 1px 6px #000;margin-bottom:2px}
+.h-rep .num{display:flex;align-items:flex-start;gap:10px}
+#dNum{display:inline-block;font-size:112px;font-weight:800;color:#fff;letter-spacing:-.02em;transform-origin:30% 60%}
+#dPlus{margin-top:14px;padding:5px 10px;border-radius:9px;background:var(--green);color:#04210B;font-size:17px;font-weight:900;box-shadow:0 0 20px rgba(63,185,80,.8)}
+#dPill{position:absolute;left:50%;top:728px;max-width:450px;width:max-content;text-align:center;transform-origin:50% 50%;
+  padding:13px 24px;border-radius:22px;background:rgba(10,132,255,.86);font-size:18px;font-weight:800;line-height:1.3;
+  box-shadow:0 8px 30px rgba(0,0,0,.45)}
+#dPill.warn{background:rgba(218,54,51,.9);box-shadow:0 0 0 2px rgba(255,180,175,.55),0 0 34px rgba(248,81,73,.75)}
+#dPill.warn::before{content:'⚠ ';font-family:var(--emoji)}
+
+/* ---------- E: kapanış ---------- */
+#eImg{transform-origin:50% 30%;filter:blur(1px) brightness(.7) saturate(.9)}
+#eCap{top:272px}
+.e-shade{background:linear-gradient(180deg,rgba(3,5,10,.35) 0%,transparent 22%,transparent 34%,rgba(3,5,10,.62) 47%,rgba(3,5,10,.93) 63%,#03050A 100%)}
+.e-box{position:absolute;left:0;right:0;top:404px;text-align:center}
+#eLogo{display:block;margin:0 auto;width:108px;height:108px;border-radius:26px;
+  box-shadow:0 0 0 1px rgba(255,255,255,.14),0 0 40px rgba(59,130,246,.75),0 18px 40px rgba(0,0,0,.6)}
+#eName{margin-top:16px;font-family:var(--display);font-weight:400;font-size:74px;line-height:1;letter-spacing:.01em}
+#eName span{color:var(--cobalt-2);text-shadow:0 0 22px rgba(59,130,246,.85)}
+#ePill{position:relative;overflow:hidden;display:inline-block;margin-top:20px;padding:15px 30px;border-radius:999px;
+  background:linear-gradient(135deg,#60A5FA,#2563EB);font-size:21px;font-weight:900;letter-spacing:.01em;
+  box-shadow:0 0 0 1px rgba(255,255,255,.25),0 0 34px rgba(59,130,246,.7)}
+#eGloss{position:absolute;top:-10px;left:0;width:60px;height:90px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.55),transparent)}
+#eBio{margin-top:16px;font-size:18px;font-weight:700;color:#D5DCE8}
+
+#flash{background:#fff;opacity:0;pointer-events:none}
+</style>
+</head>
+<body>
+<div id="stage">
+
+  <!-- A -->
+  <section class="scene" id="sA">
+    <img class="fill" id="aImg" alt="">
+    <div class="fill vig"></div>
+    <div class="cap-wrap" id="aCap"><span class="cap-box">Dur bir dakika... <span class="emoji">🤨</span></span></div>
+  </section>
+
+  <!-- B -->
+  <section class="scene" id="sB">
+    <div class="fill" id="bGroup">
+      <div class="fill wall" id="bWall"></div>
+      <div class="spill" id="bSpill"></div>
+      <div class="spill red" id="bSpillR"></div>
+      <div class="poster" id="poster">
+        <div class="pz-bg"></div>
+        <div class="pz-glow" id="pzGlow"></div>
+        <div class="pz-grid" id="pzGrid"></div>
+        <div class="pz-frame dim"></div>
+        <div class="pz-frame lit" id="pzFrame"></div>
+        <div class="pz-chip" id="pzChip"><i></i>AI POSE DETECTION</div>
+        <div class="pz-hl">
+          <div class="pz-line pz-r1"><span class="nw"><span class="dim">YANLIŞ FORM</span><span class="lit" id="pzRed">YANLIŞ FORM</span><i class="strike dim"></i><i class="strike lit" id="pzStrike"></i></span></div>
+          <div class="pz-line pz-r2"><span class="nw"><span class="dim">YAPMAYI</span><span class="lit" id="pzYap">YAPMAYI</span></span></div>
+          <div class="pz-line pz-r3"><span class="nw"><span class="dim">BIRAK!</span><span class="lit" id="pzBirak">BIRAK!</span></span></div>
+        </div>
+        <div id="pzTags">
+          <div class="p-tag l" style="left:30px;top:560px">DİZ AÇISI <em>93°</em></div>
+          <div class="p-tag r ok" style="right:30px;top:500px">SIRT DÜZ <em>✓</em></div>
+          <div class="p-tag r ok" style="right:30px;top:690px">TEKRAR <em>+1</em></div>
+        </div>
+        <div class="p-phone" id="pzPhone"><div class="p-screen"><div class="p-content" id="pzScreen">
+          <svg viewBox="0 0 194 400" aria-hidden="true">
+            <ellipse cx="112" cy="328" rx="58" ry="6" fill="rgba(0,0,0,.45)"/>
+            <g stroke="rgba(255,255,255,.45)" stroke-width="2.4" stroke-linecap="round" fill="none">
+              <path d="M110 125 L142 155 L172 147"/><path d="M110 125 L80 223"/><path d="M80 223 L144 241 L128 315 L156 325"/>
+            </g>
+            <g fill="rgba(0,255,255,.55)"><circle cx="142" cy="155" r="2.6"/><circle cx="172" cy="147" r="2.6"/><circle cx="144" cy="241" r="2.6"/><circle cx="128" cy="315" r="2.6"/></g>
+            <g stroke="#fff" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" fill="none" style="filter:drop-shadow(0 0 3px rgba(150,220,255,.9))">
+              <circle cx="119" cy="92" r="15" stroke-width="2.4" stroke="rgba(255,255,255,.8)"/>
+              <path d="M112 106 L104 128"/><path d="M104 128 L110 125"/><path d="M74 226 L80 223"/>
+              <path d="M104 128 L136 158 L166 150"/><path d="M104 128 L74 226"/><path d="M74 226 L138 244 L122 318"/><path d="M122 318 L112 326 L150 328 Z"/>
+            </g>
+            <path d="M134.2 261.6 A18 18 0 0 1 120.7 239.1" stroke="#00FFFF" stroke-width="2" fill="none" style="filter:drop-shadow(0 0 3px #00FFFF)"/>
+            <text x="100" y="270" fill="#00FFFF" font-family="Inter,Segoe UI,sans-serif" font-size="9" font-weight="800">93°</text>
+            <g fill="#00FFFF" style="filter:drop-shadow(0 0 4px #00FFFF)">
+              <circle cx="128" cy="95" r="3.4"/><circle cx="123" cy="88" r="2.4"/><circle cx="112" cy="91" r="2.6"/>
+              <circle cx="104" cy="128" r="4.2"/><circle cx="136" cy="158" r="4.2"/><circle cx="166" cy="150" r="4.2"/>
+              <circle cx="74" cy="226" r="4.2"/><circle cx="138" cy="244" r="4.2"/><circle cx="122" cy="318" r="4.2"/>
+              <circle cx="112" cy="326" r="3"/><circle cx="150" cy="328" r="3"/>
+            </g>
+          </svg>
+          <div class="ps-time"><small>GEÇEN SÜRE</small><b>00:24</b></div>
+          <div class="ps-rep"><small>TEKRAR</small><b>3</b></div>
+          <div class="ps-pill">MÜKEMMEL FORM! 3. tekrar</div>
+        </div></div></div>
+        <div class="p-foot" id="pzFoot">
+          <div class="row"><img class="logo" alt=""><h2><span>ArFitness</span> CEBİNDE.</h2></div>
+          <p>Yapay zeka formunu anlık analiz eder, her tekrarı sayar.</p>
+        </div>
+      </div>
+      <div class="fill vig"></div>
+    </div>
+  </section>
+
+  <!-- C -->
+  <section class="scene" id="sC">
+    <img class="fill" id="cImg" alt="">
+    <div class="fill" id="cWash"></div>
+    <div class="fill vig"></div>
+    <div id="cBulbBox"><i id="cRays"></i><span class="emoji" id="cBulb">💡</span></div>
+    <div id="cCap"><div>AYDINLANMA</div><div>ANI...</div></div>
+  </section>
+
+  <!-- D -->
+  <section class="scene" id="sD">
+    <div class="fill wall" id="dWall"></div>
+    <div class="fill d-light"></div>
+    <div class="floor"></div>
+    <div class="mat"></div>
+    <div class="fill d-tint"></div>
+    <svg id="fig" viewBox="0 0 540 960" aria-hidden="true">
+      <ellipse id="figShadow" cx="300" cy="680" rx="80" ry="9" fill="rgba(0,0,0,.55)" style="filter:blur(4px)"/>
+      <g id="figBody" stroke-linecap="round" fill="none"></g>
+      <path id="kneeArc" fill="none" stroke-width="2.5"/>
+      <g id="figSkel" stroke="#fff" stroke-linecap="round" fill="none"></g>
+      <g id="figDots" fill="#00FFFF"></g>
+    </svg>
+    <div id="kneeTag">DİZ <b id="kneeVal">170°</b></div>
+    <div class="fill" id="dEdge"></div>
+    <div id="dCap">YAPAY ZEKA<br>SENİ İZLİYOR <span class="emoji">🤖✨</span></div>
+    <div id="dChip"><i></i>REAL-TIME POSE ANALYSIS</div>
+    <div class="h-time"><small>GEÇEN SÜRE</small><b id="dTime">00:00</b></div>
+    <div class="h-rep"><small>TEKRAR</small><div class="num"><b id="dNum">0</b><span id="dPlus">+1</span></div></div>
+    <div id="dPill">Pozisyonunu koru</div>
+  </section>
+
+  <!-- E -->
+  <section class="scene" id="sE">
+    <img class="fill" id="eImg" alt="">
+    <div class="fill e-shade"></div>
+    <div class="cap-wrap" id="eCap"><span class="cap-box">Ersoy bile doğru<br>formu buldu! <span class="emoji">😅</span></span></div>
+    <div class="e-box">
+      <img id="eLogo" class="logo" alt="">
+      <h1 id="eName"><span>Ar</span>Fitness</h1>
+      <div id="ePill">GOOGLE PLAY'DE YAYINDA! <span class="emoji">🚀</span><i id="eGloss"></i></div>
+      <div id="eBio">Link bio'da <span class="emoji" id="eFinger">👆</span></div>
+    </div>
+  </section>
+
+  <div class="fill" id="flash"></div>
+</div>
+
+<!-- orijinal videonun üstüne binen giriş altyazısı (şeffaf olarak ayrı basılır) -->
+<div class="cap-wrap" id="intro"><span class="cap-box">Salonda herkes yanlış<br>form yaparken ben...</span></div>
+
+<script>
+const B0 = 0.70, C0 = 2.40, D0 = 3.15, E0 = 7.35;
+const $ = id => document.getElementById(id);
+const clamp = (x, a = 0, b = 1) => Math.max(a, Math.min(b, x));
+const lerp = (a, b, t) => a + (b - a) * t;
+const easeOutCubic = t => 1 - Math.pow(1 - clamp(t), 3);
+const easeInOut = t => { t = clamp(t); return t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2; };
+const easeOutBack = t => { t = clamp(t); const c1 = 1.70158, c3 = c1 + 1; return 1 + c3 * Math.pow(t - 1, 3) + c1 * Math.pow(t - 1, 2); };
+// neon yanıp sönme: verilen anlarda durum değişir (0 -> 1 -> 0 ...), son durum kalır
+const flick = (t, times) => { let s = 0; for (const x of times) { if (t >= x) s = 1 - s; else break; } return s; };
+const flash = (dt, peak, dur) => (dt >= 0 && dt < dur) ? peak * (1 - dt / dur) : 0;
+function popEl(el, t, dur = 0.22, from = 0.6, extra = '') {
+  if (t < 0) { el.style.opacity = 0; return; }
+  el.style.opacity = clamp(t / 0.07);
+  el.style.transform = `${extra} scale(${lerp(from, 1, easeOutBack(t / dur))})`;
+}
+
+/* ---- tuğla duvar (sabit tohumlu, her seferinde aynı) ---- */
+function wallURL() {
+  let s = 20261109; const rnd = () => (s = (s * 16807) % 2147483647) / 2147483647;
+  const bw = 52, bh = 20, m = 3; let rects = '';
+  for (let r = 0, y = 0; y < 960 + bh; r++, y += bh + m) {
+    for (let x = (r % 2) ? -(bw + m) / 2 : 0; x < 540; x += bw + m) {
+      const L = 12 + rnd() * 9, h = 6 + rnd() * 12, sat = 20 + rnd() * 16;
+      rects += `<rect x="${x.toFixed(1)}" y="${y}" width="${bw}" height="${bh}" rx="1.5" fill="hsl(${h.toFixed(0)},${sat.toFixed(0)}%,${L.toFixed(1)}%)"/>`;
+    }
+  }
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="540" height="960" viewBox="0 0 540 960">
+    <defs><filter id="n" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="2" seed="7"/>
+    <feColorMatrix values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 1.1 -0.25"/></filter>
+    <linearGradient id="lg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#000" stop-opacity=".35"/><stop offset=".5" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".45"/></linearGradient></defs>
+    <rect width="540" height="960" fill="#0a0808"/>${rects}
+    <rect width="540" height="960" filter="url(#n)" opacity=".55"/><rect width="540" height="960" fill="url(#lg)"/></svg>`;
+  return `url("data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}")`;
+}
+
+/* ---- squat figürü (yandan görünüş, sağa bakıyor) ---- */
+const U = 92, AX = 300, AY = 668;
+const rad = d => d * Math.PI / 180;
+const rot = (v, a) => [v[0] * Math.cos(a) - v[1] * Math.sin(a), v[0] * Math.sin(a) + v[1] * Math.cos(a)];
+const add = (p, v) => [p[0] + v[0], p[1] + v[1]];
+function pose(s) {
+  const tsD = lerp(4, 30, s), phD = lerp(6, 88, s);
+  const ts = rad(tsD), ph = rad(phD), ps = rad(lerp(3, 40, s)), al = rad(lerp(22, 95, s));
+  const A = [AX, AY];
+  const K = [A[0] + U * Math.sin(ts), A[1] - U * Math.cos(ts)];
+  const Hp = [K[0] - U * Math.sin(ph), K[1] - U * Math.cos(ph)];
+  const Sh = [Hp[0] + 1.05 * U * Math.sin(ps), Hp[1] - 1.05 * U * Math.cos(ps)];
+  const pn = ps * 0.5;
+  const N = [Sh[0] + 0.17 * U * Math.sin(pn), Sh[1] - 0.17 * U * Math.cos(pn)];
+  const Hd = [N[0] + 0.29 * U * Math.sin(pn), N[1] - 0.29 * U * Math.cos(pn)];
+  const E = [Sh[0] + 0.62 * U * Math.sin(al), Sh[1] + 0.62 * U * Math.cos(al)];
+  const al2 = al + rad(lerp(18, 6, s));
+  const Wr = [E[0] + 0.56 * U * Math.sin(al2), E[1] + 0.56 * U * Math.cos(al2)];
+  const heel = [A[0] - 0.13 * U, A[1] + 0.11 * U], toe = [A[0] + 0.44 * U, A[1] + 0.12 * U];
+  const face = {
+    nose: add(Hd, rot([0.27 * U, 0.04 * U], pn)), eye: add(Hd, rot([0.16 * U, -0.06 * U], pn)),
+    ear: add(Hd, rot([-0.03 * U, -0.01 * U], pn)), mouth: add(Hd, rot([0.19 * U, 0.14 * U], pn))
+  };
+  return { A, K, H: Hp, S: Sh, N, Hd, E, W: Wr, heel, toe, face, knee: 180 - (tsD + phD), pn };
+}
+const PC = pose(0).Hd;                 // yakın plan yakınlaştırmasının merkezi
+const NS = 'http://www.w3.org/2000/svg';
+const mk = (parent, tag, attrs) => { const e = document.createElementNS(NS, tag); for (const k in attrs) e.setAttribute(k, attrs[k]); parent.appendChild(e); return e; };
+const BODY = {}, SKEL = {}, DOTS = {};
+function buildFigure() {
+  const b = $('figBody'), s = $('figSkel'), d = $('figDots');
+  const far = '#121822', mid = '#1f2836', near = '#2a3546';
+  [['fUa', far], ['fFa', far], ['fTh', far], ['fSh', far], ['fFt', far],
+   ['torso', mid], ['butt', mid], ['neck', mid], ['head', '#263142'],
+   ['nTh', near], ['nSh', near], ['nFt', near], ['nUa', near], ['nFa', near]].forEach(([id, c]) => {
+    BODY[id] = id === 'head' || id === 'butt' ? mk(b, 'circle', { fill: c }) : mk(b, 'line', { stroke: c });
+  });
+  ['fArm1', 'fArm2', 'fLeg1', 'fLeg2', 'fFoot1', 'fFoot2', 'fFoot3'].forEach(id => SKEL[id] = mk(s, 'line', { 'stroke-opacity': .45 }));
+  ['sh', 'hip', 'arm1', 'arm2', 'leg1', 'leg2', 'foot1', 'foot2', 'foot3', 'neckL'].forEach(id => SKEL[id] = mk(s, 'line', {}));
+  ['fE', 'fW', 'fK', 'fA'].forEach(id => DOTS[id] = mk(d, 'circle', { 'fill-opacity': .55 }));
+  ['S', 'E', 'W', 'H', 'K', 'A', 'heel', 'toe', 'nose', 'eye', 'ear', 'mouth', 'fS', 'fH'].forEach(id => DOTS[id] = mk(d, 'circle', {}));
+}
+function drawFigure(p, z) {
+  const k = 1 + 2.2 * z, piv = [lerp(PC[0], 270, z), lerp(PC[1], 560, z)];
+  const T = q => [piv[0] + k * (q[0] - PC[0]), piv[1] + k * (q[1] - PC[1])];
+  const off = (q, dx, dy) => [q[0] + dx * U, q[1] + dy * U];
+  const P = {}; for (const key of ['A', 'K', 'H', 'S', 'N', 'Hd', 'E', 'W', 'heel', 'toe']) P[key] = T(p[key]);
+  const F = { S: T(off(p.S, -0.04, -0.02)), E: T(off(p.E, 0.05, -0.04)), W: T(off(p.W, 0.06, -0.04)), H: T(off(p.H, 0.03, -0.02)),
+              K: T(off(p.K, 0.07, -0.02)), A: T(off(p.A, 0.08, -0.01)), heel: T(off(p.heel, 0.08, -0.01)), toe: T(off(p.toe, 0.08, -0.01)) };
+  const fc = {}; for (const key in p.face) fc[key] = T(p.face[key]);
+  const L = (el, a, b, w) => { el.setAttribute('x1', a[0]); el.setAttribute('y1', a[1]); el.setAttribute('x2', b[0]); el.setAttribute('y2', b[1]); if (w) el.setAttribute('stroke-width', w); };
+  const C = (el, c, r) => { el.setAttribute('cx', c[0]); el.setAttribute('cy', c[1]); el.setAttribute('r', r); };
+  const w = x => x * U * k;
+  // gövde (manken)
+  L(BODY.fUa, F.S, F.E, w(.21)); L(BODY.fFa, F.E, F.W, w(.17));
+  L(BODY.fTh, F.H, F.K, w(.38)); L(BODY.fSh, F.K, F.A, w(.27)); L(BODY.fFt, F.heel, F.toe, w(.15));
+  L(BODY.torso, P.H, P.S, w(.58)); C(BODY.butt, P.H, w(.25)); L(BODY.neck, P.S, P.N, w(.2)); C(BODY.head, P.Hd, w(.29));
+  L(BODY.nTh, P.H, P.K, w(.4)); L(BODY.nSh, P.K, P.A, w(.28)); L(BODY.nFt, P.heel, P.toe, w(.16));
+  L(BODY.nUa, P.S, P.E, w(.22)); L(BODY.nFa, P.E, P.W, w(.18));
+  // iskelet (uygulamadaki gibi beyaz çizgi + camgöbeği eklem)
+  const sw = 3.2;
+  L(SKEL.fArm1, F.S, F.E, sw); L(SKEL.fArm2, F.E, F.W, sw); L(SKEL.fLeg1, F.H, F.K, sw); L(SKEL.fLeg2, F.K, F.A, sw);
+  L(SKEL.fFoot1, F.A, F.heel, sw); L(SKEL.fFoot2, F.heel, F.toe, sw); L(SKEL.fFoot3, F.toe, F.A, sw);
+  L(SKEL.sh, P.S, F.S, sw); L(SKEL.hip, P.H, F.H, sw); L(SKEL.neckL, P.S, fc.ear, 2);
+  L(SKEL.arm1, P.S, P.E, sw); L(SKEL.arm2, P.E, P.W, sw); L(SKEL.leg1, P.H, P.K, sw); L(SKEL.leg2, P.K, P.A, sw);
+  L(SKEL.foot1, P.A, P.heel, sw); L(SKEL.foot2, P.heel, P.toe, sw); L(SKEL.foot3, P.toe, P.A, sw);
+  SKEL.sh.setAttribute('stroke-opacity', .7); SKEL.hip.setAttribute('stroke-opacity', .7); SKEL.neckL.setAttribute('stroke-opacity', .6);
+  const r = 5.2 + 0.4 * z;
+  C(DOTS.fE, F.E, 3.6); C(DOTS.fW, F.W, 3.6); C(DOTS.fK, F.K, 3.6); C(DOTS.fA, F.A, 3.6);
+  for (const key of ['S', 'E', 'W', 'H', 'K', 'A']) C(DOTS[key], P[key], r);
+  C(DOTS.heel, P.heel, 3.6); C(DOTS.toe, P.toe, 3.6); C(DOTS.fS, F.S, 4); C(DOTS.fH, F.H, 4);
+  C(DOTS.nose, fc.nose, 4.2); C(DOTS.eye, fc.eye, 3.4); C(DOTS.ear, fc.ear, 3.6); C(DOTS.mouth, fc.mouth, 3);
+  // yer gölgesi
+  const sh = $('figShadow'); sh.setAttribute('cx', (P.heel[0] + P.toe[0]) / 2 - 6); sh.setAttribute('cy', P.toe[1] + 4); sh.setAttribute('rx', 60 * k); sh.setAttribute('opacity', 1 - z);
+  // diz açısı yayı + etiketi
+  const vis = 1 - clamp(z / 0.04);
+  const deep = p.knee < 110;
+  const aA = Math.atan2(P.A[1] - P.K[1], P.A[0] - P.K[0]), aH = Math.atan2(P.H[1] - P.K[1], P.H[0] - P.K[0]);
+  const R = 24, p1 = [P.K[0] + R * Math.cos(aA), P.K[1] + R * Math.sin(aA)], p2 = [P.K[0] + R * Math.cos(aH), P.K[1] + R * Math.sin(aH)];
+  const arc = $('kneeArc');
+  arc.setAttribute('d', `M${p1[0]} ${p1[1]} A${R} ${R} 0 0 1 ${p2[0]} ${p2[1]}`);
+  arc.setAttribute('stroke', deep ? '#56d364' : '#00FFFF'); arc.setAttribute('opacity', vis * clamp((152 - p.knee) / 14));
+  arc.style.filter = `drop-shadow(0 0 4px ${deep ? '#3FB950' : '#00FFFF'})`;
+  const tag = $('kneeTag');
+  tag.style.opacity = vis; tag.className = deep ? 'deep' : '';
+  tag.style.left = (P.K[0] + 22) + 'px'; tag.style.top = (P.K[1] - 44) + 'px';
+  $('kneeVal').textContent = Math.round(p.knee) + '°';
+}
+
+/* ---- sahneler ---- */
+function renderA(a) {
+  const k = easeOutCubic(a / 0.35), sh = a < 0.14 ? 1 - a / 0.14 : 0;
+  const dx = Math.sin(a * 173) * 7 * sh, dy = Math.cos(a * 131) * 5 * sh;
+  $('aImg').style.transform = `translate(${dx}px,${dy}px) scale(${1 + 0.10 * k})`;
+  $('aImg').style.filter = `saturate(${lerp(1, .72, k)}) brightness(${lerp(1, .84, k)}) contrast(1.06)`;
+  popEl($('aCap'), a - 0.08, 0.22, 0.6);
+}
+const FL = { frame: [0.04, 0.08, 0.12, 0.15, 0.20], chip: [0.22, 0.26, 0.30], red: [0.30, 0.33, 0.37, 0.39, 0.44], birak: [0.62, 0.66, 0.70, 0.72, 0.78] };
+function renderB(b) {
+  $('bGroup').style.transform = `scale(${lerp(1, 1.06, easeInOut(b / 1.7))})`;
+  const hum = 0.95 + 0.05 * Math.sin(b * 97) * Math.sin(b * 31);
+  const fr = flick(b, FL.frame) * hum, ch = flick(b, FL.chip), rd = flick(b, FL.red) * hum, bk = flick(b, FL.birak) * hum;
+  const st = b >= 0.56 ? hum : 0;
+  const yp = easeOutCubic((b - 0.50) / 0.15), ph = easeOutCubic((b - 0.80) / 0.25), tg = easeOutCubic((b - 1.00) / 0.25), ft = easeOutCubic((b - 0.92) / 0.25);
+  $('pzFrame').style.opacity = fr;
+  $('pzChip').style.opacity = 0.2 + 0.8 * ch;
+  $('pzRed').style.opacity = rd; $('pzStrike').style.opacity = st;
+  $('pzYap').style.opacity = yp; $('pzBirak').style.opacity = bk;
+  $('pzScreen').style.opacity = ph; $('pzPhone').className = 'p-phone' + (ph > 0.5 ? ' on' : '');
+  $('pzTags').style.opacity = tg; $('pzFoot').style.opacity = ft;
+  $('pzGlow').style.opacity = clamp(0.35 * fr + 0.45 * bk + 0.2 * rd);
+  $('pzGrid').style.opacity = 0.5 * clamp(fr + bk);
+  $('bSpill').style.opacity = clamp(0.35 * fr + 0.55 * bk + 0.12 * ph);
+  $('bSpillR').style.opacity = 0.75 * rd;
+}
+function renderC(c) {
+  $('cImg').style.transform = `scale(${lerp(1.16, 1.24, c / 0.75)})`;
+  $('cWash').style.opacity = c < 0.03 ? 0 : c < 0.06 ? 1 : c < 0.09 ? 0.35 : 0.95;
+  popEl($('cCap'), c - 0.05, 0.24, 0.5);
+  const bt = c - 0.12, bulb = $('cBulb'), rays = $('cRays');
+  if (bt < 0) { bulb.style.opacity = 0; rays.style.opacity = 0; return; }
+  bulb.style.opacity = clamp(bt / 0.05);
+  bulb.style.transform = `scale(${lerp(0.2, 1, easeOutBack(bt / 0.25))}) rotate(${Math.sin(bt * 22) * 10 * (1 - clamp(bt / 0.5))}deg)`;
+  rays.style.opacity = clamp(bt / 0.1);
+  rays.style.transform = `rotate(${c * 110}deg) scale(${lerp(0.4, 1, easeOutCubic(bt / 0.3))})`;
+}
+const R0 = 0.9375, PER = 0.9375;          // tekrarlar 128 BPM'e oturuyor (2 vuruş = 1 tekrar)
+function renderD(d) {
+  popEl($('dCap'), d - 0.05, 0.24, 0.6);
+  popEl($('dChip'), d - 0.15, 0.2, 0.8);
+  const z = d < 0.70 ? 1 : 1 - easeInOut((d - 0.70) / 0.25);
+  let s = 0, count = 0;
+  if (d >= R0) {
+    const kk = Math.floor((d - R0) / PER), ph = d - R0 - kk * PER;
+    count = Math.min(3, kk);
+    if (kk < 3) s = ph < 0.42 ? easeInOut(ph / 0.42) : ph < 0.47 ? 1 : 1 - easeInOut((ph - 0.47) / 0.4675);
+  }
+  if (s < 0.02) s = 0.012 * (1 + Math.sin(d * 6));           // nefes alır gibi çok küçük hareket
+  drawFigure(pose(s), z);
+  $('dTime').textContent = '00:0' + Math.min(9, Math.floor(d));
+  // tekrar sayacı
+  const num = $('dNum'), plus = $('dPlus');
+  num.textContent = count;
+  const since = count > 0 ? d - (R0 + count * PER) : 9;
+  const g = clamp(1 - since / 0.6);
+  num.style.textShadow = `0 4px 8px rgba(0,0,0,.85),0 0 ${20 + 30 * g}px rgba(63,185,80,${0.45 + 0.5 * g}),0 0 ${40 + 40 * g}px rgba(63,185,80,${0.2 + 0.4 * g})`;
+  num.style.transform = `scale(${1 + 0.28 * (1 - easeOutCubic(since / 0.25)) * (since < 0.25 ? 1 : 0)})`;
+  if (since < 0.5) { plus.style.opacity = clamp(since / 0.05) * clamp((0.5 - since) / 0.1); plus.style.transform = `translateY(${-14 * easeOutCubic(since / 0.5)}px) scale(${lerp(0.6, 1, easeOutBack(since / 0.2))})`; }
+  else plus.style.opacity = 0;
+  // geri bildirim balonu (metinler uygulamadaki SquatAnalyzer.kt'den)
+  let state, t0;
+  if (d < 0.70) { state = 'warn'; t0 = 0; }
+  else if (count === 0 && d < R0 + 0.30) { state = 'hold'; t0 = 0.70; }
+  else if (count === 0) { state = 'deep'; t0 = R0 + 0.30; }
+  else { state = 'ok'; t0 = R0 + count * PER; }
+  const pill = $('dPill');
+  pill.textContent = { warn: 'Bacakların net görünmüyor (Uzaklaş!).', hold: 'Pozisyonunu koru', deep: 'Derinlik çok iyi, şimdi kalk!' }[state] || `MÜKEMMEL FORM! ${count}. tekrar`;
+  pill.className = state === 'warn' ? 'warn' : '';
+  pill.style.transform = `translateX(-50%) scale(${lerp(0.86, 1, easeOutBack((d - t0) / 0.16))})`;
+  $('dEdge').style.opacity = d < 0.70 ? 0.75 + 0.25 * Math.sin(d * 18) : clamp(1 - (d - 0.70) / 0.12);
+}
+let TREAD = [], ASSETS = '';
+async function renderE(e) {
+  const srcT = 1.70 + e * (1.62 / 2.5), img = $('eImg');
+  let best = TREAD[0]; for (const f of TREAD) if (Math.abs(f.t - srcT) < Math.abs(best.t - srcT)) best = f;
+  if (img.dataset.f !== best.file) { img.src = ASSETS + '/' + best.file; img.dataset.f = best.file; await img.decode(); }
+  img.style.transform = `scale(${lerp(1.06, 1.12, e / 2.5)})`;
+  popEl($('eCap'), e - 0.10, 0.22, 0.7);
+  popEl($('eLogo'), e - 0.12, 0.32, 0.3);
+  const nt = clamp((e - 0.26) / 0.25); $('eName').style.opacity = nt; $('eName').style.transform = `translateY(${(1 - easeOutCubic(nt)) * 18}px)`;
+  popEl($('ePill'), e - 0.42, 0.26, 0.6);
+  const bt = clamp((e - 0.60) / 0.25); $('eBio').style.opacity = bt; $('eBio').style.transform = `translateY(${(1 - easeOutCubic(bt)) * 12}px)`;
+  $('eFinger').style.transform = `translateY(${-Math.abs(Math.sin(e * 7)) * 5}px)`;
+  const g1 = (e - 0.9) / 0.55, g2 = (e - 1.75) / 0.55, gl = (g1 >= 0 && g1 <= 1) ? g1 : (g2 >= 0 && g2 <= 1) ? g2 : -1;
+  $('eGloss').style.opacity = gl < 0 ? 0 : 1;
+  $('eGloss').style.transform = `translateX(${lerp(-120, 380, gl)}px) skewX(-20deg)`;
+}
+
+const SCENES = ['sA', 'sB', 'sC', 'sD', 'sE'];
+async function renderAt(u) {
+  const i = u < B0 ? 0 : u < C0 ? 1 : u < D0 ? 2 : u < E0 ? 3 : 4;
+  SCENES.forEach((id, j) => $(id).style.display = j === i ? 'block' : 'none');
+  if (i === 0) renderA(u); else if (i === 1) renderB(u - B0); else if (i === 2) renderC(u - C0); else if (i === 3) renderD(u - D0); else await renderE(u - E0);
+  $('flash').style.opacity = Math.max(flash(u - B0, .55, .10), flash(u - D0, 1, .22), flash(u - E0, .7, .16));
+}
+function renderIntro() {
+  document.documentElement.style.background = 'transparent'; document.body.style.background = 'transparent';
+  $('stage').style.display = 'none'; $('intro').style.display = 'block';
+}
+function exitIntro() {
+  document.documentElement.style.background = ''; document.body.style.background = '';
+  $('stage').style.display = ''; $('intro').style.display = 'none';
+}
+async function init(cfg) {
+  ASSETS = cfg.assets; TREAD = cfg.tread;
+  const w = wallURL(); $('bWall').style.backgroundImage = w; $('dWall').style.backgroundImage = w;
+  document.querySelectorAll('img.logo').forEach(i => i.src = cfg.logo);
+  $('aImg').src = $('cImg').src = ASSETS + '/last.png';
+  buildFigure();
+  await Promise.all([...document.images].filter(i => i.src).map(i => i.decode()));
+  await Promise.all(['400 84px Anton', '800 20px Inter', '900 20px Inter', '700 20px Inter', '600 20px Inter'].map(f => document.fonts.load(f, 'AaİŞĞÜÇÖ')));
+  await document.fonts.ready;
+  return true;
+}
+</script>
+</body>
+</html>

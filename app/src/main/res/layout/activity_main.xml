@@ -17,17 +17,22 @@
         app:layout_constraintTop_toTopOf="parent"
         app:navGraph="@navigation/nav_host" />
 
+    <!-- Kompakt alt bar: M3 varsayılanı 80dp minHeight + 12/16dp padding.
+         İçerik = 8 (üst) + 32 (gösterge) + 2 (etiket aralığı) + ~16 (etiket) + 6 (alt) = 64dp.
+         Sistem navigasyon çubuğu boşluğunu BottomNav kendi alt padding'i olarak ekler. -->
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottom_navigation_view"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:minHeight="64dp"
         android:background="@color/primary_dark"
         android:elevation="8dp"
-        android:paddingTop="8dp"
-        android:paddingBottom="8dp"
         app:itemIconTint="@color/nav_item_color_selector"
         app:itemTextColor="@color/nav_item_color_selector"
-        app:itemActiveIndicatorStyle="@android:color/transparent"
+        app:labelVisibilityMode="labeled"
+        app:itemPaddingTop="8dp"
+        app:itemPaddingBottom="6dp"
+        app:activeIndicatorLabelPadding="2dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

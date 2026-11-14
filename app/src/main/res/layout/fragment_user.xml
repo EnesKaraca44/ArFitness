@@ -39,6 +39,8 @@
                 android:padding="8dp"
                 android:src="@drawable/ic_settings"
                 android:contentDescription="@string/settings"
+                android:clickable="true"
+                android:focusable="true"
                 app:tint="@color/primary" />
         </LinearLayout>
 
@@ -93,7 +95,17 @@
                     android:text="@string/user_email"
                     android:textSize="14sp"
                     android:textColor="@color/text_secondary"
-                    android:layout_marginBottom="16dp" />
+                    android:layout_marginBottom="4dp" />
+
+                <TextView
+                    android:id="@+id/tvUserMetrics"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="16dp"
+                    android:gravity="center"
+                    android:textColor="@color/text_secondary"
+                    android:textSize="13sp"
+                    android:visibility="gone" />
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnEditProfile"

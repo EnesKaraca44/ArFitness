@@ -69,11 +69,12 @@
             tools:listitem="@layout/item_category" />
         <!-- item_category.xml adında bir layout oluşturman gerekecek -->
 
-        <!-- 3. DİKEY EGZERSİZ LİSTESİ (Senin tasarımınla aynı, sadece layout_weight kaldırıldı) -->
+        <!-- 3. DİKEY EGZERSİZ LİSTESİ -->
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rvExercises"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
             android:layout_marginTop="16dp"
             android:paddingHorizontal="16dp"
             android:clipToPadding="false"

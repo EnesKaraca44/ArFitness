@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.isVisible
 import androidx.navigation.fragment.NavHostFragment
 import dagger.hilt.android.AndroidEntryPoint
 import androidx.navigation.ui.setupWithNavController
@@ -41,18 +42,20 @@ class MainActivity : AppCompatActivity() {
 
         // 5. Antrenman kamerası açıkken alt menüyü (BottomNav) tamamen gizle!
         navController.addOnDestinationChangedListener { _, destination, _ ->
-            if (destination.id == R.id.exerciseFragment) {
-                binding.bottomNavigationView.visibility = android.view.View.GONE
-            } else {
-                binding.bottomNavigationView.visibility = android.view.View.VISIBLE
-            }
+            binding.bottomNavigationView.isVisible = destination.id != R.id.exerciseFragment
+            // Alt boşluğun sahibi değişti (BottomNav <-> kök layout), inset'leri yeniden uygula
+            ViewCompat.requestApplyInsets(binding.root)
         }
 
         // --- PADDING (İÇ BOŞLUK) AYARI ---
-        // 6. 'findViewById' yerine binding.root kullanarak en dıştaki layout'a eriş
+        // 6. BottomNavigationView, sistem navigasyon çubuğu yüksekliğini kendi alt padding'i
+        //    olarak zaten ekliyor. Kök layout da alttan padding verirse boşluk iki kat olur
+        //    (ikonların altındaki siyah alan). Bu yüzden alt inset'i yalnızca BottomNav
+        //    gizliyken (antrenman ekranı) kök layout'a uygula.
         ViewCompat.setOnApplyWindowInsetsListener(binding.root) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
+            val bottom = if (binding.bottomNavigationView.isVisible) 0 else systemBars.bottom
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, bottom)
             insets
         }
     }

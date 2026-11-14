@@ -35,6 +35,12 @@ class ProfileViewModel @Inject constructor(
 
         }
     }
+
+    fun clearWorkoutHistory() {
+        viewModelScope.launch {
+            repository.clearWorkoutHistory()
+        }
+    }
     // --- YENİ: Grafik için hazırlanmış veri ---
     // workoutHistory her değiştiğinde, bu 'map' bloğu otomatik olarak çalışır
     // ve haftalık veriyi hesaplayıp yeni bir LiveData olarak sunar.

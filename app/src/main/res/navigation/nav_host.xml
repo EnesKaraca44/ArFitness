@@ -69,11 +69,19 @@
         <action
             android:id="@+id/action_userFragment_to_editProfileFragment"
             app:destination="@id/editProfileFragment" />
+        <action
+            android:id="@+id/action_userFragment_to_settingsFragment"
+            app:destination="@id/settingsFragment" />
     </fragment>
     <fragment
         android:id="@+id/editProfileFragment"
         android:name="com.example.arfitness.fragment.EditProfileFragment"
         android:label="EditProfileFragment" />
+    <fragment
+        android:id="@+id/settingsFragment"
+        android:name="com.example.arfitness.fragment.SettingsFragment"
+        android:label="@string/settings"
+        tools:layout="@layout/fragment_settings" />
     <fragment
         android:id="@+id/onboardingFragment"
         android:name="com.example.arfitness.fragment.OnboardingFragment"

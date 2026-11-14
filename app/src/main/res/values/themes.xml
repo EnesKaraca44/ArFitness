@@ -16,6 +16,21 @@
 
     <style name="Theme.ArFitness" parent="Base.Theme.ArFitness" />
 
+    <style name="CalendarDateText" parent="TextAppearance.MaterialComponents.Body1">
+        <item name="android:textColor">@color/text_main</item>
+        <item name="android:textSize">16sp</item>
+    </style>
+
+    <style name="CalendarWeekdayText" parent="TextAppearance.MaterialComponents.Caption">
+        <item name="android:textColor">@color/text_secondary</item>
+        <item name="android:textSize">12sp</item>
+    </style>
+
+    <style name="CalendarHeaderText" parent="TextAppearance.MaterialComponents.Subtitle1">
+        <item name="android:textColor">@color/text_main</item>
+        <item name="android:textSize">18sp</item>
+    </style>
+
     <!-- Splash Ekranı Teması -->
     <style name="SplashTheme" parent="Theme.ArFitness">
         <item name="android:windowBackground">@color/primary_dark</item>

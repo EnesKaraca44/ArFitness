@@ -29,8 +29,8 @@ class HistoryFragment : Fragment() {
 
     private var allWorkouts: List<WorkoutSession> = emptyList()
 
-    // Başlangıçta bugünün tarihi seçili olsun
-    private var selectedDate: CalendarDay? = CalendarDay.today()
+    // Tarih filtresi kullanıcı takvimden bir gün seçene kadar uygulanmaz.
+    private var selectedDate: CalendarDay? = null
 
     // Başlangıçta "Tümü" çipi seçili olsun
     private var selectedChipId: Int = R.id.chipAll
@@ -61,14 +61,21 @@ class HistoryFragment : Fragment() {
     private fun setupMaterialCalendar() {
         val calendarView = binding.calendarView
 
-        // Başlangıçta takvimin bugünü göstermesini ve seçili olmasını sağla
-        calendarView.setCurrentDate(CalendarDay.today(), true)
-        calendarView.setDateSelected(CalendarDay.today(), true)
+        // Apply appearances directly as well as in XML so the active theme
+        // cannot fall back to MaterialCalendarView's dark default text color.
+        calendarView.setDateTextAppearance(R.style.CalendarDateText)
+        calendarView.setWeekDayTextAppearance(R.style.CalendarWeekdayText)
+        calendarView.setHeaderTextAppearance(R.style.CalendarHeaderText)
+
+        // Bugünü mavi seçili göster; başlangıçta bu görsel seçim geçmişi tarihe göre filtrelemez.
+        val today = CalendarDay.today()
+        calendarView.setCurrentDate(today, true)
+        calendarView.setDateSelected(today, true)
 
         // Kullanıcı bir tarih seçtiğinde
         calendarView.setOnDateChangedListener { _, date, selected ->
             selectedDate = if (selected) date else null
-            filterAndUpdateList() // Listeyi yeniden filtrele
+            filterAndUpdateList()
         }
     }
 
@@ -76,7 +83,7 @@ class HistoryFragment : Fragment() {
     private fun observeViewModel() {
         viewModel.workoutHistory.observe(viewLifecycleOwner) { historyList ->
             allWorkouts = historyList
-            updateUI(historyList)
+            filterAndUpdateList()
         }
     }
 
@@ -95,13 +102,12 @@ class HistoryFragment : Fragment() {
             }
         }
 
-        // 2. Adım: Çipe göre filtrele
-        filteredList = when (selectedChipId) {
-            R.id.chipSquat -> filteredList.filter { it.exerciseName.equals("squat", ignoreCase = true) }
-            R.id.chipPushup -> filteredList.filter { it.exerciseName.equals("push-ups", ignoreCase = true) }
-            R.id.chipBiceps -> filteredList.filter { it.exerciseName.equals("bicep curl", ignoreCase = true) }
-            // ... diğer tüm egzersizlerin için filter satırları ...
-            else -> filteredList // R.id.chipAll veya tanımsız bir ID ise, filtreleme yapma
+        // 2. Adım: Hareket çipine göre filtrele. Birden fazla adlandırma biçimi desteklenir.
+        val aliases = exerciseAliases[selectedChipId]
+        if (aliases != null) {
+            filteredList = filteredList.filter { workout ->
+                normalizeExerciseName(workout.exerciseName) in aliases
+            }
         }
 
         // Son olarak, filtrelenmiş listeyi UI'a gönder
@@ -124,19 +130,36 @@ class HistoryFragment : Fragment() {
 
     private fun setupFilterChips() {
         binding.chipGroupFilter.setOnCheckedChangeListener { _, checkedId ->
-            val filteredList = when (checkedId) {
-                R.id.chipSquat -> allWorkouts.filter { it.exerciseName.equals("squat", ignoreCase = true) }
-                R.id.chipPushup -> allWorkouts.filter { it.exerciseName.equals("push-ups", ignoreCase = true) }
-                R.id.chipBiceps -> allWorkouts.filter { it.exerciseName.equals("bicep curl", ignoreCase = true) }
-                R.id.chipshulderpress -> allWorkouts.filter { it.exerciseName.equals("shoulder press", ignoreCase = true) }
-                R.id.chipLunge -> allWorkouts.filter { it.exerciseName.equals("lunge", ignoreCase = true) }
-                R.id.chipdumbelfly -> allWorkouts.filter { it.exerciseName.equals("dumbell fly", ignoreCase = true) }
-                R.id.chipdumbelfly -> allWorkouts.filter { it.exerciseName.equals("dumbell fly", ignoreCase = true) }
-                R.id.chipAll -> allWorkouts
-                else -> allWorkouts
-            }
-            updateUI(filteredList)
+            selectedChipId = checkedId.takeIf { it != View.NO_ID } ?: R.id.chipAll
+            filterAndUpdateList()
         }
+    }
+
+    private fun normalizeExerciseName(name: String): String = name
+        .trim()
+        .lowercase()
+        .replace('_', ' ')
+        .replace('-', ' ')
+        .replace(Regex("\\s+"), " ")
+
+    private val exerciseAliases by lazy {
+        mapOf(
+            R.id.chipSquat to setOf("squat"),
+            R.id.chipPushup to setOf("push up", "push ups", "pushup", "pushups"),
+            R.id.chipBiceps to setOf("biceps", "bicep curl", "biceps curl"),
+            R.id.chipshulderpress to setOf("shoulder press"),
+            R.id.chipLunge to setOf("lunge", "lunges"),
+            R.id.chipdumbelfly to setOf("dumbbell fly", "dumbell fly", "dumbbell flyes", "dumbell flyes"),
+            R.id.chipBenchPress to setOf("bench press"),
+            R.id.chipPlank to setOf("plank"),
+            R.id.chipPullUp to setOf("pull up", "pull ups", "pullup", "pullups"),
+            R.id.chipLatPulldown to setOf("lat pulldown", "lat pull down"),
+            R.id.chipHammerCurl to setOf("hammer curl"),
+            R.id.chipCablePushdown to setOf("cable pushdown", "cable push down"),
+            R.id.chipLateralRaise to setOf("lateral raise"),
+            R.id.chipFrontRaise to setOf("front raise"),
+            R.id.chipDeadlift to setOf("deadlift", "dead lift")
+        )
     }
 
     override fun onDestroyView() {

@@ -1,3 +1,6 @@
+import java.io.FileInputStream
+import java.util.Properties
+
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
@@ -10,6 +13,12 @@ plugins {
 android {
     namespace = "com.example.arfitness"
     compileSdk = 34
+
+    val localProperties = Properties()
+    val localPropertiesFile = rootProject.file("local.properties")
+    if (localPropertiesFile.exists()) {
+        localProperties.load(FileInputStream(localPropertiesFile))
+    }
 
     buildFeatures {
         viewBinding = true
@@ -26,10 +35,14 @@ android {
 
     signingConfigs {
         create("release") {
-            storeFile = file("arfitness-release-key.jks")
-            storePassword = "REMOVED"
-            keyAlias = "arfitness"
-            keyPassword = "REMOVED"
+            val keyStorePath = localProperties.getProperty("RELEASE_STORE_FILE") ?: "arfitness-release-key.jks"
+            val keyStoreFile = file(keyStorePath)
+            if (keyStoreFile.exists()) {
+                storeFile = keyStoreFile
+                storePassword = localProperties.getProperty("RELEASE_STORE_PASSWORD") ?: System.getenv("RELEASE_STORE_PASSWORD") ?: ""
+                keyAlias = localProperties.getProperty("RELEASE_KEY_ALIAS") ?: System.getenv("RELEASE_KEY_ALIAS") ?: "arfitness"
+                keyPassword = localProperties.getProperty("RELEASE_KEY_PASSWORD") ?: System.getenv("RELEASE_KEY_PASSWORD") ?: ""
+            }
         }
     }
 
@@ -37,7 +50,10 @@ android {
         release {
             isMinifyEnabled = false
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
-            signingConfig = signingConfigs.getByName("release")
+            val releaseSigning = signingConfigs.findByName("release")
+            if (releaseSigning?.storeFile != null) {
+                signingConfig = releaseSigning
+            }
         }
     }
 

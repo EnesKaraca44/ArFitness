@@ -1,14 +1,16 @@
 package com.example.arfitness.fragment
 
 
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.findNavController
+import androidx.navigation.NavOptions
 import com.example.arfitness.R
 import com.example.arfitness.data.User
 import com.example.arfitness.data.WorkoutSession
@@ -85,8 +87,15 @@ class UserFragment : Fragment() {
      */
     private fun updateUserProfileUI(user: User) {
         binding.tvUserName.text = user.name
-
         binding.tvUserEmail.text = user.email
+
+        val metrics = buildList {
+            if (user.age > 0) add(getString(R.string.age_years_format, user.age))
+            if (user.height > 0) add(getString(R.string.height_value_format, user.height))
+            if (user.weight > 0) add(getString(R.string.weight_value_format, user.weight))
+        }
+        binding.tvUserMetrics.text = metrics.joinToString(" · ")
+        binding.tvUserMetrics.visibility = if (metrics.isEmpty()) View.GONE else View.VISIBLE
     }
 
     /**
@@ -112,13 +121,33 @@ class UserFragment : Fragment() {
      */
     private fun setupButtonClickListeners() {
         binding.btnEditProfile.setOnClickListener {
-            // TODO: Profili düzenleme ekranına gitmek için navigasyon kodu
-            Toast.makeText(requireContext(), "Profili Düzenle tıklandı", Toast.LENGTH_SHORT).show()
+            findNavController().navigate(R.id.action_userFragment_to_editProfileFragment)
         }
+        binding.btnSettings.setOnClickListener {
+            findNavController().navigate(R.id.action_userFragment_to_settingsFragment)
+        }
+        binding.btnLogout.setOnClickListener { confirmLogout() }
+    }
 
+    private fun confirmLogout() {
+        com.google.android.material.dialog.MaterialAlertDialogBuilder(requireContext())
+            .setTitle(R.string.logout)
+            .setMessage(R.string.logout_confirmation)
+            .setNegativeButton(R.string.cancel, null)
+            .setPositiveButton(R.string.logout) { _, _ ->
+                requireActivity()
+                    .getSharedPreferences("arfitness_prefs", Context.MODE_PRIVATE)
+                    .edit()
+                    .putBoolean("onboarding_completed", false)
+                    .apply()
 
-
-        // Diğer kartlar ve butonlar için de benzer listener'lar eklenebilir.
+                val navOptions = NavOptions.Builder()
+                    .setPopUpTo(R.id.userFragment, true)
+                    .setLaunchSingleTop(true)
+                    .build()
+                findNavController().navigate(R.id.onboardingFragment, null, navOptions)
+            }
+            .show()
     }
     // --- YENİ FONKSİYONLAR ---
     /**
