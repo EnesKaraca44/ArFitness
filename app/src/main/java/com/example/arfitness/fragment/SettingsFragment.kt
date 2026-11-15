@@ -40,7 +40,7 @@ class SettingsFragment : Fragment() {
         binding.tvAppVersion.text = getString(R.string.app_version, versionName)
         binding.btnClearHistory.setOnClickListener { confirmClearHistory() }
         binding.btnPrivacyPolicy.setOnClickListener {
-            openUrl("https://github.com/EnesKaraca44/ArFitness/blob/master/privacy_policy.html")
+            openUrl("https://github.com/EnesKaraca44/ArFitness/blob/master/privacy_policy.md")
         }
         binding.btnContactSupport.setOnClickListener { contactSupport() }
         binding.btnShareApp.setOnClickListener { shareApp() }

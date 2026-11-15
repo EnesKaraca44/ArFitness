@@ -75,6 +75,9 @@ class ExerciseFragment : Fragment() {
         }
         feedbackRaporu.message?.let { mesaj ->
             viewModel.updateFeedback(mesaj, feedbackRaporu.isWarning)
+            if (feedbackRaporu.isWarning && !feedbackRaporu.isRepCounted) {
+                repAnnouncer?.announceWarning(mesaj, timestampMs)
+            }
         }
 
         signalRecorder?.let { recordSignal(it, feedbackRaporu, timestampMs) }

@@ -26,6 +26,19 @@
     <color name="warning">#D29922</color>
     <color name="error">#F85149</color>
 
+    <!-- Sonuç ve Paylaşım Kartı Renkleri -->
+    <color name="neon_lime">#D4FF00</color>
+    <color name="neon_lime_dark">#1F240A</color>
+    <color name="neon_lime_text">#0D1117</color>
+    <color name="color_time">#00D2FF</color>
+    <color name="color_reps">#A855F7</color>
+    <color name="color_calorie">#FF5E3A</color>
+    <color name="color_score">#10B981</color>
+    <color name="card_stroke">#2D333B</color>
+    <color name="card_story_bg">#12161F</color>
+    <color name="badge_streak_bg">#251A0E</color>
+    <color name="badge_streak_border">#F59E0B</color>
+
     <!-- Egzersiz ekranı geri bildirim kartı (uyarı rengi beyaz yazıyla 4.5:1 kontrast verir) -->
     <color name="feedback_info">#CC0A84FF</color>
     <color name="feedback_warning">#E6DA3633</color>

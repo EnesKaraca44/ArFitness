@@ -72,6 +72,9 @@ class RepAnnouncer(context: Context, locale: Locale, var voiceEnabled: Boolean) 
         }
     }
 
+    private var lastWarningSpokenAtMs: Long = 0L
+    private var lastWarningSpokenText: String? = null
+
     /** Tamamlanan tekrarı bildirir: titreşim + sayının seslendirilmesi. */
     fun announceRep(count: Int) {
         vibrate()
@@ -82,6 +85,26 @@ class RepAnnouncer(context: Context, locale: Locale, var voiceEnabled: Boolean) 
     fun announceText(text: String) {
         vibrate()
         speak(text)
+    }
+
+    /**
+     * Form hatası veya yönlendirme uyarısını seslendirir (örn: "Biraz daha derine in", "Vücudun tam görünmüyor").
+     * Kullanıcıyı konuşmayla boğmamak ve tekrarları bastırmamak için akıllı bekleme süresi uygular.
+     */
+    fun announceWarning(text: String, nowMs: Long = System.currentTimeMillis()) {
+        if (!voiceEnabled || text.isBlank()) return
+        val engine = tts ?: return
+        if (!ttsReady) return
+        if (engine.isSpeaking) return
+
+        val interval = if (text == lastWarningSpokenText) 4500L else 3000L
+        if (nowMs - lastWarningSpokenAtMs < interval) return
+
+        lastWarningSpokenAtMs = nowMs
+        lastWarningSpokenText = text
+
+        requestFocus()
+        engine.speak(text, TextToSpeech.QUEUE_FLUSH, null, UTTERANCE_ID)
     }
 
     private fun speak(text: String) {
